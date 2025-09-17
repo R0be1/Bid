@@ -2,7 +2,7 @@
 "use client";
 
 import { Sidebar, SidebarProvider, SidebarTrigger, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarInset } from "@/components/ui/sidebar";
-import { CircleUser, Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy } from "lucide-react";
+import { CircleUser, Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -12,7 +12,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutGrid },
     { href: "/admin/categories", label: "Categories", icon: Tag },
-    { href: "/admin/users", label: "Users", icon: CircleUser },
+    { href: "/admin/users", label: "Users", icon: UserCog },
     { href: "/admin/results", label: "Results", icon: Trophy },
     { href: "/admin/messages", label: "Messages", icon: MessageSquare },
     { href: "/admin/communications", label: "Communications", icon: Send },

@@ -28,6 +28,8 @@ export type User = {
   name: string;
   email: string;
   status: 'pending' | 'approved' | 'blocked';
+  paidParticipation?: boolean;
+  paidDeposit?: boolean;
 };
 
 export type Bid = {

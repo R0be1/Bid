@@ -27,13 +27,14 @@ const formSchema = z.object({
 });
 
 // This is a mock value. In a real app, this would come from an authentication context.
-const MOCK_IS_LOGGED_IN = false;
+const MOCK_IS_LOGGED_IN = true;
 const MOCK_USER_STATUS = 'pending'; // or 'approved' or 'blocked'
+const MOCK_USER_HAS_PAID = false;
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="w-full font-bold" disabled={pending || !MOCK_IS_LOGGED_IN || MOCK_USER_STATUS !== 'approved'} style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+    <Button type="submit" className="w-full font-bold" disabled={pending || MOCK_USER_STATUS !== 'approved'} style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
       {pending ? "Submitting..." : "Submit Sealed Bid"}
     </Button>
   );
@@ -72,6 +73,10 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
         toast({ title: "Login Required", description: "You must be logged in to place a bid.", variant: "destructive"});
         return;
     }
+    if (requiresFees && !MOCK_USER_HAS_PAID) {
+      toast({ title: "Payment Required", description: "Please complete the required payments from your dashboard to participate.", variant: "destructive"});
+      return;
+    }
     if (MOCK_USER_STATUS !== 'approved') {
         toast({ title: "Account Not Approved", description: `Your account status is "${MOCK_USER_STATUS}". Admin approval is required to bid.`, variant: "destructive"});
         return;
@@ -79,7 +84,29 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
     formAction(formData);
   }
 
-  if (requiresFees && (!MOCK_IS_LOGGED_IN || MOCK_USER_STATUS !== 'approved')) {
+  if (!MOCK_IS_LOGGED_IN) {
+     return (
+      <Card className="shadow-lg">
+        <CardHeader>
+            <CardTitle>Join the Auction</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle>Registration Required</AlertTitle>
+                <AlertDescription>
+                   You need to be logged in to participate in this auction. Please register or log in to continue.
+                    <Button asChild className="w-full mt-4" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                        <Link href="/register">Register or Log In</Link>
+                    </Button>
+                </AlertDescription>
+            </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (requiresFees && !MOCK_USER_HAS_PAID) {
     return (
       <Card className="shadow-lg">
         <CardHeader>
@@ -88,11 +115,11 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
         <CardContent>
             <Alert>
                 <Info className="h-4 w-4" />
-                <AlertTitle>Registration & Payment Required</AlertTitle>
+                <AlertTitle>Payment Required</AlertTitle>
                 <AlertDescription>
-                    This auction requires a participation fee and/or a security deposit. Please register and complete the payment process to participate.
+                    This auction requires payment of fees. Please visit your dashboard to complete the payment.
                     <Button asChild className="w-full mt-4" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
-                        <Link href="/register">Register and Pay</Link>
+                        <Link href="/dashboard">Go to Dashboard</Link>
                     </Button>
                 </AlertDescription>
             </Alert>
@@ -131,7 +158,7 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
                         step="0.01"
                         {...field}
                         className="pl-10"
-                        disabled={!MOCK_IS_LOGGED_IN || MOCK_USER_STATUS !== 'approved'}
+                        disabled={MOCK_USER_STATUS !== 'approved'}
                       />
                     </div>
                   </FormControl>
@@ -140,7 +167,7 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
               )}
             />
             <SubmitButton />
-             {(!MOCK_IS_LOGGED_IN || MOCK_USER_STATUS !== 'approved') && <p className="text-xs text-center text-muted-foreground">You must be logged in and approved to submit a bid.</p>}
+             {MOCK_USER_STATUS !== 'approved' && <p className="text-xs text-center text-red-600">Your account is not approved to submit a bid. Please contact an administrator.</p>}
           </form>
         </Form>
       </CardContent>

@@ -21,6 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { updateUserStatus } from "@/lib/users";
+import { DollarSign } from "lucide-react";
 
 interface UserListProps {
   initialUsers: User[];
@@ -66,6 +67,7 @@ export function UserList({ initialUsers }: UserListProps) {
           <TableRow>
             <TableHead>Name</TableHead>
             <TableHead>Email</TableHead>
+            <TableHead>Payments</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Change Status</TableHead>
           </TableRow>
@@ -75,6 +77,13 @@ export function UserList({ initialUsers }: UserListProps) {
             <TableRow key={user.id}>
               <TableCell className="font-medium">{user.name}</TableCell>
               <TableCell>{user.email}</TableCell>
+              <TableCell>
+                <div className="flex items-center gap-1">
+                  {user.paidParticipation ? <Badge variant="secondary" className="gap-1"><DollarSign className="h-3 w-3"/> Participation</Badge> : null}
+                  {user.paidDeposit ? <Badge variant="secondary" className="gap-1"><DollarSign className="h-3 w-3"/> Deposit</Badge> : null}
+                  {!user.paidParticipation && !user.paidDeposit && <span className="text-xs text-muted-foreground">None</span>}
+                </div>
+              </TableCell>
               <TableCell>
                  <Badge variant={statusVariantMap[user.status]} className="capitalize">
                     {user.status}

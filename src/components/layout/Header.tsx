@@ -1,5 +1,6 @@
+
 import Link from "next/link";
-import { Gavel, Menu } from "lucide-react";
+import { Gavel, Menu, LayoutDashboard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -11,7 +12,11 @@ export function Header() {
   const navItems = [
     { href: "/", label: "Auctions" },
     { href: "/admin", label: "Admin" },
+    { href: "/dashboard", label: "Dashboard" },
   ];
+  
+  // Mock login status
+  const isLoggedIn = true;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
@@ -34,12 +39,28 @@ export function Header() {
           ))}
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <Button variant="ghost" asChild>
-            <Link href="/login">Log in</Link>
-          </Button>
-          <Button asChild style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
-            <Link href="/register">Sign up</Link>
-          </Button>
+          {isLoggedIn ? (
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/dashboard">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                </Link>
+              </Button>
+               <Button variant="outline">
+                Log out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/login">Log in</Link>
+              </Button>
+              <Button asChild style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                <Link href="/register">Sign up</Link>
+              </Button>
+            </>
+          )}
         </div>
         <div className="md:hidden ml-4">
            <Sheet>

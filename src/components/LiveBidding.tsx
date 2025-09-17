@@ -19,8 +19,10 @@ interface LiveBiddingProps {
 const bidders = ["BidMaster123", "ArtLover88", "CollectorPro", "AuctionHunter"];
 
 // This is a mock value. In a real app, this would come from an authentication context.
-const MOCK_IS_LOGGED_IN = false;
+const MOCK_IS_LOGGED_IN = true;
 const MOCK_USER_STATUS = 'pending'; // or 'approved' or 'blocked'
+const MOCK_USER_HAS_PAID = false;
+
 
 export default function LiveBidding({ item }: LiveBiddingProps) {
   const [currentBid, setCurrentBid] = useState(item.currentBid ?? item.startingPrice);
@@ -54,6 +56,10 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
         toast({ title: "Login Required", description: "You must be logged in to place a bid.", variant: "destructive"});
         return;
     }
+    if (requiresFees && !MOCK_USER_HAS_PAID) {
+      toast({ title: "Payment Required", description: "Please complete the required payments from your dashboard to participate.", variant: "destructive"});
+      return;
+    }
     if (MOCK_USER_STATUS !== 'approved') {
         toast({ title: "Account Not Approved", description: `Your account status is "${MOCK_USER_STATUS}". Admin approval is required to bid.`, variant: "destructive"});
         return;
@@ -79,7 +85,29 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
     });
   };
 
-  if (requiresFees && (!MOCK_IS_LOGGED_IN || MOCK_USER_STATUS !== 'approved')) {
+  if (!MOCK_IS_LOGGED_IN) {
+     return (
+      <Card className="shadow-lg">
+        <CardHeader>
+            <CardTitle>Join the Auction</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle>Registration Required</AlertTitle>
+                <AlertDescription>
+                   You need to be logged in to participate in this auction. Please register or log in to continue.
+                    <Button asChild className="w-full mt-4" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                        <Link href="/register">Register or Log In</Link>
+                    </Button>
+                </AlertDescription>
+            </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  if (requiresFees && !MOCK_USER_HAS_PAID) {
     return (
       <Card className="shadow-lg">
         <CardHeader>
@@ -88,11 +116,11 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
         <CardContent>
             <Alert>
                 <Info className="h-4 w-4" />
-                <AlertTitle>Registration & Payment Required</AlertTitle>
+                <AlertTitle>Payment Required</AlertTitle>
                 <AlertDescription>
-                    This auction requires a participation fee and/or a security deposit. Please register and complete the payment process to participate.
+                    This auction requires payment of fees. Please visit your dashboard to complete the payment.
                     <Button asChild className="w-full mt-4" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
-                        <Link href="/register">Register and Pay</Link>
+                        <Link href="/dashboard">Go to Dashboard</Link>
                     </Button>
                 </AlertDescription>
             </Alert>
@@ -135,17 +163,23 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
                   className="pl-10"
                   required
                   step={minIncrement}
-                  disabled={!MOCK_IS_LOGGED_IN || MOCK_USER_STATUS !== 'approved'}
+                  disabled={MOCK_USER_STATUS !== 'approved'}
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full font-bold" disabled={!MOCK_IS_LOGGED_IN || MOCK_USER_STATUS !== 'approved'} style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+            <Button type="submit" className="w-full font-bold" disabled={MOCK_USER_STATUS !== 'approved'} style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
               Place Bid
             </Button>
           </form>
-           <p className="text-xs text-center text-muted-foreground">
+           {MOCK_USER_STATUS !== 'approved' ? (
+             <p className="text-xs text-center text-red-600">
+                Your account is not approved to bid. Please contact an administrator.
+            </p>
+            ) : (
+            <p className="text-xs text-center text-muted-foreground">
               Minimum bid increment: ${minIncrement.toLocaleString()}
             </p>
+           )}
         </div>
       </CardContent>
     </Card>
