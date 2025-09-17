@@ -1,0 +1,224 @@
+"use client";
+
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PlusCircle, Trash2 } from "lucide-react";
+
+const formSchema = z.object({
+  name: z.string().min(1, "Item name is required."),
+  description: z.string().min(1, "Description is required."),
+  category: z.string().min(1, "Category is required."),
+  startingPrice: z.coerce.number().positive("Starting price must be positive."),
+  type: z.enum(["live", "sealed"]),
+  participationFee: z.coerce.number().min(0).optional(),
+  imageUrls: z.array(z.object({ value: z.string().url("Must be a valid URL.") })).min(1, "At least one image is required.").max(3, "You can add a maximum of 3 images."),
+});
+
+export function CreateAuctionForm() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      category: "",
+      startingPrice: 0,
+      type: "live",
+      participationFee: 0,
+      imageUrls: [{ value: "" }],
+    },
+  });
+  
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "imageUrls",
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    // In a real app, you would call a server action here to save the data.
+    console.log(values);
+    alert("Auction item created! (Check console for data). This is a demo and data is not saved.");
+    form.reset();
+  }
+
+  return (
+    <Card className="shadow-lg">
+      <CardHeader>
+        <CardTitle>Create New Auction Item</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Item Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="e.g. Vintage Pocket Watch" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Describe the item in detail."
+                      className="resize-y"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <div className="grid md:grid-cols-2 gap-8">
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. Antiques, Art, Collectibles" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="startingPrice"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Starting Price ($)</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.01" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-8">
+               <FormField
+                control={form.control}
+                name="type"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Auction Type</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select an auction type" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="live">Live Auction</SelectItem>
+                        <SelectItem value="sealed">Sealed Bid</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="participationFee"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Participation Fee ($)</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.01" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      Optional fee required to participate in the auction.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div>
+              <FormLabel>Item Images</FormLabel>
+              <div className="space-y-4 mt-2">
+                {fields.map((field, index) => (
+                  <FormField
+                    key={field.id}
+                    control={form.control}
+                    name={`imageUrls.${index}.value`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <div className="flex items-center gap-2">
+                          <FormControl>
+                             <Input placeholder="https://example.com/image.png" {...field} />
+                          </FormControl>
+                          {fields.length > 1 && (
+                            <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          )}
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+                {fields.length < 3 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => append({ value: "" })}
+                  >
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Add Image
+                  </Button>
+                )}
+              </div>
+              <FormDescription className="mt-2">
+                Add up to 3 image URLs for the item.
+              </FormDescription>
+            </div>
+
+
+            <Button type="submit" className="w-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+              Create Auction Item
+            </Button>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
+  );
+}

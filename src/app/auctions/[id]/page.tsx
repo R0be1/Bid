@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CountdownTimer from "@/components/CountdownTimer";
 import LiveBidding from "@/components/LiveBidding";
 import SealedBidForm from "@/components/SealedBidForm";
-import { Clock, Hammer, Tag } from "lucide-react";
+import { Clock, Hammer, Tag, DollarSign, FolderOpen } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function AuctionDetailPage({ params }: { params: { id: string } }) {
@@ -20,19 +20,22 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
         <div className="aspect-w-16 aspect-h-9">
           <Image
-            src={item.imageUrl}
+            src={item.imageUrls[0]}
             alt={item.name}
             width={600}
             height={400}
-            data-ai-hint={item.imageHint}
+            data-ai-hint={item.imageHints[0]}
             className="rounded-lg object-cover w-full h-full shadow-lg"
           />
         </div>
         <div className="flex flex-col space-y-6">
           <div>
-            <Badge variant={item.type === 'live' ? 'destructive' : 'secondary'} className="mb-2">
-              {item.type === 'live' ? 'Live Auction' : 'Sealed Bid'}
-            </Badge>
+            <div className="flex items-center gap-2 mb-2">
+              <Badge variant={item.type === 'live' ? 'destructive' : 'secondary'}>
+                {item.type === 'live' ? 'Live Auction' : 'Sealed Bid'}
+              </Badge>
+              <Badge variant="outline">{item.category}</Badge>
+            </div>
             <h1 className="text-3xl md:text-4xl font-bold font-headline text-primary">{item.name}</h1>
             <p className="text-lg text-muted-foreground mt-2">{item.description}</p>
           </div>
@@ -47,6 +50,13 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
                 <span className="font-medium">Starting Price:</span>
                 <span className="text-foreground/90">${item.startingPrice.toLocaleString()}</span>
               </div>
+              {item.participationFee && item.participationFee > 0 && (
+                <div className="flex items-center space-x-3">
+                  <DollarSign className="h-5 w-5 text-accent" />
+                  <span className="font-medium">Participation Fee:</span>
+                  <span className="text-foreground/90">${item.participationFee.toLocaleString()}</span>
+                </div>
+              )}
               <div className="flex items-center space-x-3">
                 <Clock className="h-5 w-5 text-accent" />
                 <span className="font-medium">Auction Ends:</span>

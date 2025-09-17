@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button";
 import { Tag, Clock } from "lucide-react";
 import CountdownTimer from "./CountdownTimer";
+import { Badge } from "@/components/ui/badge";
 
 interface AuctionItemCardProps {
   item: AuctionItem;
@@ -19,19 +20,22 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
         <CardHeader className="p-0">
           <div className="aspect-w-16 aspect-h-9 overflow-hidden">
             <Image
-              src={item.imageUrl}
+              src={item.imageUrls[0]}
               alt={item.name}
               width={600}
               height={400}
-              data-ai-hint={item.imageHint}
+              data-ai-hint={item.imageHints[0]}
               className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
             />
           </div>
         </CardHeader>
         <CardContent className="p-4 flex-grow">
-          <CardTitle className="text-lg font-semibold text-primary group-hover:text-accent transition-colors">
-            {item.name}
-          </CardTitle>
+          <div className="flex justify-between items-start">
+            <CardTitle className="text-lg font-semibold text-primary group-hover:text-accent transition-colors mb-2">
+              {item.name}
+            </CardTitle>
+            <Badge variant="outline" className="text-xs whitespace-nowrap">{item.category}</Badge>
+          </div>
           <div className="mt-2 flex items-center text-sm text-foreground/80">
             <Tag className="mr-2 h-4 w-4" />
             <span>{item.type === 'live' ? 'Current Bid:' : 'Starts At:'}</span>

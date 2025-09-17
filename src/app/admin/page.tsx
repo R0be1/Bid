@@ -1,28 +1,19 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Shield } from "lucide-react";
+import { CreateAuctionForm } from "./_components/create-auction-form";
 
 export default function AdminPage() {
   return (
-    <div className="flex items-center justify-center py-12">
-      <Card className="w-full max-w-md text-center shadow-lg">
-        <CardHeader>
-          <div className="mx-auto bg-primary text-primary-foreground rounded-full p-3 w-fit">
-            <Shield className="h-8 w-8" />
-          </div>
-          <CardTitle className="mt-4">Admin Dashboard</CardTitle>
-          <CardDescription>Manage users, auctions, and settings.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-muted-foreground">
-            This area is restricted to administrators only. Full functionality for managing the auction system will be available here.
-          </p>
-          <Button asChild className="w-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
-            <Link href="/">Return to Homepage</Link>
-          </Button>
-        </CardContent>
-      </Card>
+    <div className="max-w-4xl mx-auto py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold font-headline text-primary">Admin Dashboard</h1>
+        <p className="text-muted-foreground">Create and manage auction items from here.</p>
+      </div>
+      
+      <CreateAuctionForm />
+
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold font-headline text-primary mb-4">Manage Existing Items</h2>
+        <p className="text-muted-foreground">Functionality to edit and delete existing auction items will be available here soon.</p>
+      </div>
     </div>
   );
 }
