@@ -10,6 +10,7 @@ export type AuctionItem = {
   endDate: string; // ISO string
   startingPrice: number;
   participationFee?: number;
+  securityDeposit?: number;
   currentBid?: number;
   highBidder?: string;
   maxAllowedValue?: number; // for sealed bids

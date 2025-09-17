@@ -21,6 +21,7 @@ const items: AuctionItem[] = [
     currentBid: 750,
     highBidder: "WatchFan82",
     participationFee: 10,
+    securityDeposit: 50,
     minIncrement: 10,
   },
   {
@@ -62,6 +63,7 @@ const items: AuctionItem[] = [
     startingPrice: 2000,
     maxAllowedValue: 10000,
     participationFee: 50,
+    securityDeposit: 200,
   },
   {
     id: "5",
@@ -101,6 +103,7 @@ const items: AuctionItem[] = [
     startingPrice: 1500,
     maxAllowedValue: 5000,
     participationFee: 25,
+    securityDeposit: 150,
   },
    {
     id: "8",

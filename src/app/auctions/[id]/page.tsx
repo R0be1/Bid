@@ -1,3 +1,4 @@
+
 import { getAuctionItem } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -5,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CountdownTimer from "@/components/CountdownTimer";
 import LiveBidding from "@/components/LiveBidding";
 import SealedBidForm from "@/components/SealedBidForm";
-import { Clock, Hammer, Tag, DollarSign, FolderOpen } from "lucide-react";
+import { Clock, Hammer, Tag, DollarSign, FolderOpen, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 export default function AuctionDetailPage({ params }: { params: { id: string } }) {
@@ -55,6 +56,13 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
                   <DollarSign className="h-5 w-5 text-accent" />
                   <span className="font-medium">Participation Fee:</span>
                   <span className="text-foreground/90">${item.participationFee.toLocaleString()}</span>
+                </div>
+              )}
+              {item.securityDeposit && item.securityDeposit > 0 && (
+                <div className="flex items-center space-x-3">
+                  <ShieldCheck className="h-5 w-5 text-accent" />
+                  <span className="font-medium">Security Deposit:</span>
+                  <span className="text-foreground/90">${item.securityDeposit.toLocaleString()}</span>
                 </div>
               )}
               <div className="flex items-center space-x-3">

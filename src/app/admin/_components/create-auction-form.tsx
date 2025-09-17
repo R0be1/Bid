@@ -34,6 +34,7 @@ const formSchema = z.object({
   startingPrice: z.coerce.number().positive("Starting price must be positive."),
   type: z.enum(["live", "sealed"]),
   participationFee: z.coerce.number().min(0).optional(),
+  securityDeposit: z.coerce.number().min(0).optional(),
   minIncrement: z.coerce.number().optional(),
   images: z.array(z.any()).min(1, "At least one image is required.").max(3, "You can add a maximum of 3 images."),
 }).refine((data) => {
@@ -60,6 +61,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
       startingPrice: 0,
       type: "live",
       participationFee: 0,
+      securityDeposit: 0,
       minIncrement: 1,
       images: [undefined],
     },
@@ -210,32 +212,50 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                       <Input type="number" step="0.01" {...field} />
                     </FormControl>
                     <FormDescription>
-                      Optional fee required to participate in the auction.
+                      Optional fee to participate in the auction.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-
-            {auctionType === 'live' && (
-              <FormField
+            
+            <div className="grid md:grid-cols-2 gap-8">
+               <FormField
                 control={form.control}
-                name="minIncrement"
+                name="securityDeposit"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Minimum Increment ($)</FormLabel>
+                    <FormLabel>Security Deposit ($)</FormLabel>
                     <FormControl>
                       <Input type="number" step="0.01" {...field} />
                     </FormControl>
                     <FormDescription>
-                      The smallest amount by which a bid can be increased.
+                      Optional deposit forfeited if winner doesn't pay.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            )}
+              {auctionType === 'live' && (
+                <FormField
+                  control={form.control}
+                  name="minIncrement"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Minimum Increment ($)</FormLabel>
+                      <FormControl>
+                        <Input type="number" step="0.01" {...field} />
+                      </FormControl>
+                      <FormDescription>
+                        The smallest amount by which a bid can be increased.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+            </div>
 
             <div>
               <FormLabel>Item Images</FormLabel>
