@@ -34,7 +34,6 @@ export function CategoryForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // This is a demo. In a real app, this would be a server action.
     try {
         addCategory(values.name);
         toast({
@@ -43,10 +42,10 @@ export function CategoryForm() {
         });
         form.reset();
         router.refresh(); // Refresh the page to show the new category
-    } catch (error) {
+    } catch (error: any) {
          toast({
             title: "Error",
-            description: "Failed to add category.",
+            description: error.message || "Failed to add category.",
             variant: "destructive"
         });
     }

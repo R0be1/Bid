@@ -29,7 +29,7 @@ export default function CategoriesPage() {
                     <CardTitle>Existing Categories</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <CategoryList categories={categories} />
+                    <CategoryList initialCategories={categories} />
                 </CardContent>
             </Card>
         </div>
