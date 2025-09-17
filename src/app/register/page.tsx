@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Info } from "lucide-react";
+import { Info, Phone } from "lucide-react";
 import Link from "next/link";
 
 export default function RegisterPage() {
@@ -32,6 +33,15 @@ export default function RegisterPage() {
             <Label htmlFor="email">Email</Label>
             <Input id="email" type="email" placeholder="m@example.com" required />
           </div>
+           <div className="grid gap-2">
+            <Label htmlFor="phone">Phone Number</Label>
+            <div className="relative">
+              <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+              </div>
+              <Input id="phone" type="tel" placeholder="(123) 456-7890" required className="pl-10" />
+            </div>
+          </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
             <Input id="password" type="password" required />
@@ -39,7 +49,7 @@ export default function RegisterPage() {
           <Alert>
             <Info className="h-4 w-4" />
             <AlertDescription>
-              Your account will be pending approval from an administrator before you can place bids.
+              Your account will be pending approval from an administrator. For some auctions, payment of fees and phone verification will be required.
             </AlertDescription>
           </Alert>
         </CardContent>

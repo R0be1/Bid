@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { User, DollarSign } from "lucide-react";
+import { User, DollarSign, Info } from "lucide-react";
+import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 
 interface LiveBiddingProps {
   item: AuctionItem;
@@ -16,25 +18,47 @@ interface LiveBiddingProps {
 
 const bidders = ["BidMaster123", "ArtLover88", "CollectorPro", "AuctionHunter"];
 
+// This is a mock value. In a real app, this would come from an authentication context.
+const MOCK_IS_LOGGED_IN = false;
+const MOCK_USER_STATUS = 'pending'; // or 'approved' or 'blocked'
+
 export default function LiveBidding({ item }: LiveBiddingProps) {
   const [currentBid, setCurrentBid] = useState(item.currentBid ?? item.startingPrice);
   const [highBidder, setHighBidder] = useState(item.highBidder ?? "None");
   const [newBid, setNewBid] = useState("");
   const { toast } = useToast();
   const minIncrement = item.minIncrement ?? 1;
+  
+  const requiresFees = (item.participationFee && item.participationFee > 0) || (item.securityDeposit && item.securityDeposit > 0);
 
   useEffect(() => {
+    // In a real app with a real-time database like Firestore,
+    // you wouldn't need to simulate bids like this.
     const simulateBids = setInterval(() => {
+      if (new Date() > new Date(item.endDate)) {
+        clearInterval(simulateBids);
+        return;
+      }
       const bidIncrease = minIncrement + Math.floor(Math.random() * 10) * minIncrement;
       setCurrentBid((prev) => prev + bidIncrease);
       setHighBidder(bidders[Math.floor(Math.random() * bidders.length)]);
-    }, 5000 + Math.random() * 5000); // between 5-10 seconds
+    }, 5000 + Math.random() * 5000);
 
     return () => clearInterval(simulateBids);
-  }, [minIncrement]);
+  }, [minIncrement, item.endDate]);
 
   const handleBidSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!MOCK_IS_LOGGED_IN) {
+        toast({ title: "Login Required", description: "You must be logged in to place a bid.", variant: "destructive"});
+        return;
+    }
+    if (MOCK_USER_STATUS !== 'approved') {
+        toast({ title: "Account Not Approved", description: `Your account status is "${MOCK_USER_STATUS}". Admin approval is required to bid.`, variant: "destructive"});
+        return;
+    }
+
     const bidAmount = parseFloat(newBid);
     const requiredBid = currentBid + minIncrement;
     
@@ -54,6 +78,28 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
       description: `You are now the highest bidder with $${bidAmount.toLocaleString()}.`,
     });
   };
+
+  if (requiresFees && (!MOCK_IS_LOGGED_IN || MOCK_USER_STATUS !== 'approved')) {
+    return (
+      <Card className="shadow-lg">
+        <CardHeader>
+            <CardTitle>Special Auction Requirements</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <Alert>
+                <Info className="h-4 w-4" />
+                <AlertTitle>Registration & Payment Required</AlertTitle>
+                <AlertDescription>
+                    This auction requires a participation fee and/or a security deposit. Please register and complete the payment process to participate.
+                    <Button asChild className="w-full mt-4" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                        <Link href="/register">Register and Pay</Link>
+                    </Button>
+                </AlertDescription>
+            </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="shadow-lg">
@@ -89,10 +135,11 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
                   className="pl-10"
                   required
                   step={minIncrement}
+                  disabled={!MOCK_IS_LOGGED_IN || MOCK_USER_STATUS !== 'approved'}
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full font-bold" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+            <Button type="submit" className="w-full font-bold" disabled={!MOCK_IS_LOGGED_IN || MOCK_USER_STATUS !== 'approved'} style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
               Place Bid
             </Button>
           </form>
