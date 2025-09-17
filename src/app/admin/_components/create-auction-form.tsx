@@ -35,7 +35,7 @@ const formSchema = z.object({
   type: z.enum(["live", "sealed"]),
   participationFee: z.coerce.number().min(0).optional(),
   minIncrement: z.coerce.number().optional(),
-  imageUrls: z.array(z.object({ value: z.string().url("Must be a valid URL.") })).min(1, "At least one image is required.").max(3, "You can add a maximum of 3 images."),
+  images: z.array(z.any()).min(1, "At least one image is required.").max(3, "You can add a maximum of 3 images."),
 }).refine((data) => {
     if (data.type === 'live') {
         return data.minIncrement !== undefined && data.minIncrement > 0;
@@ -61,13 +61,13 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
       type: "live",
       participationFee: 0,
       minIncrement: 1,
-      imageUrls: [{ value: "" }],
+      images: [undefined],
     },
   });
   
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "imageUrls",
+    name: "images",
   });
 
   const auctionType = useWatch({
@@ -77,7 +77,23 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     // In a real app, you would call a server action here to save the data.
-    console.log(values);
+    // This would involve uploading the files to a storage service (like Firebase Storage)
+    // and then saving the returned URLs with the auction item data.
+    console.log("Form Values:", values);
+    
+    // Create a FormData object to see how files would be handled
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("description", values.description);
+    // ... append other fields
+
+    values.images.forEach((fileList, index) => {
+      if (fileList && fileList[0]) {
+        formData.append(`image_${index}`, fileList[0]);
+      }
+    });
+
+    console.log("FormData to be sent (demo):", formData.get("image_0"));
     alert("Auction item created! (Check console for data). This is a demo and data is not saved.");
     form.reset();
   }
@@ -228,12 +244,17 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                   <FormField
                     key={field.id}
                     control={form.control}
-                    name={`imageUrls.${index}.value`}
-                    render={({ field }) => (
+                    name={`images.${index}`}
+                    render={({ field: { onChange, value, ...rest } }) => (
                       <FormItem>
                         <div className="flex items-center gap-2">
                           <FormControl>
-                             <Input placeholder="https://example.com/image.png" {...field} />
+                             <Input 
+                               type="file" 
+                               accept="image/*"
+                               onChange={(e) => onChange(e.target.files)}
+                               {...rest}
+                              />
                           </FormControl>
                           {fields.length > 1 && (
                             <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
@@ -251,7 +272,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => append({ value: "" })}
+                    onClick={() => append(undefined)}
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
                     Add Image
@@ -259,7 +280,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                 )}
               </div>
               <FormDescription className="mt-2">
-                Add up to 3 image URLs for the item.
+                Add up to 3 images for the item.
               </FormDescription>
             </div>
 
