@@ -1,3 +1,4 @@
+
 export type AuctionItem = {
   id: string;
   name: string;
@@ -12,4 +13,9 @@ export type AuctionItem = {
   currentBid?: number;
   highBidder?: string;
   maxAllowedValue?: number; // for sealed bids
+};
+
+export type Category = {
+  id: string;
+  name: string;
 };

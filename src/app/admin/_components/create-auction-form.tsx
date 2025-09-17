@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm, useFieldArray } from "react-hook-form";
@@ -24,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PlusCircle, Trash2 } from "lucide-react";
+import type { Category } from "@/lib/types";
 
 const formSchema = z.object({
   name: z.string().min(1, "Item name is required."),
@@ -35,7 +37,11 @@ const formSchema = z.object({
   imageUrls: z.array(z.object({ value: z.string().url("Must be a valid URL.") })).min(1, "At least one image is required.").max(3, "You can add a maximum of 3 images."),
 });
 
-export function CreateAuctionForm() {
+interface CreateAuctionFormProps {
+    categories: Category[];
+}
+
+export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -108,9 +114,20 @@ export function CreateAuctionForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g. Antiques, Art, Collectibles" {...field} />
-                    </FormControl>
+                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categories.map((category) => (
+                            <SelectItem key={category.id} value={category.name}>
+                                {category.name}
+                            </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

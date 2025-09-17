@@ -1,8 +1,11 @@
+
 import type { AuctionItem } from "./types";
 import { addDays } from "date-fns";
 import { PlaceHolderImages } from "./placeholder-images";
+import { getCategories } from "./categories";
 
 const now = new Date();
+const categories = getCategories();
 
 const items: AuctionItem[] = [
   {
@@ -11,7 +14,7 @@ const items: AuctionItem[] = [
     description: "A beautifully preserved gold-plated pocket watch from the early 20th century. Features intricate engravings and a porcelain dial. In working condition.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '1')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '1')?.imageHint || ''],
-    category: "Antiques",
+    category: categories[0]?.name || "Antiques",
     type: "live",
     endDate: addDays(now, 2).toISOString(),
     startingPrice: 500,
@@ -25,7 +28,7 @@ const items: AuctionItem[] = [
     description: "A vibrant, large-scale abstract painting by a renowned contemporary artist. A statement piece for any modern home or office.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '2')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '2')?.imageHint || ''],
-    category: "Art",
+    category: categories[1]?.name || "Art",
     type: "live",
     endDate: addDays(now, 1).toISOString(),
     startingPrice: 1200,
@@ -38,7 +41,7 @@ const items: AuctionItem[] = [
     description: "A hand-carved mahogany chair with original upholstery. Dates back to the Victorian era. Perfect as a decorative accent.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '3')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '3')?.imageHint || ''],
-    category: "Furniture",
+    category: categories[2]?.name || "Furniture",
     type: "live",
     endDate: addDays(now, 3).toISOString(),
     startingPrice: 250,
@@ -50,7 +53,7 @@ const items: AuctionItem[] = [
     description: "A curated collection of rare stamps from around the world, including several sought-after misprints. Housed in a professional album.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '4')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '4')?.imageHint || ''],
-    category: "Collectibles",
+    category: categories[3]?.name || "Collectibles",
     type: "sealed",
     endDate: addDays(now, 7).toISOString(),
     startingPrice: 2000,
@@ -63,7 +66,7 @@ const items: AuctionItem[] = [
     description: "A baseball autographed by a legendary Hall of Fame player. Comes with a certificate of authenticity. A must-have for any sports memorabilia collector.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '5')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '5')?.imageHint || ''],
-    category: "Sports Memorabilia",
+    category: categories[4]?.name || "Sports Memorabilia",
     type: "sealed",
     endDate: addDays(now, 5).toISOString(),
     startingPrice: 300,
@@ -75,7 +78,7 @@ const items: AuctionItem[] = [
     description: "A rare, first edition printing of a classic 20th-century novel. In excellent condition with original dust jacket.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '6')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '6')?.imageHint || ''],
-    category: "Books",
+    category: categories[5]?.name || "Books",
     type: "live",
     endDate: addDays(now, 4).toISOString(),
     startingPrice: 800,
@@ -88,7 +91,7 @@ const items: AuctionItem[] = [
     description: "An iconic, limited-edition leather handbag from a world-famous luxury brand. Barely used and in pristine condition.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '7')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '7')?.imageHint || ''],
-    category: "Fashion",
+    category: categories[6]?.name || "Fashion",
     type: "sealed",
     endDate: addDays(now, 6).toISOString(),
     startingPrice: 1500,
@@ -101,7 +104,7 @@ const items: AuctionItem[] = [
     description: "A vintage model electric guitar known for its legendary tone. All original parts, with a beautifully aged sunburst finish.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '8')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '8')?.imageHint || ''],
-    category: "Musical Instruments",
+    category: categories[7]?.name || "Musical Instruments",
     type: "live",
     endDate: addDays(now, 10).toISOString(),
     startingPrice: 2500,
