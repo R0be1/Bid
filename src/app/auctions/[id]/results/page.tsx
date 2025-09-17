@@ -18,7 +18,9 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { Trophy, Users, BarChart2 } from "lucide-react";
+import { Trophy, Users, BarChart2, Megaphone } from "lucide-react";
+import { AnnounceResultsForm } from "./_components/announce-results-form";
+import { getMessageTemplates } from "@/lib/messages";
 
 export default function AuctionResultsPage({ params }: { params: { id: string } }) {
   const item = getAuctionItem(params.id);
@@ -31,6 +33,7 @@ export default function AuctionResultsPage({ params }: { params: { id: string } 
   const auctionEnded = new Date() >= new Date(item.endDate);
   const winners = bids.slice(0, 10);
   const participantCount = new Set(bids.map(b => b.bidderName)).size;
+  const messageTemplates = getMessageTemplates();
 
   const bidCounts = bids.reduce((acc, bid) => {
       const priceRange = Math.floor(bid.amount / 100) * 100;
@@ -60,6 +63,21 @@ export default function AuctionResultsPage({ params }: { params: { id: string } 
             <h1 className="text-3xl font-bold font-headline text-primary">Auction Results</h1>
             <p className="text-lg text-muted-foreground">{item.name}</p>
         </div>
+      
+       <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Megaphone className="text-accent" />
+            Announce Results
+          </CardTitle>
+          <CardDescription>
+            Notify the top bidders about the auction outcome using a message template.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AnnounceResultsForm templates={messageTemplates} bids={bids} item={item} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
