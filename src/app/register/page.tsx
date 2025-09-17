@@ -19,17 +19,21 @@ import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 
 export default function RegisterPage() {
-  const [step, setStep] = useState("details"); // 'details', 'otp', 'success'
+  const [step, setStep] = useState("phone"); // 'phone', 'otp', 'details', 'success'
+  const [phoneNumber, setPhoneNumber] = useState("");
   const { toast } = useToast();
 
-  const handleDetailsSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handlePhoneSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // In a real app, you would call a server action here to send an OTP
-    toast({
-      title: "OTP Sent",
-      description: "A one-time password has been sent to your phone.",
-    });
-    setStep("otp");
+    const phone = (event.currentTarget.elements.namedItem("phone") as HTMLInputElement).value;
+    if (phone) {
+        setPhoneNumber(phone);
+        toast({
+            title: "OTP Sent",
+            description: "A one-time password has been sent to your phone.",
+        });
+        setStep("otp");
+    }
   };
 
   const handleOtpSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -37,13 +41,12 @@ export default function RegisterPage() {
     const otp = (event.currentTarget.elements.namedItem("otp") as HTMLInputElement).value;
 
     // In a real app, you'd verify the OTP with your backend.
-    // For this demo, we'll accept any 6-digit code.
     if (otp && /^\d{6}$/.test(otp)) {
       toast({
-        title: "Registration Complete",
-        description: "Your account has been created and is pending approval.",
+        title: "Phone Verified",
+        description: "Please complete your registration details.",
       });
-      setStep("success");
+      setStep("details");
     } else {
       toast({
         title: "Invalid OTP",
@@ -52,46 +55,44 @@ export default function RegisterPage() {
       });
     }
   };
+  
+  const handleDetailsSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    // In a real app, you would call a server action here to create the user.
+    toast({
+      title: "Registration Complete",
+      description: "Your account has been created and is pending approval.",
+    });
+    setStep("success");
+  };
 
   return (
     <div className="flex items-center justify-center py-12">
-      {step === "details" && (
+      {step === "phone" && (
         <Card className="w-full max-w-sm shadow-lg">
-          <form onSubmit={handleDetailsSubmit}>
+          <form onSubmit={handlePhoneSubmit}>
             <CardHeader>
               <CardTitle className="text-2xl font-headline">Register</CardTitle>
               <CardDescription>
-                Create an account to start bidding on exclusive items.
+                Enter your phone number to begin registration.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="full-name">Full Name</Label>
-                <Input id="full-name" placeholder="John Doe" required />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="m@example.com" required />
-              </div>
               <div className="grid gap-2">
                 <Label htmlFor="phone">Phone Number</Label>
                 <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                     <Phone className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <Input id="phone" type="tel" placeholder="(123) 456-7890" required className="pl-10" />
+                  <Input id="phone" name="phone" type="tel" placeholder="(123) 456-7890" required className="pl-10" />
                 </div>
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" required />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
               <Button type="submit" className="w-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
                 Send Verification Code
               </Button>
-              <div className="text-center text-sm">
+               <div className="text-center text-sm">
                 Already have an account?{" "}
                 <Link href="/login" className="underline text-primary">
                   Login
@@ -108,7 +109,7 @@ export default function RegisterPage() {
             <CardHeader>
               <CardTitle className="text-2xl font-headline">Verify Phone</CardTitle>
               <CardDescription>
-                Enter the 6-digit code sent to your phone number.
+                Enter the 6-digit code sent to {phoneNumber}.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
@@ -118,7 +119,7 @@ export default function RegisterPage() {
                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                     <KeyRound className="h-4 w-4 text-muted-foreground" />
                   </div>
-                  <Input id="otp" name="otp" type="text" placeholder="123456" required className="pl-10" maxLength={6} />
+                  <Input id="otp" name="otp" type="text" placeholder="123456" required className="pl-10 tracking-widest text-center" maxLength={6} />
                 </div>
               </div>
               <Alert>
@@ -130,10 +131,46 @@ export default function RegisterPage() {
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
               <Button type="submit" className="w-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
-                Verify & Create Account
+                Verify Code
               </Button>
-              <Button variant="link" onClick={() => setStep("details")}>
-                  Go back
+              <Button variant="link" onClick={() => setStep("phone")}>
+                  Use a different number
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
+      )}
+
+      {step === "details" && (
+        <Card className="w-full max-w-sm shadow-lg">
+          <form onSubmit={handleDetailsSubmit}>
+            <CardHeader>
+              <CardTitle className="text-2xl font-headline">Complete Profile</CardTitle>
+              <CardDescription>
+                Your phone number is verified. Now, create your account.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+               <div className="grid gap-2">
+                <Label htmlFor="phone-display">Phone Number</Label>
+                <Input id="phone-display" type="tel" value={phoneNumber} disabled />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="full-name">Full Name</Label>
+                <Input id="full-name" placeholder="John Doe" required />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" placeholder="m@example.com" required />
+              </div>
+              <div className="grid gap-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" required />
+              </div>
+            </CardContent>
+            <CardFooter>
+              <Button type="submit" className="w-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                Create Account
               </Button>
             </CardFooter>
           </form>
@@ -152,7 +189,7 @@ export default function RegisterPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-                <p className="text-sm text-muted-foreground">You will be notified once your account is approved. For some auctions, payment of fees will also be required to participate.</p>
+                <p className="text-sm text-muted-foreground">You will be notified once your account is approved. You can then log in and participate in auctions.</p>
             </CardContent>
             <CardFooter>
                 <Button asChild className="w-full">
