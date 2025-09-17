@@ -26,6 +26,15 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
 
   return (
     <div className="max-w-6xl mx-auto">
+       <div className="mb-4">
+        <div className="flex items-center gap-2 mb-2">
+            <Badge variant={item.type === 'live' ? 'destructive' : 'secondary'}>
+            {item.type === 'live' ? 'Live Auction' : 'Sealed Bid'}
+            </Badge>
+            <Badge variant="outline">{item.category}</Badge>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold font-headline text-primary">{item.name}</h1>
+      </div>
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
         <div className="space-y-4">
             <div className="aspect-w-16 aspect-h-9">
@@ -54,18 +63,30 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
                 ))}
             </div>
             )}
+             <p className="text-lg text-muted-foreground mt-4 pt-4 border-t">{item.description}</p>
         </div>
         <div className="flex flex-col space-y-6">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Badge variant={item.type === 'live' ? 'destructive' : 'secondary'}>
-                {item.type === 'live' ? 'Live Auction' : 'Sealed Bid'}
-              </Badge>
-              <Badge variant="outline">{item.category}</Badge>
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold font-headline text-primary">{item.name}</h1>
-            <p className="text-lg text-muted-foreground mt-2">{item.description}</p>
-          </div>
+          
+          {auctionActive && (
+            <>
+              {item.type === "live" ? (
+                <LiveBidding item={item} />
+              ) : (
+                <SealedBidForm item={item} />
+              )}
+            </>
+          )}
+
+          {auctionUpcoming && (
+              <Card>
+                  <CardHeader>
+                      <CardTitle>Auction starts soon</CardTitle>
+                      <CardDescription>
+                          This auction has not started yet. Bidding will open on {format(new Date(item.startDate), "PPP p")}.
+                      </CardDescription>
+                  </CardHeader>
+              </Card>
+          )}
           
           <Card className="bg-card/80">
             <CardHeader className="pb-2">
@@ -108,27 +129,6 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
               </div>
             </CardContent>
           </Card>
-          
-          {auctionActive && (
-            <>
-              {item.type === "live" ? (
-                <LiveBidding item={item} />
-              ) : (
-                <SealedBidForm item={item} />
-              )}
-            </>
-          )}
-
-          {auctionUpcoming && (
-              <Card>
-                  <CardHeader>
-                      <CardTitle>Auction starts soon</CardTitle>
-                      <CardDescription>
-                          This auction has not started yet. Bidding will open on {format(new Date(item.startDate), "PPP p")}.
-                      </CardDescription>
-                  </CardHeader>
-              </Card>
-          )}
           
           <Card>
               <CardHeader>
