@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import {
@@ -34,7 +34,16 @@ const formSchema = z.object({
   startingPrice: z.coerce.number().positive("Starting price must be positive."),
   type: z.enum(["live", "sealed"]),
   participationFee: z.coerce.number().min(0).optional(),
+  minIncrement: z.coerce.number().optional(),
   imageUrls: z.array(z.object({ value: z.string().url("Must be a valid URL.") })).min(1, "At least one image is required.").max(3, "You can add a maximum of 3 images."),
+}).refine((data) => {
+    if (data.type === 'live') {
+        return data.minIncrement !== undefined && data.minIncrement > 0;
+    }
+    return true;
+}, {
+    message: "Minimum increment must be a positive number for live auctions.",
+    path: ["minIncrement"],
 });
 
 interface CreateAuctionFormProps {
@@ -51,6 +60,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
       startingPrice: 0,
       type: "live",
       participationFee: 0,
+      minIncrement: 1,
       imageUrls: [{ value: "" }],
     },
   });
@@ -58,6 +68,11 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "imageUrls",
+  });
+
+  const auctionType = useWatch({
+      control: form.control,
+      name: "type"
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -186,6 +201,25 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                 )}
               />
             </div>
+
+            {auctionType === 'live' && (
+              <FormField
+                control={form.control}
+                name="minIncrement"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Minimum Increment ($)</FormLabel>
+                    <FormControl>
+                      <Input type="number" step="0.01" {...field} />
+                    </FormControl>
+                    <FormDescription>
+                      The smallest amount by which a bid can be increased.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
 
             <div>
               <FormLabel>Item Images</FormLabel>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { AuctionItem } from "@/lib/types";
@@ -20,24 +21,27 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
   const [highBidder, setHighBidder] = useState(item.highBidder ?? "None");
   const [newBid, setNewBid] = useState("");
   const { toast } = useToast();
+  const minIncrement = item.minIncrement ?? 1;
 
   useEffect(() => {
     const simulateBids = setInterval(() => {
-      const bidIncrease = Math.floor(Math.random() * 100) + 10;
+      const bidIncrease = minIncrement + Math.floor(Math.random() * 10) * minIncrement;
       setCurrentBid((prev) => prev + bidIncrease);
       setHighBidder(bidders[Math.floor(Math.random() * bidders.length)]);
     }, 5000 + Math.random() * 5000); // between 5-10 seconds
 
     return () => clearInterval(simulateBids);
-  }, []);
+  }, [minIncrement]);
 
   const handleBidSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const bidAmount = parseFloat(newBid);
-    if (!bidAmount || bidAmount <= currentBid) {
+    const requiredBid = currentBid + minIncrement;
+    
+    if (!bidAmount || bidAmount < requiredBid) {
       toast({
         title: "Invalid Bid",
-        description: `Your bid must be higher than the current bid of $${currentBid.toLocaleString()}.`,
+        description: `Your bid must be at least $${requiredBid.toLocaleString()}. (Minimum increment: $${minIncrement.toLocaleString()})`,
         variant: "destructive",
       });
       return;
@@ -79,11 +83,12 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
                 <Input
                   id="bidAmount"
                   type="number"
-                  placeholder={`$${(currentBid + 1).toLocaleString()} or more`}
+                  placeholder={`$${(currentBid + minIncrement).toLocaleString()} or more`}
                   value={newBid}
                   onChange={(e) => setNewBid(e.target.value)}
                   className="pl-10"
                   required
+                  step={minIncrement}
                 />
               </div>
             </div>
@@ -91,6 +96,9 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
               Place Bid
             </Button>
           </form>
+           <p className="text-xs text-center text-muted-foreground">
+              Minimum bid increment: ${minIncrement.toLocaleString()}
+            </p>
         </div>
       </CardContent>
     </Card>

@@ -13,6 +13,7 @@ export type AuctionItem = {
   currentBid?: number;
   highBidder?: string;
   maxAllowedValue?: number; // for sealed bids
+  minIncrement?: number; // for live auctions
 };
 
 export type Category = {

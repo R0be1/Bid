@@ -21,6 +21,7 @@ const items: AuctionItem[] = [
     currentBid: 750,
     highBidder: "WatchFan82",
     participationFee: 10,
+    minIncrement: 10,
   },
   {
     id: "2",
@@ -34,6 +35,7 @@ const items: AuctionItem[] = [
     startingPrice: 1200,
     currentBid: 1550,
     highBidder: "ArtLover88",
+    minIncrement: 50,
   },
   {
     id: "3",
@@ -46,6 +48,7 @@ const items: AuctionItem[] = [
     endDate: addDays(now, 3).toISOString(),
     startingPrice: 250,
     currentBid: 250,
+    minIncrement: 25,
   },
   {
     id: "4",
@@ -84,6 +87,7 @@ const items: AuctionItem[] = [
     startingPrice: 800,
     currentBid: 950,
     highBidder: "BookWorm22",
+    minIncrement: 20,
   },
   {
     id: "7",
@@ -110,6 +114,7 @@ const items: AuctionItem[] = [
     startingPrice: 2500,
     currentBid: 3200,
     highBidder: "RockStar01",
+    minIncrement: 100,
   },
 ];
 
