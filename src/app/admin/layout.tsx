@@ -2,7 +2,7 @@
 "use client";
 
 import { Sidebar, SidebarProvider, SidebarTrigger, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarInset } from "@/components/ui/sidebar";
-import { CircleUser, Gavel, LayoutGrid, Tag } from "lucide-react";
+import { CircleUser, Gavel, LayoutGrid, Tag, Trophy } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -13,6 +13,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: "/admin", label: "Dashboard", icon: LayoutGrid },
     { href: "/admin/categories", label: "Categories", icon: Tag },
     { href: "/admin/users", label: "Users", icon: CircleUser },
+    { href: "/admin/results", label: "Results", icon: Trophy },
   ];
 
   return (
