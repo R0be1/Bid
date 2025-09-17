@@ -35,3 +35,10 @@ export type Bid = {
     amount: number;
     date: string;
 };
+
+export type MessageTemplate = {
+  id: string;
+  name: string;
+  channel: 'email' | 'sms';
+  template: string;
+};
