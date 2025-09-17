@@ -1,3 +1,4 @@
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getAuctionItems } from "@/lib/data";
 import AuctionItemCard from "@/components/AuctionItemCard";
@@ -24,7 +25,7 @@ export default function Home() {
           <TabsTrigger value="sealed">Sealed Bid Auctions</TabsTrigger>
         </TabsList>
         <TabsContent value="live">
-          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8 mt-6">
+          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 mt-6">
             {liveItems.length > 0 ? (
               liveItems.map((item) => (
                 <AuctionItemCard key={item.id} item={item} />
@@ -37,7 +38,7 @@ export default function Home() {
           </div>
         </TabsContent>
         <TabsContent value="sealed">
-          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8 mt-6">
+          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 mt-6">
             {sealedItems.length > 0 ? (
               sealedItems.map((item) => (
                 <AuctionItemCard key={item.id} item={item} />
