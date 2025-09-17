@@ -130,24 +130,23 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
               </Card>
           )}
           
-          {auctionEnded && (
-               <Card>
-                  <CardHeader>
-                      <CardTitle>Auction has ended</CardTitle>
-                      <CardDescription>
-                          This auction ended on {format(new Date(item.endDate), "PPP p")}.
-                      </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button asChild className="w-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
-                        <Link href={`/auctions/${item.id}/results`}>
-                            <Trophy className="mr-2 h-4 w-4" />
-                            View Results
-                        </Link>
-                    </Button>
-                  </CardContent>
-              </Card>
-          )}
+          <Card>
+              <CardHeader>
+                  <CardTitle>Auction Status</CardTitle>
+                  <CardDescription>
+                      {auctionEnded ? `This auction ended on ${format(new Date(item.endDate), "PPP p")}.` : auctionActive ? "This auction is currently active." : `This auction will start on ${format(new Date(item.startDate), "PPP p")}.`}
+                  </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild className="w-full" disabled={!auctionEnded} style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                    <Link href={`/auctions/${item.id}/results`}>
+                        <Trophy className="mr-2 h-4 w-4" />
+                        View Results
+                    </Link>
+                </Button>
+                {!auctionEnded && <p className="text-xs text-center text-muted-foreground mt-2">Results will be available after the auction ends.</p>}
+              </CardContent>
+          </Card>
 
         </div>
       </div>
