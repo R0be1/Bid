@@ -1,6 +1,6 @@
 
-import type { AuctionItem } from "./types";
-import { addDays } from "date-fns";
+import type { AuctionItem, Bid } from "./types";
+import { addDays, subDays } from "date-fns";
 import { PlaceHolderImages } from "./placeholder-images";
 import { getCategories } from "./categories";
 
@@ -12,8 +12,16 @@ const items: AuctionItem[] = [
     id: "1",
     name: "Vintage Pocket Watch",
     description: "A beautifully preserved gold-plated pocket watch from the early 20th century. Features intricate engravings and a porcelain dial. In working condition.",
-    imageUrls: [PlaceHolderImages.find(p => p.id === '1')?.imageUrl || ''],
-    imageHints: [PlaceHolderImages.find(p => p.id === '1')?.imageHint || ''],
+    imageUrls: [
+        PlaceHolderImages.find(p => p.id === '1')?.imageUrl || '',
+        "https://picsum.photos/seed/1a/200/200",
+        "https://picsum.photos/seed/1b/200/200"
+    ],
+    imageHints: [
+        PlaceHolderImages.find(p => p.id === '1')?.imageHint || '',
+        'watch detail',
+        'watch mechanism'
+    ],
     category: categories[0]?.name || "Antiques",
     type: "live",
     startDate: now.toISOString(),
@@ -48,10 +56,11 @@ const items: AuctionItem[] = [
     imageHints: [PlaceHolderImages.find(p => p.id === '3')?.imageHint || ''],
     category: categories[2]?.name || "Furniture",
     type: "live",
-    startDate: now.toISOString(),
-    endDate: addDays(now, 3).toISOString(),
+    startDate: subDays(now, 4).toISOString(),
+    endDate: subDays(now, 1).toISOString(),
     startingPrice: 250,
-    currentBid: 250,
+    currentBid: 450,
+    highBidder: "VintageFinds",
     minIncrement: 25,
   },
   {
@@ -77,8 +86,8 @@ const items: AuctionItem[] = [
     imageHints: [PlaceHolderImages.find(p => p.id === '5')?.imageHint || ''],
     category: categories[4]?.name || "Sports Memorabilia",
     type: "sealed",
-    startDate: now.toISOString(),
-    endDate: addDays(now, 5).toISOString(),
+    startDate: subDays(now, 10).toISOString(),
+    endDate: subDays(now, 2).toISOString(),
     startingPrice: 300,
     maxAllowedValue: 1500,
   },
@@ -129,10 +138,42 @@ const items: AuctionItem[] = [
   },
 ];
 
+const mockBids: { [itemId: string]: Bid[] } = {
+    "3": [
+        { bidderName: "VintageFinds", amount: 450, date: subDays(now, 1).toISOString() },
+        { bidderName: "FurnishLover", amount: 425, date: subDays(now, 2).toISOString() },
+        { bidderName: "Collector22", amount: 400, date: subDays(now, 2).toISOString() },
+        { bidderName: "OldTimer", amount: 375, date: subDays(now, 3).toISOString() },
+        { bidderName: "JaneDoe", amount: 350, date: subDays(now, 3).toISOString() },
+        { bidderName: "ChairMan", amount: 325, date: subDays(now, 3).toISOString() },
+        { bidderName: "BidMaster", amount: 300, date: subDays(now, 4).toISOString() },
+        { bidderName: "NewbieBidder", amount: 275, date: subDays(now, 4).toISOString() },
+        { bidderName: "FirstTimer", amount: 250, date: subDays(now, 4).toISOString() },
+    ],
+    "5": [
+        { bidderName: "SportFanatic", amount: 1450, date: subDays(now, 3).toISOString() },
+        { bidderName: "CollectorPro", amount: 1400, date: subDays(now, 3).toISOString() },
+        { bidderName: "BaseballNut", amount: 1350, date: subDays(now, 4).toISOString() },
+        { bidderName: "MantleFan", amount: 1200, date: subDays(now, 5).toISOString() },
+        { bidderName: "Yankees1", amount: 1100, date: subDays(now, 6).toISOString() },
+        { bidderName: "HighBidder", amount: 1000, date: subDays(now, 7).toISOString() },
+        { bidderName: "Lucky7", amount: 950, date: subDays(now, 8).toISOString() },
+        { bidderName: "BidMachine", amount: 800, date: subDays(now, 9).toISOString() },
+        { bidderName: "TheBroker", amount: 750, date: subDays(now, 9).toISOString() },
+        { bidderName: "PennyPincher", amount: 600, date: subDays(now, 9).toISOString() },
+        { bidderName: "LastMinute", amount: 550, date: subDays(now, 10).toISOString() },
+        { bidderName: "AnotherBidder", amount: 500, date: subDays(now, 10).toISOString() },
+    ]
+};
+
 export function getAuctionItems(): AuctionItem[] {
   return items;
 }
 
 export function getAuctionItem(id: string): AuctionItem | undefined {
   return items.find((item) => item.id === id);
+}
+
+export function getAuctionBids(id: string): Bid[] {
+    return mockBids[id]?.sort((a, b) => b.amount - a.amount) || [];
 }

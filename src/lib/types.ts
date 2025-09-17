@@ -29,3 +29,9 @@ export type User = {
   email: string;
   status: 'pending' | 'approved' | 'blocked';
 };
+
+export type Bid = {
+    bidderName: string;
+    amount: number;
+    date: string;
+};

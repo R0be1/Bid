@@ -2,13 +2,15 @@
 import { getAuctionItem } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import CountdownTimer from "@/components/CountdownTimer";
 import LiveBidding from "@/components/LiveBidding";
 import SealedBidForm from "@/components/SealedBidForm";
-import { Clock, Hammer, Tag, DollarSign, FolderOpen, ShieldCheck, Calendar } from "lucide-react";
+import { Clock, Hammer, Tag, DollarSign, ShieldCheck, Calendar, Trophy } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
 
 export default function AuctionDetailPage({ params }: { params: { id: string } }) {
   const item = getAuctionItem(params.id);
@@ -25,15 +27,33 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
   return (
     <div className="max-w-6xl mx-auto">
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-        <div className="aspect-w-16 aspect-h-9">
-          <Image
-            src={item.imageUrls[0]}
-            alt={item.name}
-            width={600}
-            height={400}
-            data-ai-hint={item.imageHints[0]}
-            className="rounded-lg object-cover w-full h-full shadow-lg"
-          />
+        <div className="space-y-4">
+            <div className="aspect-w-16 aspect-h-9">
+            <Image
+                src={item.imageUrls[0]}
+                alt={item.name}
+                width={600}
+                height={400}
+                data-ai-hint={item.imageHints[0]}
+                className="rounded-lg object-cover w-full h-full shadow-lg"
+            />
+            </div>
+            {item.imageUrls.length > 1 && (
+            <div className="grid grid-cols-3 gap-2">
+                {item.imageUrls.slice(1).map((url, index) => (
+                <div key={index} className="aspect-w-1 aspect-h-1">
+                    <Image
+                    src={url}
+                    alt={`${item.name} image ${index + 2}`}
+                    width={200}
+                    height={200}
+                    data-ai-hint={item.imageHints[index+1]}
+                    className="rounded-md object-cover w-full h-full shadow-md"
+                    />
+                </div>
+                ))}
+            </div>
+            )}
         </div>
         <div className="flex flex-col space-y-6">
           <div>
@@ -118,6 +138,14 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
                           This auction ended on {format(new Date(item.endDate), "PPP p")}.
                       </CardDescription>
                   </CardHeader>
+                  <CardContent>
+                    <Button asChild className="w-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                        <Link href={`/auctions/${item.id}/results`}>
+                            <Trophy className="mr-2 h-4 w-4" />
+                            View Results
+                        </Link>
+                    </Button>
+                  </CardContent>
               </Card>
           )}
 
