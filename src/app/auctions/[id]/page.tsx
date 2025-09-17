@@ -6,8 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CountdownTimer from "@/components/CountdownTimer";
 import LiveBidding from "@/components/LiveBidding";
 import SealedBidForm from "@/components/SealedBidForm";
-import { Clock, Hammer, Tag, DollarSign, FolderOpen, ShieldCheck } from "lucide-react";
+import { Clock, Hammer, Tag, DollarSign, FolderOpen, ShieldCheck, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
 
 export default function AuctionDetailPage({ params }: { params: { id: string } }) {
   const item = getAuctionItem(params.id);
@@ -15,6 +16,11 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
   if (!item) {
     notFound();
   }
+  
+  const auctionActive = new Date() >= new Date(item.startDate) && new Date() < new Date(item.endDate);
+  const auctionUpcoming = new Date() < new Date(item.startDate);
+  const auctionEnded = new Date() >= new Date(item.endDate);
+
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -66,8 +72,13 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
                 </div>
               )}
               <div className="flex items-center space-x-3">
+                 <Calendar className="h-5 w-5 text-accent" />
+                 <span className="font-medium">Starts On:</span>
+                 <span className="text-foreground/90">{format(new Date(item.startDate), "PPP p")}</span>
+              </div>
+              <div className="flex items-center space-x-3">
                 <Clock className="h-5 w-5 text-accent" />
-                <span className="font-medium">Auction Ends:</span>
+                <span className="font-medium">Ends In:</span>
                 <CountdownTimer endDate={item.endDate} />
               </div>
               <div className="flex items-center space-x-3">
@@ -77,12 +88,39 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
               </div>
             </CardContent>
           </Card>
-
-          {item.type === "live" ? (
-            <LiveBidding item={item} />
-          ) : (
-            <SealedBidForm item={item} />
+          
+          {auctionActive && (
+            <>
+              {item.type === "live" ? (
+                <LiveBidding item={item} />
+              ) : (
+                <SealedBidForm item={item} />
+              )}
+            </>
           )}
+
+          {auctionUpcoming && (
+              <Card>
+                  <CardHeader>
+                      <CardTitle>Auction starts soon</CardTitle>
+                      <CardDescription>
+                          This auction has not started yet. Bidding will open on {format(new Date(item.startDate), "PPP p")}.
+                      </CardDescription>
+                  </CardHeader>
+              </Card>
+          )}
+          
+          {auctionEnded && (
+               <Card>
+                  <CardHeader>
+                      <CardTitle>Auction has ended</CardTitle>
+                      <CardDescription>
+                          This auction ended on {format(new Date(item.endDate), "PPP p")}.
+                      </CardDescription>
+                  </CardHeader>
+              </Card>
+          )}
+
         </div>
       </div>
     </div>

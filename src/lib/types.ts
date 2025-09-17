@@ -7,6 +7,7 @@ export type AuctionItem = {
   imageHints: string[];
   category: string;
   type: 'live' | 'sealed';
+  startDate: string; // ISO string
   endDate: string; // ISO string
   startingPrice: number;
   participationFee?: number;
