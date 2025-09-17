@@ -2,9 +2,9 @@
 "use client";
 
 import { getAuctionItem, getAuctionBids } from "@/lib/data";
-import { notFound } from "next/navigation";
-import { useState } from "react";
-import type { MessageTemplate, Bid, AuctionItem } from "@/lib/types";
+import { notFound, useParams } from "next/navigation";
+import { useState, useEffect } from "react";
+import type { Bid, CommunicationLog } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -23,25 +23,34 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Trophy, Users, BarChart2, Megaphone, Send } from "lucide-react";
-import { AnnounceResultsForm, type Announcement } from "./_components/announce-results-form";
+import { AnnounceResultsForm } from "./_components/announce-results-form";
 import { AnnouncementHistory } from "./_components/announcement-history";
 import { getMessageTemplates } from "@/lib/messages";
+import { getCommunications } from "@/lib/communications";
 
-export default function AuctionResultsPage({ params }: { params: { id: string } }) {
-  const item = getAuctionItem(params.id);
+export default function AuctionResultsPage() {
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
+  const item = getAuctionItem(id);
   
   if (!item) {
     notFound();
   }
   
-  const bids = getAuctionBids(params.id);
+  const bids = getAuctionBids(id);
   const auctionEnded = new Date() >= new Date(item.endDate);
   const winners = bids.slice(0, 10);
   const participantCount = new Set(bids.map(b => b.bidderName)).size;
   const messageTemplates = getMessageTemplates();
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [announcements, setAnnouncements] = useState<CommunicationLog[]>([]);
 
-  const handleAddAnnouncement = (announcement: Announcement) => {
+  useEffect(() => {
+    // Load initial announcements for this auction
+    const allCommunications = getCommunications();
+    setAnnouncements(allCommunications.filter(log => log.auctionId === id));
+  }, [id]);
+
+  const handleAddAnnouncement = (announcement: CommunicationLog) => {
     setAnnouncements(prev => [announcement, ...prev]);
   };
 

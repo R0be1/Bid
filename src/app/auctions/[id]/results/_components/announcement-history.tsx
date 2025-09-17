@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { Announcement } from "./announce-results-form";
+import type { CommunicationLog } from "@/lib/types";
 import { format } from "date-fns";
 import {
   Table,
@@ -14,7 +14,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 
 interface AnnouncementHistoryProps {
-  announcements: Announcement[];
+  announcements: CommunicationLog[];
 }
 
 export function AnnouncementHistory({ announcements }: AnnouncementHistoryProps) {

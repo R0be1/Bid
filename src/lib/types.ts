@@ -42,3 +42,13 @@ export type MessageTemplate = {
   channel: 'email' | 'sms';
   template: string;
 };
+
+export type CommunicationLog = {
+  id: string;
+  auctionId: string;
+  auctionName: string;
+  templateName: string;
+  channel: 'email' | 'sms';
+  recipientsCount: number;
+  sentAt: Date;
+}

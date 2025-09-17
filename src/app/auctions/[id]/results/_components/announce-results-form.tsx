@@ -4,7 +4,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import type { MessageTemplate, Bid, AuctionItem } from "@/lib/types";
+import type { MessageTemplate, Bid, AuctionItem, CommunicationLog } from "@/lib/types";
 import {
   Form,
   FormControl,
@@ -26,20 +26,13 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
-
-export type Announcement = {
-  id: string;
-  templateName: string;
-  channel: 'email' | 'sms';
-  recipientsCount: number;
-  sentAt: Date;
-}
+import { addCommunicationLog } from "@/lib/communications";
 
 interface AnnounceResultsFormProps {
   templates: MessageTemplate[];
   bids: Bid[];
   item: AuctionItem;
-  onAnnouncementSent: (announcement: Announcement) => void;
+  onAnnouncementSent: (announcement: CommunicationLog) => void;
 }
 
 const formSchema = z.object({
@@ -66,15 +59,18 @@ export function AnnounceResultsForm({ templates, bids, item, onAnnouncementSent 
     }
     
     // In a real application, this would trigger a server action to send emails/SMS.
-    const newAnnouncement: Announcement = {
-      id: crypto.randomUUID(),
+    // For now, we just log it.
+    const newLog = addCommunicationLog({
+      auctionId: item.id,
+      auctionName: item.name,
       templateName: template.name,
       channel: template.channel,
       recipientsCount: values.numberOfWinners,
       sentAt: new Date(),
-    };
+    });
 
-    onAnnouncementSent(newAnnouncement);
+
+    onAnnouncementSent(newLog);
 
     toast({
         title: "Announcements Sent!",
