@@ -27,10 +27,19 @@ import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
 
+export type Announcement = {
+  id: string;
+  templateName: string;
+  channel: 'email' | 'sms';
+  recipientsCount: number;
+  sentAt: Date;
+}
+
 interface AnnounceResultsFormProps {
   templates: MessageTemplate[];
   bids: Bid[];
   item: AuctionItem;
+  onAnnouncementSent: (announcement: Announcement) => void;
 }
 
 const formSchema = z.object({
@@ -38,7 +47,7 @@ const formSchema = z.object({
   numberOfWinners: z.coerce.number().min(1, "Number of bidders must be at least 1."),
 });
 
-export function AnnounceResultsForm({ templates, bids, item }: AnnounceResultsFormProps) {
+export function AnnounceResultsForm({ templates, bids, item, onAnnouncementSent }: AnnounceResultsFormProps) {
   const { toast } = useToast();
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,17 +66,21 @@ export function AnnounceResultsForm({ templates, bids, item }: AnnounceResultsFo
     }
     
     // In a real application, this would trigger a server action to send emails/SMS.
-    // For this demo, we'll just show a success toast.
-    console.log("Announcing results with these values:", {
-        ...values,
-        itemName: item.name,
-        topBidders: bids.slice(0, values.numberOfWinners)
-    });
+    const newAnnouncement: Announcement = {
+      id: crypto.randomUUID(),
+      templateName: template.name,
+      channel: template.channel,
+      recipientsCount: values.numberOfWinners,
+      sentAt: new Date(),
+    };
+
+    onAnnouncementSent(newAnnouncement);
 
     toast({
         title: "Announcements Sent!",
         description: `Notifications have been queued for the top ${values.numberOfWinners} bidder(s) using the "${template.name}" template.`,
     });
+    form.reset();
   }
   
   if (bids.length === 0) {

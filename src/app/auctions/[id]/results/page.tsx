@@ -1,6 +1,10 @@
 
+"use client";
+
 import { getAuctionItem, getAuctionBids } from "@/lib/data";
 import { notFound } from "next/navigation";
+import { useState } from "react";
+import type { MessageTemplate, Bid, AuctionItem } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -18,8 +22,9 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { Trophy, Users, BarChart2, Megaphone } from "lucide-react";
-import { AnnounceResultsForm } from "./_components/announce-results-form";
+import { Trophy, Users, BarChart2, Megaphone, Send } from "lucide-react";
+import { AnnounceResultsForm, type Announcement } from "./_components/announce-results-form";
+import { AnnouncementHistory } from "./_components/announcement-history";
 import { getMessageTemplates } from "@/lib/messages";
 
 export default function AuctionResultsPage({ params }: { params: { id: string } }) {
@@ -34,6 +39,11 @@ export default function AuctionResultsPage({ params }: { params: { id: string } 
   const winners = bids.slice(0, 10);
   const participantCount = new Set(bids.map(b => b.bidderName)).size;
   const messageTemplates = getMessageTemplates();
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+
+  const handleAddAnnouncement = (announcement: Announcement) => {
+    setAnnouncements(prev => [announcement, ...prev]);
+  };
 
   const bidCounts = bids.reduce((acc, bid) => {
       const priceRange = Math.floor(bid.amount / 100) * 100;
@@ -75,7 +85,20 @@ export default function AuctionResultsPage({ params }: { params: { id: string } 
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AnnounceResultsForm templates={messageTemplates} bids={bids} item={item} />
+          <AnnounceResultsForm templates={messageTemplates} bids={bids} item={item} onAnnouncementSent={handleAddAnnouncement} />
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Send className="text-accent" />
+            Announcement History
+          </CardTitle>
+          <CardDescription>A log of all announcements sent for this auction.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AnnouncementHistory announcements={announcements} />
         </CardContent>
       </Card>
 
