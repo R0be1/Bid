@@ -1,4 +1,6 @@
 
+"use client";
+
 import { getAuctioneers } from "./auctioneers";
 import { getUsers } from "./users";
 import { getSuperAdmins } from "./super-admins";
@@ -39,6 +41,9 @@ export const login = (phone: string, password: string): AuthResult => {
       (a) => a.user.phone === phone && a.user.tempPassword === password
     );
     if (auctioneer) {
+        if (auctioneer.status !== 'active') {
+            return { success: false, message: "Your account is currently inactive. Please contact the administrator." };
+        }
         const user: AuthenticatedUser = { id: auctioneer.id, name: auctioneer.user.firstName, role: 'admin' };
         
         setCookie(null, SESSION_KEY, JSON.stringify(user), {
@@ -85,4 +90,3 @@ export const getCurrentUser = (req?: IncomingMessage): AuthenticatedUser | null 
 export const isAuthenticated = (req?: IncomingMessage): boolean => {
     return !!getCurrentUser(req);
 };
-
