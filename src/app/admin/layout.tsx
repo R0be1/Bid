@@ -27,7 +27,7 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
                 <div className="flex items-center gap-2 p-4">
                     <Gavel className="h-7 w-7 text-primary" />
                     <span className="font-bold text-xl text-foreground group-data-[collapsible=icon]:hidden">
-                        BidCraft Admin
+                        NIBtera ጨረታ Admin
                     </span>
                 </div>
             </SidebarHeader>

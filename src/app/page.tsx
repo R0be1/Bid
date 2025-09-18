@@ -34,7 +34,7 @@ export default function Home() {
     <div className="space-y-8">
       <div className="text-center">
         <h1 className="text-4xl font-bold tracking-tight text-primary sm:text-5xl lg:text-6xl font-headline">
-          Welcome to BidCraft
+          Welcome to NIBtera ጨረታ
         </h1>
         <p className="mt-4 text-lg leading-8 text-foreground/80 max-w-2xl mx-auto">
           Discover unique treasures and compete in exciting live and sealed-bid auctions. Your next great find is just a bid away.

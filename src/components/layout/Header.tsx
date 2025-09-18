@@ -24,7 +24,7 @@ export function Header() {
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <Gavel className="h-6 w-6 text-primary" />
           <span className="font-bold text-lg text-primary font-headline">
-            BidCraft
+            NIBtera ጨረታ
           </span>
         </Link>
         <nav className="hidden md:flex md:items-center md:space-x-6 text-sm font-medium">
