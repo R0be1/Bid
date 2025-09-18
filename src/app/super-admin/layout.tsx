@@ -11,7 +11,6 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/super-admin", label: "Dashboard", icon: LayoutGrid },
     { href: "/super-admin/manage-auctioneer", label: "Manage Auctioneer", icon: Users },
     { href: "/super-admin/settings", label: "Settings", icon: Settings },
   ];
@@ -29,6 +28,14 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             </SidebarHeader>
             <SidebarContent className="p-0">
                 <SidebarMenu>
+                     <SidebarMenuItem>
+                        <SidebarMenuButton asChild isActive={pathname === '/super-admin'} tooltip="Dashboard">
+                            <Link href="/super-admin">
+                                <LayoutGrid />
+                                <span className="group-data-[collapsible=icon]:hidden">Dashboard</span>
+                            </Link>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
                     {navItems.map((item) => (
                         <SidebarMenuItem key={item.label}>
                             <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={item.label}>
