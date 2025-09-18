@@ -12,7 +12,7 @@ export function getSuperAdmins(): SuperAdmin[] {
 
 export function addSuperAdmin({name, email}: {name: string, email: string}): SuperAdmin {
     const newAdmin: SuperAdmin = {
-        id: `sa-${crypto.randomUUID()}`,
+        id: `sa-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
         name,
         email,
     };
