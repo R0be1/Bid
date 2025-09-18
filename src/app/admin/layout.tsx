@@ -12,12 +12,12 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/auctioneer", label: "Dashboard", icon: LayoutGrid },
-    { href: "/auctioneer/categories", label: "Categories", icon: Tag },
-    { href: "/auctioneer/users", label: "Users", icon: UserCog },
-    { href: "/auctioneer/results", label: "Results", icon: Trophy },
-    { href: "/auctioneer/messages", label: "Messages", icon: MessageSquare },
-    { href: "/auctioneer/communications", label: "Communications", icon: Send },
+    { href: "/admin", label: "Dashboard", icon: LayoutGrid },
+    { href: "/admin/categories", label: "Categories", icon: Tag },
+    { href: "/admin/users", label: "Users", icon: UserCog },
+    { href: "/admin/results", label: "Results", icon: Trophy },
+    { href: "/admin/messages", label: "Messages", icon: MessageSquare },
+    { href: "/admin/communications", label: "Communications", icon: Send },
   ];
 
   return (

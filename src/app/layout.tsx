@@ -17,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const isPortalPage = pathname.startsWith("/auctioneer") || pathname.startsWith("/super-admin");
+  const isPortalPage = pathname.startsWith("/admin") || pathname.startsWith("/super-admin");
 
   return (
     <html lang="en" className="h-full">

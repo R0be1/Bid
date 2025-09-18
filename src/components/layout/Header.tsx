@@ -11,7 +11,7 @@ import {
 export function Header() {
   const navItems = [
     { href: "/", label: "Auctions" },
-    { href: "/auctioneer", label: "Auctioneer Portal" },
+    { href: "/admin", label: "Auctioneer Portal" },
     { href: "/dashboard", label: "Dashboard" },
   ];
   
