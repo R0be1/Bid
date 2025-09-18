@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { getAuctioneers, updateAuctioneerStatus } from "@/lib/auctioneers";
 import type { Auctioneer } from "@/lib/types";
@@ -20,10 +20,18 @@ import { format } from "date-fns";
 import { PlusCircle, Edit, Power, Info, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
 export default function ManageAuctioneerPage() {
   const [auctioneers, setAuctioneers] = useState<Auctioneer[]>(getAuctioneers());
   const { toast } = useToast();
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const paginatedAuctioneers = useMemo(() => {
+    const startIndex = (page - 1) * rowsPerPage;
+    return auctioneers.slice(startIndex, startIndex + rowsPerPage);
+  }, [auctioneers, page, rowsPerPage]);
 
   const handleToggleStatus = (auctioneerId: string, currentStatus: 'active' | 'inactive') => {
     const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
@@ -81,7 +89,7 @@ export default function ManageAuctioneerPage() {
                       </TableRow>
                   </TableHeader>
                   <TableBody>
-                      {auctioneers.map((auctioneer) => (
+                      {paginatedAuctioneers.map((auctioneer) => (
                           <TableRow key={auctioneer.id}>
                               <TableCell className="font-medium">
                                 <Tooltip>
@@ -131,6 +139,13 @@ export default function ManageAuctioneerPage() {
                       ))}
                   </TableBody>
               </Table>
+              <DataTablePagination
+                page={page}
+                setPage={setPage}
+                rowsPerPage={rowsPerPage}
+                setRowsPerPage={setRowsPerPage}
+                totalRows={auctioneers.length}
+              />
             </TooltipProvider>
           </CardContent>
       </Card>

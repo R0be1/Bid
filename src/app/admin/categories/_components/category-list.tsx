@@ -2,7 +2,7 @@
 "use client";
 
 import type { Category } from "@/lib/types";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -28,6 +28,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
 interface CategoryListProps {
   initialCategories: Category[];
@@ -39,6 +40,13 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
   const [editingName, setEditingName] = useState("");
   const { toast } = useToast();
   const router = useRouter();
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const paginatedCategories = useMemo(() => {
+    const startIndex = (page - 1) * rowsPerPage;
+    return categories.slice(startIndex, startIndex + rowsPerPage);
+  }, [categories, page, rowsPerPage]);
 
   const handleEditClick = (category: Category) => {
     setEditingCategoryId(category.id);
@@ -102,6 +110,7 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
   }
 
   return (
+    <>
     <Table>
       <TableHeader>
         <TableRow>
@@ -111,7 +120,7 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {categories.map((category) => (
+        {paginatedCategories.map((category) => (
           <TableRow key={category.id}>
             <TableCell className="font-medium">{category.id}</TableCell>
             <TableCell>
@@ -172,5 +181,13 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
         ))}
       </TableBody>
     </Table>
+    <DataTablePagination
+        page={page}
+        setPage={setPage}
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
+        totalRows={categories.length}
+      />
+    </>
   );
 }

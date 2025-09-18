@@ -1,5 +1,8 @@
 
 
+"use client";
+
+import { useState, useMemo } from "react";
 import { getCommunications } from "@/lib/communications";
 import { getAuctionItems } from "@/lib/data";
 import {
@@ -21,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
 // MOCK: In a real app, this would come from the logged-in user's session
 const MOCK_AUCTIONEER_NAME = "Vintage Treasures LLC";
@@ -31,6 +35,14 @@ export default function CommunicationsPage() {
   const auctioneerItemIds = new Set(allItems.filter(item => item.auctioneerName === MOCK_AUCTIONEER_NAME).map(item => item.id));
 
   const communications = allCommunications.filter(log => auctioneerItemIds.has(log.auctionId));
+
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const paginatedCommunications = useMemo(() => {
+    const startIndex = (page - 1) * rowsPerPage;
+    return communications.slice(startIndex, startIndex + rowsPerPage);
+  }, [communications, page, rowsPerPage]);
 
   return (
     <div className="space-y-8">
@@ -48,6 +60,7 @@ export default function CommunicationsPage() {
         </CardHeader>
         <CardContent>
           {communications.length > 0 ? (
+            <>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -59,7 +72,7 @@ export default function CommunicationsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {communications.map((log) => (
+                {paginatedCommunications.map((log) => (
                   <TableRow key={log.id}>
                      <TableCell>{format(log.sentAt, "PPP p")}</TableCell>
                     <TableCell>
@@ -80,6 +93,14 @@ export default function CommunicationsPage() {
                 ))}
               </TableBody>
             </Table>
+            <DataTablePagination
+              page={page}
+              setPage={setPage}
+              rowsPerPage={rowsPerPage}
+              setRowsPerPage={setRowsPerPage}
+              totalRows={communications.length}
+            />
+            </>
           ) : (
              <div className="text-center text-muted-foreground py-8">
                 <p>No communications have been sent for your auctions yet.</p>

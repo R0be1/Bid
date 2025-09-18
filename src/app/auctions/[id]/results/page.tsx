@@ -3,7 +3,7 @@
 
 import { getAuctionItem, getAuctionBids } from "@/lib/data";
 import { notFound, useParams } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { Bid, CommunicationLog } from "@/lib/types";
 import {
   Card,
@@ -27,6 +27,7 @@ import { AnnounceResultsForm } from "./_components/announce-results-form";
 import { AnnouncementHistory } from "./_components/announcement-history";
 import { getMessageTemplates } from "@/lib/messages";
 import { getCommunications } from "@/lib/communications";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
 export default function AuctionResultsPage() {
   const params = useParams();
@@ -39,10 +40,18 @@ export default function AuctionResultsPage() {
   
   const bids = getAuctionBids(id);
   const auctionEnded = new Date() >= new Date(item.endDate);
-  const winners = bids.slice(0, 10);
   const participantCount = new Set(bids.map(b => b.bidderName)).size;
   const messageTemplates = getMessageTemplates();
   const [announcements, setAnnouncements] = useState<CommunicationLog[]>([]);
+
+  const [winnersPage, setWinnersPage] = useState(1);
+  const [winnersRowsPerPage, setWinnersRowsPerPage] useState(5);
+
+  const paginatedWinners = useMemo(() => {
+    const startIndex = (winnersPage - 1) * winnersRowsPerPage;
+    return bids.slice(startIndex, startIndex + winnersRowsPerPage);
+  }, [bids, winnersPage, winnersRowsPerPage]);
+
 
   useEffect(() => {
     // Load initial announcements for this auction
@@ -118,7 +127,7 @@ export default function AuctionResultsPage() {
             Winners List
           </CardTitle>
           <CardDescription>
-            Top 10 bids for this auction. The highest bidder is the winner.
+            Bids for this auction, sorted by amount. The highest bidder is the winner.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -131,15 +140,18 @@ export default function AuctionResultsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {winners.length > 0 ? winners.map((bid, index) => (
-                <TableRow key={index} className={index === 0 ? "bg-accent/10" : ""}>
-                  <TableCell className="font-bold">
-                    {index === 0 ? <Trophy className="h-5 w-5 text-yellow-500" /> : `#${index + 1}`}
-                  </TableCell>
-                  <TableCell>{bid.bidderName}</TableCell>
-                  <TableCell className="text-right font-semibold">{bid.amount.toLocaleString()} Birr</TableCell>
-                </TableRow>
-              )) : (
+              {paginatedWinners.length > 0 ? paginatedWinners.map((bid, index) => {
+                const rank = (winnersPage - 1) * winnersRowsPerPage + index + 1;
+                return (
+                  <TableRow key={rank} className={rank === 1 ? "bg-accent/10" : ""}>
+                    <TableCell className="font-bold">
+                      {rank === 1 ? <Trophy className="h-5 w-5 text-yellow-500" /> : `#${rank}`}
+                    </TableCell>
+                    <TableCell>{bid.bidderName}</TableCell>
+                    <TableCell className="text-right font-semibold">{bid.amount.toLocaleString()} Birr</TableCell>
+                  </TableRow>
+                );
+              }) : (
                 <TableRow>
                     <TableCell colSpan={3} className="text-center text-muted-foreground">
                         No bids were placed in this auction.
@@ -148,6 +160,13 @@ export default function AuctionResultsPage() {
               )}
             </TableBody>
           </Table>
+           <DataTablePagination
+              page={winnersPage}
+              setPage={setWinnersPage}
+              rowsPerPage={winnersRowsPerPage}
+              setRowsPerPage={setWinnersRowsPerPage}
+              totalRows={bids.length}
+            />
         </CardContent>
       </Card>
       

@@ -25,6 +25,8 @@ import { useToast } from "@/hooks/use-toast";
 import { updateUserStatus } from "@/lib/users";
 import { Banknote, Paperclip, CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
+
 
 interface UserListProps {
   initialUsers: User[];
@@ -40,6 +42,8 @@ export function UserList({ initialUsers }: UserListProps) {
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
   const { toast } = useToast();
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const handleStatusChange = (userId: string, newStatus: User['status']) => {
     try {
@@ -91,15 +95,20 @@ export function UserList({ initialUsers }: UserListProps) {
   
   const handleSelectAll = (checked: boolean) => {
       if (checked) {
-          const allUserIds = new Set(users.map(u => u.id));
+          const allUserIds = new Set(paginatedUsers.map(u => u.id));
           setSelectedUserIds(allUserIds);
       } else {
           setSelectedUserIds(new Set());
       }
   };
 
-  const isAllSelected = useMemo(() => selectedUserIds.size > 0 && selectedUserIds.size === users.length, [selectedUserIds, users.length]);
-  const isSomeSelected = useMemo(() => selectedUserIds.size > 0 && selectedUserIds.size < users.length, [selectedUserIds, users.length]);
+  const paginatedUsers = useMemo(() => {
+    const startIndex = (page - 1) * rowsPerPage;
+    return users.slice(startIndex, startIndex + rowsPerPage);
+  }, [users, page, rowsPerPage]);
+
+  const isAllSelected = useMemo(() => selectedUserIds.size > 0 && paginatedUsers.every(u => selectedUserIds.has(u.id)), [selectedUserIds, paginatedUsers]);
+  const isSomeSelected = useMemo(() => selectedUserIds.size > 0 && !isAllSelected, [selectedUserIds, isAllSelected]);
 
   if (users.length === 0) {
     return <p className="text-muted-foreground">No users found.</p>;
@@ -123,8 +132,7 @@ export function UserList({ initialUsers }: UserListProps) {
               <TableHead className="w-[50px]">
                 <Checkbox 
                   onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
-                  checked={isAllSelected || isSomeSelected}
-                  indeterminate={isSomeSelected}
+                  checked={isAllSelected}
                   aria-label="Select all rows"
                 />
               </TableHead>
@@ -136,7 +144,7 @@ export function UserList({ initialUsers }: UserListProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+            {paginatedUsers.map((user) => (
               <TableRow key={user.id} data-state={selectedUserIds.has(user.id) ? "selected" : ""}>
                 <TableCell>
                   <Checkbox 
@@ -185,6 +193,13 @@ export function UserList({ initialUsers }: UserListProps) {
           </TableBody>
         </Table>
       </div>
+       <DataTablePagination 
+        page={page}
+        setPage={setPage}
+        rowsPerPage={rowsPerPage}
+        setRowsPerPage={setRowsPerPage}
+        totalRows={users.length}
+      />
     </div>
   );
 }
