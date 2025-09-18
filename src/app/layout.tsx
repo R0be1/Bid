@@ -31,7 +31,7 @@ export default function RootLayout({
         className={`${inter.variable} font-body antialiased flex flex-col min-h-screen bg-background text-foreground`}
       >
         <Header />
-        <main className="container mx-auto flex-grow px-4 py-8 sm:px-6 lg:px-8">
+        <main className="flex-grow py-8">
           {children}
         </main>
         <Footer />

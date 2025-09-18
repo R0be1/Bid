@@ -20,36 +20,36 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <SidebarProvider>
-        <Sidebar>
-            <SidebarHeader className="p-4">
-                <div className="flex items-center gap-2">
-                    <Gavel className="h-7 w-7 text-primary" />
-                    <span className="font-bold text-xl text-foreground group-data-[collapsible=icon]:hidden">
-                        BidCraft Admin
-                    </span>
-                </div>
-            </SidebarHeader>
-            <SidebarContent>
-                <SidebarMenu>
-                    {navItems.map((item) => (
-                        <SidebarMenuItem key={item.label}>
-                            <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
-                                <Link href={item.href}>
-                                    <item.icon />
-                                    <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
-                                </Link>
-                            </SidebarMenuButton>
-                        </SidebarMenuItem>
-                    ))}
-                </SidebarMenu>
-            </SidebarContent>
-            <SidebarFooter>
-               <SidebarTrigger />
-            </SidebarFooter>
-        </Sidebar>
-        <main className="flex-1 p-4 md:p-8">
-            {children}
-        </main>
+      <Sidebar>
+          <SidebarHeader>
+              <div className="flex items-center gap-2 p-4">
+                  <Gavel className="h-7 w-7 text-primary" />
+                  <span className="font-bold text-xl text-foreground group-data-[collapsible=icon]:hidden">
+                      BidCraft Admin
+                  </span>
+              </div>
+          </SidebarHeader>
+          <SidebarContent>
+              <SidebarMenu>
+                  {navItems.map((item) => (
+                      <SidebarMenuItem key={item.label}>
+                          <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
+                              <Link href={item.href}>
+                                  <item.icon />
+                                  <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
+                              </Link>
+                          </SidebarMenuButton>
+                      </SidebarMenuItem>
+                  ))}
+              </SidebarMenu>
+          </SidebarContent>
+          <SidebarFooter>
+             <SidebarTrigger />
+          </SidebarFooter>
+      </Sidebar>
+      <main className="flex-1 p-4 md:p-8">
+          {children}
+      </main>
     </SidebarProvider>
   );
 }
