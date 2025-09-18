@@ -31,6 +31,8 @@ export type User = {
   status: 'pending' | 'approved' | 'blocked';
   paidParticipation?: boolean;
   paidDeposit?: boolean;
+  paymentMethod?: 'direct' | 'receipt';
+  receiptUrl?: string;
 };
 
 export type Bid = {
