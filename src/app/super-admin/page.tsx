@@ -5,8 +5,8 @@ import { getAuctioneers } from "@/lib/auctioneers";
 import { getAuctionItems } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users, Gavel } from "lucide-react";
-import { Pie, PieChart, ResponsiveContainer, Cell } from "recharts";
-import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { Pie, PieChart, Cell } from "recharts";
+import { ChartContainer, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 
 export default function SuperAdminDashboard() {
   const auctioneers = getAuctioneers();
@@ -84,7 +84,6 @@ export default function SuperAdminDashboard() {
                     cx="50%" 
                     cy="50%" 
                     outerRadius={80} 
-                    label
                 >
                     {auctioneerStatusData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.fill} />
