@@ -30,7 +30,7 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
             <SidebarHeader className="p-0">
                 <div className="flex items-center gap-2 p-4">
                     <Gavel className="h-7 w-7 text-primary" />
-                    <span className="font-bold text-lg text-white group-data-[collapsible=icon]:hidden truncate">
+                    <span className="font-bold text-lg text-white group-data-[collapsible=icon]:hidden">
                         {MOCK_AUCTIONEER_NAME}
                     </span>
                 </div>
