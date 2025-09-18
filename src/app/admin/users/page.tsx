@@ -9,7 +9,7 @@ export default function UsersPage() {
   const users = getUsers();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-4 md:p-8">
         <div>
             <h1 className="text-3xl font-bold font-headline text-primary flex items-center gap-2">
                 <UserCog />

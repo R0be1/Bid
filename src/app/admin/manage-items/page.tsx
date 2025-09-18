@@ -1,7 +1,7 @@
 
 
 import { CreateAuctionForm } from "../_components/create-auction-form";
-import { ExistingItemsList } from "../_components/existing-items-list";
+import { ExistingItemsList } from "./_components/existing-items-list";
 import { getCategories } from "@/lib/categories";
 import { getAuctionItems } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +15,7 @@ export default function ManageItemsPage() {
   const auctioneerItems = allItems.filter(item => item.auctioneerName === MOCK_AUCTIONEER_NAME);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-4 md:p-8">
        <div>
           <h1 className="text-3xl font-bold font-headline text-primary">Manage Auction Items</h1>
           <p className="text-muted-foreground">Create and manage your auction items from here.</p>

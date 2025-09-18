@@ -1,4 +1,5 @@
 
+
 import { getMessageTemplates } from "@/lib/messages";
 import { MessageTemplateList } from "./_components/message-template-list";
 import { MessageTemplateForm } from "./_components/message-template-form";
@@ -23,7 +24,7 @@ export default function MessagesPage() {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-4 md:p-8">
         <div>
             <h1 className="text-3xl font-bold font-headline text-primary">Message Templates</h1>
             <p className="text-muted-foreground">Manage templates for email and SMS notifications.</p>

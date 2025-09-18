@@ -45,7 +45,7 @@ export default function CommunicationsPage() {
   }, [communications, page, rowsPerPage]);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-4 md:p-8">
       <div>
         <h1 className="text-3xl font-bold font-headline text-primary">Communication History</h1>
         <p className="text-muted-foreground">A log of all announcements sent for your auctions.</p>

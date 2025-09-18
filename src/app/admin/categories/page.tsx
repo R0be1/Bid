@@ -1,4 +1,5 @@
 
+
 import { getCategories } from "@/lib/categories";
 import { CategoryForm } from "./_components/category-form";
 import { CategoryList } from "./_components/category-list";
@@ -8,7 +9,7 @@ export default function CategoriesPage() {
   const categories = getCategories();
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
+    <div className="space-y-8 p-4 md:p-8">
         <div className="mb-8">
             <h1 className="text-3xl font-bold font-headline text-primary">Manage Categories</h1>
             <p className="text-muted-foreground">Add, view, and manage auction categories.</p>
