@@ -3,7 +3,7 @@ import type { SuperAdmin } from './types';
 
 // In a real application, this would be a database.
 let superAdmins: SuperAdmin[] = [
-    { id: 'sa-1', name: 'Super Admin', email: 'super@admin.com', phone: '0911000000', tempPassword: 'superpassword' },
+    { id: 'sa-1', name: 'Super Admin', email: 'super@admin.com', phone: '0912345678', tempPassword: 'Admin@123' },
 ];
 
 export function getSuperAdmins(): SuperAdmin[] {
