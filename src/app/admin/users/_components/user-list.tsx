@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { updateUserStatus } from "@/lib/users";
-import { DollarSign, Paperclip, CheckCircle } from "lucide-react";
+import { Banknote, Paperclip, CheckCircle } from "lucide-react";
 import Link from "next/link";
 
 interface UserListProps {
@@ -149,8 +149,8 @@ export function UserList({ initialUsers }: UserListProps) {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    {user.paidParticipation ? <Badge variant="secondary" className="gap-1"><DollarSign className="h-3 w-3"/> Participation</Badge> : null}
-                    {user.paidDeposit ? <Badge variant="secondary" className="gap-1"><DollarSign className="h-3 w-3"/> Deposit</Badge> : null}
+                    {user.paidParticipation ? <Badge variant="secondary" className="gap-1"><Banknote className="h-3 w-3"/> Participation</Badge> : null}
+                    {user.paidDeposit ? <Badge variant="secondary" className="gap-1"><Banknote className="h-3 w-3"/> Deposit</Badge> : null}
                     {user.paymentMethod === 'receipt' && user.receiptUrl && (
                       <Button variant="ghost" size="icon" asChild className="h-6 w-6">
                         <Link href={user.receiptUrl} target="_blank" title="View Receipt">

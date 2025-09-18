@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { DollarSign, Info } from "lucide-react";
+import { Banknote, Info } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import Link from "next/link";
 

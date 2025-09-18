@@ -9,7 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { getAuctionItems } from "@/lib/data";
 import type { AuctionItem, User } from "@/lib/types";
 import { getUser, recordPayment } from "@/lib/users";
-import { CheckCircle, Clock, CreditCard, DollarSign, UserCheck, Upload } from "lucide-react";
+import { CheckCircle, Clock, CreditCard, Banknote, UserCheck, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Link from "next/link";
 import {
@@ -153,7 +153,7 @@ export default function DashboardPage() {
                                             <p className="text-sm font-medium text-center capitalize">{p.type} Fee: Birr {p.amount}</p>
                                             <div className="flex flex-col gap-2">
                                                 <Button onClick={() => handleDirectPayment(p.type)} disabled={user.status === 'blocked'}>
-                                                    <DollarSign className="mr-2 h-4 w-4" />
+                                                    <Banknote className="mr-2 h-4 w-4" />
                                                     Pay Now
                                                 </Button>
                                                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

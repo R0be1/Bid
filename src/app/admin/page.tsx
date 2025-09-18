@@ -2,7 +2,7 @@
 import { getAuctionItems } from "@/lib/data";
 import { getUsers } from "@/lib/users";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Gavel, Users, Clock, Calendar, CheckCircle, DollarSign } from "lucide-react";
+import { Gavel, Users, Clock, Calendar, CheckCircle, Banknote } from "lucide-react";
 
 
 export default function AdminPage() {
@@ -116,7 +116,7 @@ export default function AdminPage() {
             <CardTitle className="text-sm font-medium">
               Total Participation Fees
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <Banknote className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">Birr {totalParticipationFees.toLocaleString()}</div>
@@ -130,7 +130,7 @@ export default function AdminPage() {
             <CardTitle className="text-sm font-medium">
               Total Security Deposits
             </CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <Banknote className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">Birr {totalSecurityDeposits.toLocaleString()}</div>

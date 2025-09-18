@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import CountdownTimer from "@/components/CountdownTimer";
 import LiveBidding from "@/components/LiveBidding";
 import SealedBidForm from "@/components/SealedBidForm";
-import { Clock, Hammer, Tag, DollarSign, ShieldCheck, Calendar, Trophy, Gavel } from "lucide-react";
+import { Clock, Hammer, Tag, Banknote, ShieldCheck, Calendar, Trophy, Gavel } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -101,7 +101,7 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
               </div>
               {item.participationFee && item.participationFee > 0 && (
                 <div className="flex items-center space-x-3">
-                  <DollarSign className="h-5 w-5 text-accent" />
+                  <Banknote className="h-5 w-5 text-accent" />
                   <span className="font-medium">Participation Fee:</span>
                   <span className="text-foreground/90">Birr {item.participationFee.toLocaleString()}</span>
                 </div>
