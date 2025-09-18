@@ -79,30 +79,28 @@ export default function ProfilePage() {
                     <CardDescription>These details are managed by the platform administrator.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="companyName">Auctioneer/Company Name</Label>
-                            <Input id="companyName" value={auctioneer.name} readOnly disabled />
-                        </div>
+                    <div>
+                        <Label htmlFor="companyName">Auctioneer/Company Name</Label>
+                        <Input id="companyName" value={auctioneer.name} readOnly disabled className="border-0 bg-secondary" />
                     </div>
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
                             <Label htmlFor="firstName">First Name</Label>
-                            <Input id="firstName" value={auctioneer.user.firstName} readOnly disabled />
+                            <Input id="firstName" value={auctioneer.user.firstName} readOnly disabled className="border-0 bg-secondary" />
                         </div>
                         <div>
                             <Label htmlFor="lastName">Last Name</Label>
-                            <Input id="lastName" value={auctioneer.user.lastName} readOnly disabled />
+                            <Input id="lastName" value={auctioneer.user.lastName} readOnly disabled className="border-0 bg-secondary" />
                         </div>
                     </div>
                     <div className="grid md:grid-cols-2 gap-4">
                         <div>
                             <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" value={auctioneer.user.email} readOnly disabled />
+                            <Input id="email" value={auctioneer.user.email} readOnly disabled className="border-0 bg-secondary" />
                         </div>
                         <div>
                             <Label htmlFor="phone">Phone Number</Label>
-                            <Input id="phone" value={auctioneer.user.phone} readOnly disabled />
+                            <Input id="phone" value={auctioneer.user.phone} readOnly disabled className="border-0 bg-secondary" />
                         </div>
                     </div>
                 </CardContent>
@@ -123,7 +121,7 @@ export default function ProfilePage() {
                                     <FormItem>
                                     <FormLabel>Current Password</FormLabel>
                                     <FormControl>
-                                        <Input type="password" {...field} />
+                                        <Input type="password" {...field} className="bg-secondary/50"/>
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -136,7 +134,7 @@ export default function ProfilePage() {
                                     <FormItem>
                                     <FormLabel>New Password</FormLabel>
                                     <FormControl>
-                                        <Input type="password" {...field} />
+                                        <Input type="password" {...field} className="bg-secondary/50"/>
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -149,7 +147,7 @@ export default function ProfilePage() {
                                     <FormItem>
                                     <FormLabel>Confirm New Password</FormLabel>
                                     <FormControl>
-                                        <Input type="password" {...field} />
+                                        <Input type="password" {...field} className="bg-secondary/50"/>
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
