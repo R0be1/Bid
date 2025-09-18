@@ -2,6 +2,8 @@
 import { getAuctioneers } from "./auctioneers";
 import { getUsers } from "./users";
 import { getSuperAdmins } from "./super-admins";
+import { parseCookies, setCookie, destroyCookie } from 'nookies';
+import type { IncomingMessage } from 'http';
 
 export type UserRole = 'user' | 'admin' | 'super-admin';
 
@@ -17,42 +19,19 @@ export interface AuthResult {
     role?: UserRole;
 }
 
-// In a real app, these tokens would be JWTs. Here we just mock them.
-const MOCK_ACCESS_TOKEN = "mock-access-token-12345";
-const MOCK_REFRESH_TOKEN = "mock-refresh-token-67890";
 
 const SESSION_KEY = 'user_session';
-
-// This would be your token validation and refresh logic in a real app
-const getSession = (): { user: AuthenticatedUser, accessToken: string, refreshToken: string } | null => {
-    if (typeof window === 'undefined') return null;
-    const session = sessionStorage.getItem(SESSION_KEY);
-    if (!session) return null;
-
-    try {
-        const { user, accessToken, refreshToken } = JSON.parse(session);
-        // In a real app, you'd verify the accessToken here.
-        // If expired, you'd use the refreshToken to get a new one.
-        if (accessToken === MOCK_ACCESS_TOKEN) {
-            return { user, accessToken, refreshToken };
-        }
-        return null;
-    } catch (e) {
-        return null;
-    }
-}
 
 export const login = (phone: string, password: string): AuthResult => {
     const superAdmin = getSuperAdmins().find(sa => sa.email === 'super@admin.com'); // Special case for login
     if (superAdmin && phone === "0912345678" && password === "Admin@123") {
         const user: AuthenticatedUser = { id: superAdmin.id, name: superAdmin.name, role: 'super-admin' };
-        if (typeof window !== 'undefined') {
-            sessionStorage.setItem(SESSION_KEY, JSON.stringify({ 
-                user, 
-                accessToken: MOCK_ACCESS_TOKEN, 
-                refreshToken: MOCK_REFRESH_TOKEN 
-            }));
-        }
+        
+        setCookie(null, SESSION_KEY, JSON.stringify(user), {
+            maxAge: 30 * 24 * 60 * 60,
+            path: '/',
+        });
+
         return { success: true, message: `Welcome, ${superAdmin.name}!`, role: 'super-admin' };
     }
 
@@ -61,26 +40,24 @@ export const login = (phone: string, password: string): AuthResult => {
     );
     if (auctioneer) {
         const user: AuthenticatedUser = { id: auctioneer.id, name: auctioneer.user.firstName, role: 'admin' };
-        if (typeof window !== 'undefined') {
-            sessionStorage.setItem(SESSION_KEY, JSON.stringify({ 
-                user, 
-                accessToken: MOCK_ACCESS_TOKEN, 
-                refreshToken: MOCK_REFRESH_TOKEN 
-            }));
-        }
+        
+        setCookie(null, SESSION_KEY, JSON.stringify(user), {
+            maxAge: 30 * 24 * 60 * 60,
+            path: '/',
+        });
+
         return { success: true, message: `Welcome, ${auctioneer.name}.`, role: 'admin' };
     }
     
     const regularUser = getUsers().find(u => u.email.split('@')[0] === phone);
     if (regularUser && password === "password") {
        const user: AuthenticatedUser = { id: regularUser.id, name: regularUser.name, role: 'user' };
-       if (typeof window !== 'undefined') {
-            sessionStorage.setItem(SESSION_KEY, JSON.stringify({ 
-                user, 
-                accessToken: MOCK_ACCESS_TOKEN, 
-                refreshToken: MOCK_REFRESH_TOKEN 
-            }));
-        }
+       
+        setCookie(null, SESSION_KEY, JSON.stringify(user), {
+            maxAge: 30 * 24 * 60 * 60,
+            path: '/',
+        });
+
        return { success: true, message: `Welcome back, ${regularUser.name}!`, role: 'user' };
     }
 
@@ -88,16 +65,24 @@ export const login = (phone: string, password: string): AuthResult => {
 }
 
 export const logout = (): void => {
-    if (typeof window !== 'undefined') {
-        sessionStorage.removeItem(SESSION_KEY);
-    }
+    destroyCookie(null, SESSION_KEY, { path: '/' });
 };
 
-export const getCurrentUser = (): AuthenticatedUser | null => {
-    const session = getSession();
-    return session ? session.user : null;
+export const getCurrentUser = (req?: IncomingMessage): AuthenticatedUser | null => {
+    const cookies = parseCookies({ req });
+    const session = cookies[SESSION_KEY];
+
+    if (!session) return null;
+
+    try {
+        const user: AuthenticatedUser = JSON.parse(session);
+        return user;
+    } catch (e) {
+        return null;
+    }
 }
 
-export const isAuthenticated = (): boolean => {
-    return !!getSession();
+export const isAuthenticated = (req?: IncomingMessage): boolean => {
+    return !!getCurrentUser(req);
 };
+
