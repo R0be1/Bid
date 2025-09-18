@@ -3,13 +3,13 @@
 "use client";
 
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
-import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog, Home, User, LogOut } from "lucide-react";
+import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog, User, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 // MOCK: In a real app, this would come from the logged-in user's session
-const MOCK_AUCTIONEER_FULLNAME = "John Smith";
+const MOCK_AUCTIONEER_NAME = "Vintage Treasures LLC";
 
 export default function AuctioneerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -31,7 +31,7 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
                 <div className="flex items-center gap-2 p-4">
                     <Gavel className="h-7 w-7 text-primary" />
                     <span className="font-bold text-lg text-white group-data-[collapsible=icon]:hidden truncate">
-                        {MOCK_AUCTIONEER_FULLNAME}
+                        {MOCK_AUCTIONEER_NAME}
                     </span>
                 </div>
             </SidebarHeader>
