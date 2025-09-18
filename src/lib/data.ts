@@ -1,11 +1,14 @@
 
+
 import type { AuctionItem, Bid } from "./types";
 import { addDays, subDays } from "date-fns";
 import { PlaceHolderImages } from "./placeholder-images";
 import { getCategories } from "./categories";
+import { getAuctioneers } from "./auctioneers";
 
 const now = new Date();
 const categories = getCategories();
+const auctioneers = getAuctioneers();
 
 const items: AuctionItem[] = [
   {
@@ -23,6 +26,7 @@ const items: AuctionItem[] = [
         'watch mechanism'
     ],
     category: categories[0]?.name || "Antiques",
+    auctioneerName: auctioneers[0]?.name || "Vintage Treasures LLC",
     type: "live",
     startDate: now.toISOString(),
     endDate: addDays(now, 2).toISOString(),
@@ -40,6 +44,7 @@ const items: AuctionItem[] = [
     imageUrls: [PlaceHolderImages.find(p => p.id === '2')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '2')?.imageHint || ''],
     category: categories[1]?.name || "Art",
+    auctioneerName: auctioneers[1]?.name || "Modern Art Auctions",
     type: "live",
     startDate: now.toISOString(),
     endDate: addDays(now, 1).toISOString(),
@@ -55,6 +60,7 @@ const items: AuctionItem[] = [
     imageUrls: [PlaceHolderImages.find(p => p.id === '3')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '3')?.imageHint || ''],
     category: categories[2]?.name || "Furniture",
+    auctioneerName: auctioneers[0]?.name || "Vintage Treasures LLC",
     type: "live",
     startDate: subDays(now, 4).toISOString(),
     endDate: subDays(now, 1).toISOString(),
@@ -70,6 +76,7 @@ const items: AuctionItem[] = [
     imageUrls: [PlaceHolderImages.find(p => p.id === '4')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '4')?.imageHint || ''],
     category: categories[3]?.name || "Collectibles",
+    auctioneerName: auctioneers[0]?.name || "Vintage Treasures LLC",
     type: "sealed",
     startDate: now.toISOString(),
     endDate: addDays(now, 7).toISOString(),
@@ -85,6 +92,7 @@ const items: AuctionItem[] = [
     imageUrls: [PlaceHolderImages.find(p => p.id === '5')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '5')?.imageHint || ''],
     category: categories[4]?.name || "Sports Memorabilia",
+    auctioneerName: auctioneers[2]?.name || "Sports Memorabilia Kings",
     type: "sealed",
     startDate: subDays(now, 10).toISOString(),
     endDate: subDays(now, 2).toISOString(),
@@ -98,6 +106,7 @@ const items: AuctionItem[] = [
     imageUrls: [PlaceHolderImages.find(p => p.id === '6')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '6')?.imageHint || ''],
     category: categories[5]?.name || "Books",
+    auctioneerName: auctioneers[0]?.name || "Vintage Treasures LLC",
     type: "live",
     startDate: now.toISOString(),
     endDate: addDays(now, 4).toISOString(),
@@ -113,6 +122,7 @@ const items: AuctionItem[] = [
     imageUrls: [PlaceHolderImages.find(p => p.id === '7')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '7')?.imageHint || ''],
     category: categories[6]?.name || "Fashion",
+    auctioneerName: auctioneers[1]?.name || "Modern Art Auctions",
     type: "sealed",
     startDate: now.toISOString(),
     endDate: addDays(now, 6).toISOString(),
@@ -128,6 +138,7 @@ const items: AuctionItem[] = [
     imageUrls: [PlaceHolderImages.find(p => p.id === '8')?.imageUrl || ''],
     imageHints: [PlaceHolderImages.find(p => p.id === '8')?.imageHint || ''],
     category: categories[7]?.name || "Musical Instruments",
+    auctioneerName: auctioneers[2]?.name || "Sports Memorabilia Kings",
     type: "live",
     startDate: now.toISOString(),
     endDate: addDays(now, 10).toISOString(),

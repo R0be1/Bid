@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import CountdownTimer from "@/components/CountdownTimer";
 import LiveBidding from "@/components/LiveBidding";
 import SealedBidForm from "@/components/SealedBidForm";
-import { Clock, Hammer, Tag, DollarSign, ShieldCheck, Calendar, Trophy } from "lucide-react";
+import { Clock, Hammer, Tag, DollarSign, ShieldCheck, Calendar, Trophy, Gavel } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,7 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
             <Badge variant="outline">{item.category}</Badge>
         </div>
         <h1 className="text-3xl md:text-4xl font-bold font-headline text-primary">{item.name}</h1>
+        <p className="text-md text-muted-foreground flex items-center gap-2 mt-2"><Gavel className="h-4 w-4" /> Sold by {item.auctioneerName}</p>
       </div>
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
         <div className="space-y-4">

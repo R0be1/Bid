@@ -7,6 +7,7 @@ export type AuctionItem = {
   imageUrls: string[];
   imageHints: string[];
   category: string;
+  auctioneerName: string;
   type: 'live' | 'sealed';
   startDate: string; // ISO string
   endDate: string; // ISO string

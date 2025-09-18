@@ -12,19 +12,23 @@ import {
 } from "@/components/ui/select";
 import { getAuctionItems } from "@/lib/data";
 import { getCategories } from "@/lib/categories";
+import { getAuctioneers } from "@/lib/auctioneers";
 import AuctionItemCard from "@/components/AuctionItemCard";
-import type { Category } from "@/lib/types";
-import { ListFilter } from "lucide-react";
+import type { Auctioneer, Category } from "@/lib/types";
+import { ListFilter, Gavel } from "lucide-react";
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedAuctioneer, setSelectedAuctioneer] = useState<string>("all");
 
   const allItems = getAuctionItems();
   const categories = getCategories();
+  const auctioneers = getAuctioneers();
 
   const filteredItems = allItems.filter(
     (item) =>
-      selectedCategory === "all" || item.category === selectedCategory
+      (selectedCategory === "all" || item.category === selectedCategory) &&
+      (selectedAuctioneer === "all" || item.auctioneerName === selectedAuctioneer)
   );
 
   const liveItems = filteredItems.filter((item) => item.type === "live");
@@ -61,6 +65,24 @@ export default function Home() {
                 {categories.map((category: Category) => (
                   <SelectItem key={category.id} value={category.name}>
                     {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+        </div>
+        <div className="w-full md:w-auto md:min-w-[250px]">
+           <Select value={selectedAuctioneer} onValueChange={setSelectedAuctioneer}>
+              <SelectTrigger className="w-full">
+                <div className="flex items-center gap-2">
+                    <Gavel className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Filter by auctioneer..." />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Auctioneers</SelectItem>
+                {auctioneers.map((auctioneer: Auctioneer) => (
+                  <SelectItem key={auctioneer.id} value={auctioneer.name}>
+                    {auctioneer.name}
                   </SelectItem>
                 ))}
               </SelectContent>

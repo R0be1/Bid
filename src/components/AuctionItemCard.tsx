@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Tag, Clock } from "lucide-react";
+import { Tag, Clock, Gavel } from "lucide-react";
 import CountdownTimer from "./CountdownTimer";
 import { Badge } from "@/components/ui/badge";
 
@@ -35,6 +35,10 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
               {item.name}
             </CardTitle>
             <Badge variant="outline" className="text-xs whitespace-nowrap">{item.category}</Badge>
+          </div>
+          <div className="mt-2 flex items-center text-sm text-foreground/80">
+            <Gavel className="mr-2 h-4 w-4" />
+            <span>{item.auctioneerName}</span>
           </div>
           <div className="mt-2 flex items-center text-sm text-foreground/80">
             <Tag className="mr-2 h-4 w-4" />
