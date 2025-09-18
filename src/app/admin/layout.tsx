@@ -9,7 +9,7 @@ import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 // MOCK: In a real app, this would come from the logged-in user's session
-const MOCK_AUCTIONEER_NAME = "Vintage Treasures LLC";
+const MOCK_AUCTIONEER_FULLNAME = "John Smith";
 
 export default function AuctioneerLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -31,7 +31,7 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
                 <div className="flex items-center gap-2 p-4">
                     <Gavel className="h-7 w-7 text-primary" />
                     <span className="font-bold text-lg text-white group-data-[collapsible=icon]:hidden truncate">
-                        {MOCK_AUCTIONEER_NAME}
+                        {MOCK_AUCTIONEER_FULLNAME}
                     </span>
                 </div>
             </SidebarHeader>
