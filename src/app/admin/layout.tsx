@@ -22,7 +22,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <SidebarProvider>
       <Sidebar>
           <SidebarHeader>
-              <div className="flex items-center gap-2 p-4">
+              <div className="flex items-center gap-2 px-4 pb-4 pt-2">
                   <Gavel className="h-7 w-7 text-primary" />
                   <span className="font-bold text-xl text-foreground group-data-[collapsible=icon]:hidden">
                       BidCraft Admin
