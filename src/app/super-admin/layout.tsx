@@ -3,7 +3,7 @@
 "use client";
 
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
-import { Shield, LayoutGrid, Users, Settings, Home } from "lucide-react";
+import { Shield, LayoutGrid, Users, Settings, Home, User, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -50,11 +50,27 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
             </SidebarContent>
             <SidebarFooter className="p-0">
               <SidebarMenu>
+                   <SidebarMenuItem>
+                      <SidebarMenuButton asChild tooltip="Profile">
+                          <Link href="/super-admin/settings">
+                              <User />
+                              <span className="group-data-[collapsible=icon]:hidden">Profile</span>
+                          </Link>
+                      </SidebarMenuButton>
+                  </SidebarMenuItem>
                   <SidebarMenuItem>
                       <SidebarMenuButton asChild tooltip="Customer Portal">
                           <Link href="/">
                               <Home />
                               <span className="group-data-[collapsible=icon]:hidden">Customer Portal</span>
+                          </Link>
+                      </SidebarMenuButton>
+                  </SidebarMenuItem>
+                   <SidebarMenuItem>
+                      <SidebarMenuButton asChild tooltip="Logout">
+                          <Link href="/login">
+                              <LogOut />
+                              <span className="group-data-[collapsible=icon]:hidden">Logout</span>
                           </Link>
                       </SidebarMenuButton>
                   </SidebarMenuItem>

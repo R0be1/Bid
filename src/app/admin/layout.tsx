@@ -3,7 +3,7 @@
 "use client";
 
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
-import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog, Home } from "lucide-react";
+import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog, Home, User, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
     { href: "/admin", label: "Dashboard", icon: LayoutGrid },
     { href: "/admin/manage-items", label: "Manage Items", icon: Gavel },
     { href: "/admin/categories", label: "Categories", icon: Tag },
-    { href: "/admin/users", label: "Users", icon: UserCog },
+    { href: "/admin/users", label: "Bidders", icon: UserCog },
     { href: "/admin/results", label: "Results", icon: Trophy },
     { href: "/admin/messages", label: "Messages", icon: MessageSquare },
     { href: "/admin/communications", label: "Communications", icon: Send },
@@ -49,10 +49,26 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
             <SidebarFooter className="p-0">
               <SidebarMenu>
                   <SidebarMenuItem>
+                      <SidebarMenuButton asChild tooltip="Profile">
+                          <Link href="/admin/users">
+                              <User />
+                              <span className="group-data-[collapsible=icon]:hidden">Profile</span>
+                          </Link>
+                      </SidebarMenuButton>
+                  </SidebarMenuItem>
+                  <SidebarMenuItem>
                       <SidebarMenuButton asChild tooltip="Customer Portal">
                           <Link href="/">
                               <Home />
                               <span className="group-data-[collapsible=icon]:hidden">Customer Portal</span>
+                          </Link>
+                      </SidebarMenuButton>
+                  </SidebarMenuItem>
+                   <SidebarMenuItem>
+                      <SidebarMenuButton asChild tooltip="Logout">
+                          <Link href="/login">
+                              <LogOut />
+                              <span className="group-data-[collapsible=icon]:hidden">Logout</span>
                           </Link>
                       </SidebarMenuButton>
                   </SidebarMenuItem>

@@ -1,4 +1,5 @@
 
+
 import { getUsers } from "@/lib/users";
 import { UserList } from "./_components/user-list";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,15 +13,15 @@ export default function UsersPage() {
         <div>
             <h1 className="text-3xl font-bold font-headline text-primary flex items-center gap-2">
                 <UserCog />
-                Manage Users
+                Manage Bidders
             </h1>
-            <p className="text-muted-foreground">Approve, block, and manage registered users and their payment statuses.</p>
+            <p className="text-muted-foreground">Approve, block, and manage registered bidders and their payment statuses.</p>
         </div>
 
         <Card>
             <CardHeader>
-                <CardTitle>Registered Users</CardTitle>
-                <CardDescription>View all users, their approval status, and any payments made for auction entry.</CardDescription>
+                <CardTitle>Registered Bidders</CardTitle>
+                <CardDescription>View all bidders, their approval status, and any payments made for auction entry.</CardDescription>
             </CardHeader>
             <CardContent>
                 <UserList initialUsers={users} />
