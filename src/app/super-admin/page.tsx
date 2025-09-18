@@ -5,8 +5,8 @@ import { getAuctioneers } from "@/lib/auctioneers";
 import { getAuctionItems } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users, Gavel } from "lucide-react";
-import { Pie, PieChart, Cell } from "recharts";
-import { ChartContainer, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
+import { Pie, PieChart, Cell, Tooltip } from "recharts";
+import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 export default function SuperAdminDashboard() {
   const auctioneers = getAuctioneers();
@@ -77,6 +77,10 @@ export default function SuperAdminDashboard() {
         <CardContent className="flex items-center justify-center">
           <ChartContainer config={chartConfig} className="min-h-[200px] w-full max-w-[300px]">
             <PieChart>
+               <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent indicator="dot" />}
+                />
                 <Pie 
                     data={auctioneerStatusData} 
                     dataKey="count" 
