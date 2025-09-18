@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import type { Metadata } from "next";
@@ -18,6 +17,9 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const isPortalPage = pathname.startsWith("/admin") || pathname.startsWith("/super-admin");
+  const isAuthPage = pathname === "/login" || pathname === "/register";
+
+  const showHeader = !isPortalPage && !isAuthPage;
 
   return (
     <html lang="en" className="h-full">
@@ -32,8 +34,8 @@ export default function RootLayout({
       <body
         className={`${inter.variable} font-body antialiased flex flex-col min-h-screen bg-background text-foreground`}
       >
-        {!isPortalPage && <Header />}
-        <div className={`flex-grow ${!isPortalPage ? 'container mx-auto px-4 sm:px-6 lg:px-8 py-8' : 'flex'}`}>
+        {showHeader && <Header />}
+        <div className={`flex-grow ${showHeader ? 'container mx-auto px-4 sm:px-6 lg:px-8 py-8' : isPortalPage ? 'flex' : ''}`}>
           {children}
         </div>
         <Toaster />
