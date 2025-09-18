@@ -1,4 +1,5 @@
 
+
 import { getAuctionItems } from "@/lib/data";
 import {
   Card,
@@ -21,22 +22,27 @@ import Link from "next/link";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 
+// MOCK: In a real app, this would come from the logged-in user's session
+const MOCK_AUCTIONEER_NAME = "Vintage Treasures LLC";
+
 export default function AdminResultsPage() {
   const allItems = getAuctionItems();
-  const completedAuctions = allItems.filter(item => new Date(item.endDate) < new Date());
+  // Filter items for the logged-in auctioneer
+  const auctioneerItems = allItems.filter(item => item.auctioneerName === MOCK_AUCTIONEER_NAME);
+  const completedAuctions = auctioneerItems.filter(item => new Date(item.endDate) < new Date());
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold font-headline text-primary">Auction Results</h1>
-        <p className="text-muted-foreground">View results for all completed auctions.</p>
+        <p className="text-muted-foreground">View results for your completed auctions.</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Completed Auctions</CardTitle>
+          <CardTitle>Your Completed Auctions</CardTitle>
           <CardDescription>
-            A list of all auctions that have ended. Click 'View' to see detailed results.
+            A list of all your auctions that have ended. Click 'View' to see detailed results.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -70,7 +76,7 @@ export default function AdminResultsPage() {
             </Table>
           ) : (
              <div className="text-center text-muted-foreground py-8">
-                <p>No auctions have been completed yet.</p>
+                <p>You have no completed auctions yet.</p>
               </div>
           )}
         </CardContent>

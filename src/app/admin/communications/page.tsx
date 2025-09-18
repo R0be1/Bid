@@ -1,5 +1,7 @@
 
+
 import { getCommunications } from "@/lib/communications";
+import { getAuctionItems } from "@/lib/data";
 import {
   Card,
   CardContent,
@@ -19,23 +21,29 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+
+// MOCK: In a real app, this would come from the logged-in user's session
+const MOCK_AUCTIONEER_NAME = "Vintage Treasures LLC";
 
 export default function CommunicationsPage() {
-  const communications = getCommunications();
+  const allCommunications = getCommunications();
+  const allItems = getAuctionItems();
+  const auctioneerItemIds = new Set(allItems.filter(item => item.auctioneerName === MOCK_AUCTIONEER_NAME).map(item => item.id));
+
+  const communications = allCommunications.filter(log => auctioneerItemIds.has(log.auctionId));
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold font-headline text-primary">Communication History</h1>
-        <p className="text-muted-foreground">A log of all announcements sent to bidders.</p>
+        <p className="text-muted-foreground">A log of all announcements sent for your auctions.</p>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Sent Announcements</CardTitle>
           <CardDescription>
-            This log shows all the email and SMS communications sent from auction results pages.
+            This log shows all the email and SMS communications sent from your auction results pages.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -74,7 +82,7 @@ export default function CommunicationsPage() {
             </Table>
           ) : (
              <div className="text-center text-muted-foreground py-8">
-                <p>No communications have been sent yet.</p>
+                <p>No communications have been sent for your auctions yet.</p>
               </div>
           )}
         </CardContent>
