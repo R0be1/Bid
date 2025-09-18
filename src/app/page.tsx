@@ -25,7 +25,13 @@ export default function Home() {
   const categories = getCategories();
   const auctioneers = getAuctioneers();
 
-  const filteredItems = allItems.filter(
+  const activeAuctioneerNames = new Set(
+    auctioneers.filter((a) => a.status === 'active').map((a) => a.name)
+  );
+
+  const visibleItems = allItems.filter((item) => activeAuctioneerNames.has(item.auctioneerName));
+
+  const filteredItems = visibleItems.filter(
     (item) =>
       (selectedCategory === "all" || item.category === selectedCategory) &&
       (selectedAuctioneer === "all" || item.auctioneerName === selectedAuctioneer)
@@ -80,7 +86,7 @@ export default function Home() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Auctioneers</SelectItem>
-                {auctioneers.map((auctioneer: Auctioneer) => (
+                {auctioneers.filter(a => a.status === 'active').map((auctioneer: Auctioneer) => (
                   <SelectItem key={auctioneer.id} value={auctioneer.name}>
                     {auctioneer.name}
                   </SelectItem>
