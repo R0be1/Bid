@@ -1,3 +1,6 @@
+
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
+import { Phone, KeyRound } from "lucide-react";
 
 export default function LoginPage() {
   return (
@@ -18,17 +22,27 @@ export default function LoginPage() {
         <CardHeader>
           <CardTitle className="text-2xl font-headline">Login</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account.
+            Enter your phone number and password to access your account.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" placeholder="m@example.com" required />
+            <Label htmlFor="phone">Phone Number</Label>
+            <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <Input id="phone" type="tel" placeholder="(123) 456-7890" required className="pl-10" />
+            </div>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required />
+             <div className="relative">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <KeyRound className="h-4 w-4 text-muted-foreground" />
+                </div>
+                <Input id="password" type="password" required className="pl-10" />
+            </div>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
