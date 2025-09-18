@@ -123,9 +123,9 @@ export function UserList({ initialUsers }: UserListProps) {
               <TableHead className="w-[50px]">
                 <Checkbox 
                   onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
-                  checked={isAllSelected}
-                  aria-label="Select all rows"
+                  checked={isAllSelected || isSomeSelected}
                   indeterminate={isSomeSelected}
+                  aria-label="Select all rows"
                 />
               </TableHead>
               <TableHead>Name</TableHead>
