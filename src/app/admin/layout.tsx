@@ -52,8 +52,8 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
             <SidebarFooter className="p-0">
               <SidebarMenu>
                   <SidebarMenuItem>
-                      <SidebarMenuButton asChild tooltip="Profile">
-                          <Link href="/admin/users">
+                      <SidebarMenuButton asChild isActive={pathname === '/admin/profile'} tooltip="Profile">
+                          <Link href="/admin/profile">
                               <User />
                               <span className="group-data-[collapsible=icon]:hidden">Profile</span>
                           </Link>
