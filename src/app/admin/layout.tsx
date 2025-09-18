@@ -36,7 +36,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
                                 <Link href={item.href}>
                                     <item.icon />
-                                    <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
+                                    <span>{item.label}</span>
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
