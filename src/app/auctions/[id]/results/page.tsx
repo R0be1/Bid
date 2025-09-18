@@ -56,7 +56,7 @@ export default function AuctionResultsPage() {
 
   const bidCounts = bids.reduce((acc, bid) => {
       const priceRange = Math.floor(bid.amount / 100) * 100;
-      const rangeLabel = `Birr ${priceRange} - Birr ${priceRange + 99}`;
+      const rangeLabel = `${priceRange} - ${priceRange + 99} Birr`;
       acc[rangeLabel] = (acc[rangeLabel] || 0) + 1;
       return acc;
   }, {} as Record<string, number>);
@@ -137,7 +137,7 @@ export default function AuctionResultsPage() {
                     {index === 0 ? <Trophy className="h-5 w-5 text-yellow-500" /> : `#${index + 1}`}
                   </TableCell>
                   <TableCell>{bid.bidderName}</TableCell>
-                  <TableCell className="text-right font-semibold">Birr {bid.amount.toLocaleString()}</TableCell>
+                  <TableCell className="text-right font-semibold">{bid.amount.toLocaleString()} Birr</TableCell>
                 </TableRow>
               )) : (
                 <TableRow>

@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { User, DollarSign, Info } from "lucide-react";
+import { User, Banknote, Info } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 
@@ -71,7 +71,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
     if (!bidAmount || bidAmount < requiredBid) {
       toast({
         title: "Invalid Bid",
-        description: `Your bid must be at least Birr ${requiredBid.toLocaleString()}. (Minimum increment: Birr ${minIncrement.toLocaleString()})`,
+        description: `Your bid must be at least ${requiredBid.toLocaleString()} Birr. (Minimum increment: ${minIncrement.toLocaleString()} Birr)`,
         variant: "destructive",
       });
       return;
@@ -81,7 +81,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
     setNewBid("");
     toast({
       title: "Bid Placed!",
-      description: `You are now the highest bidder with Birr ${bidAmount.toLocaleString()}.`,
+      description: `You are now the highest bidder with ${bidAmount.toLocaleString()} Birr.`,
     });
   };
 
@@ -140,7 +140,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
           <div className="p-4 border rounded-lg bg-secondary/50">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium text-muted-foreground">Current Bid</span>
-              <span className="text-2xl font-bold text-primary">Birr {currentBid.toLocaleString()}</span>
+              <span className="text-2xl font-bold text-primary">{currentBid.toLocaleString()} Birr</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">High Bidder</span>
@@ -177,7 +177,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
             </p>
             ) : (
             <p className="text-xs text-center text-muted-foreground">
-              Minimum bid increment: Birr {minIncrement.toLocaleString()}
+              Minimum bid increment: {minIncrement.toLocaleString()} Birr
             </p>
            )}
         </div>

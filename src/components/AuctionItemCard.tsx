@@ -43,7 +43,7 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
           <div className="mt-2 flex items-center text-sm text-foreground/80">
             <Tag className="mr-2 h-4 w-4" />
             <span>{item.type === 'live' ? 'Current Bid:' : 'Starts At:'}</span>
-            <span className="ml-1 font-bold">Birr {currentPrice.toLocaleString()}</span>
+            <span className="ml-1 font-bold">{currentPrice.toLocaleString()} Birr</span>
           </div>
           <div className="mt-2 flex items-center text-sm text-foreground/80">
             <Clock className="mr-2 h-4 w-4" />
