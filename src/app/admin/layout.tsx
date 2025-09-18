@@ -13,6 +13,7 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutGrid },
+    { href: "/admin/manage-items", label: "Manage Items", icon: Gavel },
     { href: "/admin/categories", label: "Categories", icon: Tag },
     { href: "/admin/users", label: "Users", icon: UserCog },
     { href: "/admin/results", label: "Results", icon: Trophy },
