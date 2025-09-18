@@ -67,100 +67,101 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-8 p-4 md:p-8">
+    <div className="space-y-8">
         <div>
             <h1 className="text-3xl font-bold font-headline text-primary">Your Profile</h1>
             <p className="text-muted-foreground">View your account details and manage your password.</p>
         </div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><User /> Account Information</CardTitle>
+                    <CardDescription>These details are managed by the platform administrator.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <Label htmlFor="companyName">Auctioneer/Company Name</Label>
+                            <Input id="companyName" value={auctioneer.name} readOnly disabled />
+                        </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <Label htmlFor="firstName">First Name</Label>
+                            <Input id="firstName" value={auctioneer.user.firstName} readOnly disabled />
+                        </div>
+                        <div>
+                            <Label htmlFor="lastName">Last Name</Label>
+                            <Input id="lastName" value={auctioneer.user.lastName} readOnly disabled />
+                        </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <Label htmlFor="email">Email Address</Label>
+                            <Input id="email" value={auctioneer.user.email} readOnly disabled />
+                        </div>
+                        <div>
+                            <Label htmlFor="phone">Phone Number</Label>
+                            <Input id="phone" value={auctioneer.user.phone} readOnly disabled />
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
 
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><User /> Account Information</CardTitle>
-                <CardDescription>These details are managed by the platform administrator.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                 <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                        <Label htmlFor="companyName">Auctioneer/Company Name</Label>
-                        <Input id="companyName" value={auctioneer.name} readOnly disabled />
-                    </div>
-                 </div>
-                 <div className="grid md:grid-cols-2 gap-4">
-                     <div>
-                        <Label htmlFor="firstName">First Name</Label>
-                        <Input id="firstName" value={auctioneer.user.firstName} readOnly disabled />
-                    </div>
-                    <div>
-                        <Label htmlFor="lastName">Last Name</Label>
-                        <Input id="lastName" value={auctioneer.user.lastName} readOnly disabled />
-                    </div>
-                 </div>
-                 <div className="grid md:grid-cols-2 gap-4">
-                     <div>
-                        <Label htmlFor="email">Email Address</Label>
-                        <Input id="email" value={auctioneer.user.email} readOnly disabled />
-                    </div>
-                    <div>
-                        <Label htmlFor="phone">Phone Number</Label>
-                        <Input id="phone" value={auctioneer.user.phone} readOnly disabled />
-                    </div>
-                 </div>
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Lock /> Change Password</CardTitle>
-                <CardDescription>Update your password here. Remember to choose a strong one.</CardDescription>
-            </CardHeader>
-            <CardContent>
-                <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                        <FormField
-                            control={form.control}
-                            name="currentPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Current Password</FormLabel>
-                                <FormControl>
-                                    <Input type="password" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="newPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>New Password</FormLabel>
-                                <FormControl>
-                                    <Input type="password" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                         <FormField
-                            control={form.control}
-                            name="confirmPassword"
-                            render={({ field }) => (
-                                <FormItem>
-                                <FormLabel>Confirm New Password</FormLabel>
-                                <FormControl>
-                                    <Input type="password" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <Button type="submit">Update Password</Button>
-                    </form>
-                </Form>
-            </CardContent>
-        </Card>
-
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2"><Lock /> Change Password</CardTitle>
+                    <CardDescription>Update your password here. Remember to choose a strong one.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                            <FormField
+                                control={form.control}
+                                name="currentPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Current Password</FormLabel>
+                                    <FormControl>
+                                        <Input type="password" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="newPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>New Password</FormLabel>
+                                    <FormControl>
+                                        <Input type="password" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="confirmPassword"
+                                render={({ field }) => (
+                                    <FormItem>
+                                    <FormLabel>Confirm New Password</FormLabel>
+                                    <FormControl>
+                                        <Input type="password" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                            <Button type="submit">Update Password</Button>
+                        </form>
+                    </Form>
+                </CardContent>
+            </Card>
+        </div>
     </div>
   );
 }
