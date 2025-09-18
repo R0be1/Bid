@@ -22,7 +22,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                 <div className="flex items-center gap-2 p-4">
                     <Shield className="h-7 w-7 text-accent" />
                     <span className="font-bold text-xl text-white group-data-[collapsible=icon]:hidden">
-                        Super Admin
+                        NIBtera ጨረታ Super Admin
                     </span>
                 </div>
             </SidebarHeader>
