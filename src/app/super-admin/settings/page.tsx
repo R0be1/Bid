@@ -54,7 +54,7 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="space-y-8 max-w-2xl mx-auto">
+        <div className="space-y-8">
             <div>
                 <h1 className="text-3xl font-bold font-headline text-primary">Settings</h1>
                 <p className="text-muted-foreground">Manage super admin users.</p>
