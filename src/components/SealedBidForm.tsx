@@ -27,7 +27,7 @@ const formSchema = z.object({
 });
 
 // This is a mock value. In a real app, this would come from an authentication context.
-const MOCK_IS_LOGGED_IN = true;
+const MOCK_IS_LOGGED_IN = false;
 const MOCK_USER_STATUS = 'pending'; // or 'approved' or 'blocked'
 const MOCK_USER_HAS_PAID = false;
 

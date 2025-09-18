@@ -17,8 +17,9 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { PlusCircle, Edit, Power } from "lucide-react";
+import { PlusCircle, Edit, Power, Info } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function ManageAuctioneerPage() {
   const [auctioneers, setAuctioneers] = useState<Auctioneer[]>(getAuctioneers());
@@ -71,7 +72,16 @@ export default function ManageAuctioneerPage() {
                   <TableBody>
                       {auctioneers.map((auctioneer) => (
                           <TableRow key={auctioneer.id}>
-                              <TableCell className="font-medium">{auctioneer.name}</TableCell>
+                              <TableCell className="font-medium">
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <span className="cursor-help underline decoration-dashed">{auctioneer.name}</span>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Temp Password: <span className="font-bold">{auctioneer.user.tempPassword}</span></p>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </TableCell>
                               <TableCell>{auctioneer.user.firstName} {auctioneer.user.lastName}</TableCell>
                               <TableCell>{auctioneer.user.email}</TableCell>
                               <TableCell>

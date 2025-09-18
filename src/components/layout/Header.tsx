@@ -16,7 +16,7 @@ export function Header() {
   ];
   
   // Mock login status
-  const isLoggedIn = true;
+  const isLoggedIn = false;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
@@ -53,8 +53,8 @@ export function Header() {
                     Dashboard
                 </Link>
               </Button>
-               <Button variant="outline">
-                Log out
+               <Button variant="outline" asChild>
+                <Link href="/login">Log out</Link>
               </Button>
             </>
           ) : (

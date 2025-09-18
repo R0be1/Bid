@@ -13,6 +13,7 @@ let auctioneers: Auctioneer[] = [
             lastName: "Smith",
             phone: "111-222-3333",
             email: "john.smith@vintagetreasures.com",
+            tempPassword: "password123"
         },
         createdAt: subDays(new Date(), 90),
     },
@@ -26,6 +27,7 @@ let auctioneers: Auctioneer[] = [
             lastName: "Garcia",
             phone: "444-555-6666",
             email: "maria.garcia@modernart.com",
+            tempPassword: "password456"
         },
         createdAt: subDays(new Date(), 45),
     },
@@ -39,6 +41,7 @@ let auctioneers: Auctioneer[] = [
             lastName: "Lee",
             phone: "777-888-9999",
             email: "david.lee@sportskings.com",
+            tempPassword: "password789"
         },
         createdAt: subDays(new Date(), 120),
     }
@@ -54,11 +57,17 @@ export function getAuctioneerById(id: string): Auctioneer | undefined {
 }
 
 export function addAuctioneer(data: Omit<Auctioneer, 'id' | 'createdAt' | 'status'>): Auctioneer {
+    // In a real app, you'd generate a more secure random password.
+    const tempPassword = Math.random().toString(36).slice(-8);
     const newAuctioneer: Auctioneer = {
         ...data,
         id: `auc-${Math.random().toString(36).substr(2, 9)}`,
         createdAt: new Date(),
-        status: 'active'
+        status: 'active',
+        user: {
+            ...data.user,
+            tempPassword: tempPassword,
+        }
     };
     auctioneers.push(newAuctioneer);
     return newAuctioneer;

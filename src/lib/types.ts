@@ -69,6 +69,7 @@ export type Auctioneer = {
     lastName: string;
     phone: string;
     email: string;
+    tempPassword?: string;
   };
   createdAt: Date;
 };
