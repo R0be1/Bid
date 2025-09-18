@@ -78,4 +78,5 @@ export type SuperAdmin = {
   id: string;
   name: string;
   email: string;
+  tempPassword?: string;
 };

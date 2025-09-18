@@ -20,11 +20,13 @@ import { addSuperAdmin, getSuperAdmins } from "@/lib/super-admins";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useState, useMemo } from "react";
 import type { SuperAdmin } from "@/lib/types";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { Info, Copy } from "lucide-react";
+
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required."),
   email: z.string().email("Invalid email address."),
-  password: z.string().min(8, "Password must be at least 8 characters."),
 });
 
 export default function SettingsPage() {
@@ -37,7 +39,6 @@ export default function SettingsPage() {
         defaultValues: {
             name: "",
             email: "",
-            password: "",
         },
     });
 
@@ -52,6 +53,17 @@ export default function SettingsPage() {
         });
         form.reset();
     }
+    
+    const handleCopyPassword = (password: string | undefined) => {
+      if (!password) return;
+      navigator.clipboard.writeText(password).then(() => {
+        toast({
+          title: "Copied!",
+          description: "Temporary password copied to clipboard.",
+        });
+      });
+    };
+
 
     return (
         <div className="space-y-8">
@@ -95,19 +107,6 @@ export default function SettingsPage() {
                                         </FormItem>
                                     )}
                                 />
-                                <FormField
-                                    control={form.control}
-                                    name="password"
-                                    render={({ field }) => (
-                                        <FormItem>
-                                        <FormLabel>Temporary Password</FormLabel>
-                                        <FormControl>
-                                            <Input type="password" {...field} />
-                                        </FormControl>
-                                        <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
                                 <Button type="submit" variant="accent" className="w-full">Register Admin</Button>
                             </form>
                         </Form>
@@ -120,24 +119,43 @@ export default function SettingsPage() {
                         <CardDescription>List of all users with super administrative privileges.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                    <div className="overflow-x-auto border rounded-lg">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Name</TableHead>
-                                    <TableHead>Email</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {admins.map((admin) => (
-                                    <TableRow key={admin.id}>
-                                        <TableCell className="font-medium">{admin.name}</TableCell>
-                                        <TableCell>{admin.email}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        </div>
+                        <TooltipProvider>
+                            <div className="overflow-x-auto border rounded-lg">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead>Name</TableHead>
+                                            <TableHead>Email</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {admins.map((admin) => (
+                                            <TableRow key={admin.id}>
+                                                <TableCell className="font-medium">
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <div className="flex items-center gap-2 cursor-help">
+                                                            <span>{admin.name}</span>
+                                                            <Info className="h-4 w-4 text-muted-foreground"/>
+                                                            </div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>
+                                                            <div className="flex items-center gap-2">
+                                                                <p>Temp Password: <span className="font-bold">{admin.tempPassword}</span></p>
+                                                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopyPassword(admin.tempPassword)}>
+                                                                    <Copy className="h-4 w-4" />
+                                                                </Button>
+                                                            </div>
+                                                        </TooltipContent>
+                                                    </Tooltip>
+                                                </TableCell>
+                                                <TableCell>{admin.email}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+                        </TooltipProvider>
                     </CardContent>
                 </Card>
             </div>
