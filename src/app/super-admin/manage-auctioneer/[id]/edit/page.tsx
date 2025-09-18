@@ -179,7 +179,7 @@ export default function EditAuctioneerPage() {
                     </CardContent>
                 </Card>
 
-                <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">Save Changes</Button>
+                <Button type="submit" size="lg" variant="accent" className="w-full">Save Changes</Button>
             </form>
         </Form>
     </div>
