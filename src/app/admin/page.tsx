@@ -1,5 +1,4 @@
 
-
 import { getAuctionItems } from "@/lib/data";
 import { getUsers } from "@/lib/users";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -120,7 +119,7 @@ export default function AdminPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalParticipationFees.toLocaleString()}</div>
+            <div className="text-2xl font-bold">Birr {totalParticipationFees.toLocaleString()}</div>
              <p className="text-xs text-muted-foreground">
               from {usersWhoPaidParticipation} user(s) across all fee-based auctions
             </p>
@@ -134,7 +133,7 @@ export default function AdminPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalSecurityDeposits.toLocaleString()}</div>
+            <div className="text-2xl font-bold">Birr {totalSecurityDeposits.toLocaleString()}</div>
              <p className="text-xs text-muted-foreground">
               from {usersWhoPaidDeposit} user(s) across all deposit-based auctions
             </p>

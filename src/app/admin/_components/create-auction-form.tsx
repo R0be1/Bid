@@ -179,7 +179,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                 name="startingPrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Starting Price ($)</FormLabel>
+                    <FormLabel>Starting Price (Birr)</FormLabel>
                     <FormControl>
                       <Input type="number" step="0.01" {...field} />
                     </FormControl>
@@ -216,7 +216,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                 name="participationFee"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Participation Fee ($)</FormLabel>
+                    <FormLabel>Participation Fee (Birr)</FormLabel>
                     <FormControl>
                       <Input type="number" step="0.01" {...field} />
                     </FormControl>
@@ -315,7 +315,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                 name="securityDeposit"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Security Deposit ($)</FormLabel>
+                    <FormLabel>Security Deposit (Birr)</FormLabel>
                     <FormControl>
                       <Input type="number" step="0.01" {...field} />
                     </FormControl>
@@ -332,7 +332,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                   name="minIncrement"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Minimum Increment ($)</FormLabel>
+                      <FormLabel>Minimum Increment (Birr)</FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" {...field} />
                       </FormControl>

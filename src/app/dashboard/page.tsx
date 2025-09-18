@@ -150,7 +150,7 @@ export default function DashboardPage() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full md:w-auto">
                                     {pendingPayments.map(p => (
                                         <div key={p.type} className="space-y-2">
-                                            <p className="text-sm font-medium text-center capitalize">{p.type} Fee: ${p.amount}</p>
+                                            <p className="text-sm font-medium text-center capitalize">{p.type} Fee: Birr {p.amount}</p>
                                             <div className="flex flex-col gap-2">
                                                 <Button onClick={() => handleDirectPayment(p.type)} disabled={user.status === 'blocked'}>
                                                     <DollarSign className="mr-2 h-4 w-4" />
@@ -167,7 +167,7 @@ export default function DashboardPage() {
                                                         <DialogHeader>
                                                             <DialogTitle>Upload Payment Receipt</DialogTitle>
                                                             <DialogDescription>
-                                                                Upload a screenshot or document of your payment for the {p.type} fee of ${p.amount}. An admin will review it.
+                                                                Upload a screenshot or document of your payment for the {p.type} fee of Birr {p.amount}. An admin will review it.
                                                             </DialogDescription>
                                                         </DialogHeader>
                                                         <div className="grid gap-4 py-4">

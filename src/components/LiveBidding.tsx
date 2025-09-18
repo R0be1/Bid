@@ -71,7 +71,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
     if (!bidAmount || bidAmount < requiredBid) {
       toast({
         title: "Invalid Bid",
-        description: `Your bid must be at least $${requiredBid.toLocaleString()}. (Minimum increment: $${minIncrement.toLocaleString()})`,
+        description: `Your bid must be at least Birr ${requiredBid.toLocaleString()}. (Minimum increment: Birr ${minIncrement.toLocaleString()})`,
         variant: "destructive",
       });
       return;
@@ -81,7 +81,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
     setNewBid("");
     toast({
       title: "Bid Placed!",
-      description: `You are now the highest bidder with $${bidAmount.toLocaleString()}.`,
+      description: `You are now the highest bidder with Birr ${bidAmount.toLocaleString()}.`,
     });
   };
 
@@ -140,7 +140,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
           <div className="p-4 border rounded-lg bg-secondary/50">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium text-muted-foreground">Current Bid</span>
-              <span className="text-2xl font-bold text-primary">${currentBid.toLocaleString()}</span>
+              <span className="text-2xl font-bold text-primary">Birr {currentBid.toLocaleString()}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">High Bidder</span>
@@ -152,12 +152,12 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
               <Label htmlFor="bidAmount" className="sr-only">Bid Amount</Label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <DollarSign className="h-5 w-5 text-muted-foreground" />
+                  <span className="text-muted-foreground">Birr</span>
                 </div>
                 <Input
                   id="bidAmount"
                   type="number"
-                  placeholder={`$${(currentBid + minIncrement).toLocaleString()} or more`}
+                  placeholder={`${(currentBid + minIncrement).toLocaleString()} or more`}
                   value={newBid}
                   onChange={(e) => setNewBid(e.target.value)}
                   className="pl-10"
@@ -177,7 +177,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
             </p>
             ) : (
             <p className="text-xs text-center text-muted-foreground">
-              Minimum bid increment: ${minIncrement.toLocaleString()}
+              Minimum bid increment: Birr {minIncrement.toLocaleString()}
             </p>
            )}
         </div>

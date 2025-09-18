@@ -96,20 +96,20 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
               <div className="flex items-center space-x-3">
                 <Tag className="h-5 w-5 text-accent" />
                 <span className="font-medium">Starting Price:</span>
-                <span className="text-foreground/90">${item.startingPrice.toLocaleString()}</span>
+                <span className="text-foreground/90">Birr {item.startingPrice.toLocaleString()}</span>
               </div>
               {item.participationFee && item.participationFee > 0 && (
                 <div className="flex items-center space-x-3">
                   <DollarSign className="h-5 w-5 text-accent" />
                   <span className="font-medium">Participation Fee:</span>
-                  <span className="text-foreground/90">${item.participationFee.toLocaleString()}</span>
+                  <span className="text-foreground/90">Birr {item.participationFee.toLocaleString()}</span>
                 </div>
               )}
               {item.securityDeposit && item.securityDeposit > 0 && (
                 <div className="flex items-center space-x-3">
                   <ShieldCheck className="h-5 w-5 text-accent" />
                   <span className="font-medium">Security Deposit:</span>
-                  <span className="text-foreground/90">${item.securityDeposit.toLocaleString()}</span>
+                  <span className="text-foreground/90">Birr {item.securityDeposit.toLocaleString()}</span>
                 </div>
               )}
               <div className="flex items-center space-x-3">

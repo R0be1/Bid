@@ -7,19 +7,19 @@ let messageTemplates: MessageTemplate[] = [
         id: "1", 
         name: "Auction Winner Notification", 
         channel: "email", 
-        template: "Congratulations {winnerName}! You have won the auction for {itemName} with a final bid of ${winningBid}. Please proceed to payment within 48 hours." 
+        template: "Congratulations {winnerName}! You have won the auction for {itemName} with a final bid of Birr {winningBid}. Please proceed to payment within 48 hours." 
     },
     { 
         id: "2", 
         name: "Outbid Notification", 
         channel: "sms", 
-        template: "Hi {userName}, you have been outbid on {itemName}. The current bid is now ${currentBid}. Place a new bid to stay in the auction!" 
+        template: "Hi {userName}, you have been outbid on {itemName}. The current bid is now Birr {currentBid}. Place a new bid to stay in the auction!" 
     },
     { 
         id: "3", 
         name: "Auction Ending Soon", 
         channel: "email", 
-        template: "The auction for {itemName} is ending in one hour! The current bid is ${currentBid}. Don't miss your chance to win." 
+        template: "The auction for {itemName} is ending in one hour! The current bid is Birr {currentBid}. Don't miss your chance to win." 
     },
 ];
 

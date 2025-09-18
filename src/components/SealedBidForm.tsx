@@ -150,7 +150,7 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
                   <FormControl>
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                         <DollarSign className="h-5 w-5 text-muted-foreground" />
+                         <span className="text-muted-foreground">Birr</span>
                       </div>
                       <Input
                         type="number"
