@@ -43,8 +43,8 @@ export default function SettingsPage() {
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         // In a real app, this would call a server action to create a new super admin user
-        const newAdmin = addSuperAdmin({name: values.name, email: values.email});
-        setAdmins(prev => [...prev, newAdmin]);
+        addSuperAdmin({name: values.name, email: values.email});
+        setAdmins(getSuperAdmins());
         
         toast({
             title: "Super Admin Registered",
