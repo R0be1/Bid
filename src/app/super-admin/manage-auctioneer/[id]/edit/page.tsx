@@ -74,13 +74,13 @@ export default function EditAuctioneerPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-        <div className="mb-8">
+        <div className="mb-8 pt-8 px-8">
             <h1 className="text-3xl font-bold font-headline text-primary">Edit Auctioneer</h1>
             <p className="text-muted-foreground">Modify the details for {auctioneer.name}.</p>
         </div>
 
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-8 pb-8">
                 <Card>
                     <CardHeader>
                         <CardTitle>Auctioneer Details</CardTitle>

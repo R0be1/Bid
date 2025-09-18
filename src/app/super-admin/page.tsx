@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import { getAuctioneers } from "@/lib/auctioneers";
@@ -38,7 +39,7 @@ export default function SuperAdminDashboard() {
 
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-4 sm:p-6 lg:p-8">
       <div>
         <h1 className="text-3xl font-bold font-headline text-primary">Super Admin Dashboard</h1>
         <p className="text-muted-foreground">Overview of the auction platform.</p>

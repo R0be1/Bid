@@ -56,7 +56,7 @@ export default function ManageAuctioneerPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-4 sm:p-6 lg:p-8">
       <div className="flex items-center justify-between">
         <div>
             <h1 className="text-3xl font-bold font-headline text-primary">Manage Auctioneers</h1>
