@@ -34,8 +34,8 @@
     --sidebar-foreground: 30 20% 90%; /* Light tan/off-white */
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 31 82% 25%; /* Slightly lighter brown for accent */
-    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-accent: 46 97% 51%; /* Gold for accent */
+    --sidebar-accent-foreground: 31 82% 10%; /* Dark brown for text on gold */
     --sidebar-border: 31 82% 20%;
     --sidebar-ring: 46 97% 51%; /* Gold for ring */
   }
@@ -68,8 +68,8 @@
     --sidebar-foreground: 30 20% 90%;
     --sidebar-primary: 224.3 76.3% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 31 82% 25%;
-    --sidebar-accent-foreground: 0 0% 98%;
+    --sidebar-accent: 46 97% 51%;
+    --sidebar-accent-foreground: 31 82% 10%;
     --sidebar-border: 31 82% 20%;
     --sidebar-ring: 46 97% 51%;
   }

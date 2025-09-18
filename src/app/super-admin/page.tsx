@@ -5,7 +5,7 @@ import { getAuctioneers } from "@/lib/auctioneers";
 import { getAuctionItems } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users, Gavel } from "lucide-react";
-import { Pie, PieChart, Cell, Tooltip } from "recharts";
+import { Pie, PieChart, Cell } from "recharts";
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 export default function SuperAdminDashboard() {
@@ -18,7 +18,7 @@ export default function SuperAdminDashboard() {
   const totalBidItems = auctionItems.length;
 
   const auctioneerStatusData = [
-    { name: 'Active', count: activeAuctioneers, fill: 'hsl(var(--primary))' },
+    { name: 'Active', count: activeAuctioneers, fill: 'hsl(var(--accent))' },
     { name: 'Inactive', count: inactiveAuctioneers, fill: 'hsl(var(--destructive))' },
   ];
   
@@ -28,7 +28,7 @@ export default function SuperAdminDashboard() {
     },
     Active: {
       label: "Active",
-      color: "hsl(var(--primary))",
+      color: "hsl(var(--accent))",
     },
     Inactive: {
       label: "Inactive",
@@ -40,7 +40,7 @@ export default function SuperAdminDashboard() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold font-headline text-primary">Super Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold font-headline text-accent">Super Admin Dashboard</h1>
         <p className="text-muted-foreground">Overview of the auction platform.</p>
       </div>
 
