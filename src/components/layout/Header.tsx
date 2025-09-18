@@ -12,6 +12,7 @@ export function Header() {
   const navItems = [
     { href: "/", label: "Auctions" },
     { href: "/dashboard", label: "Dashboard" },
+    { href: "/profile", label: "Profile" },
   ];
   
   // Mock login status
