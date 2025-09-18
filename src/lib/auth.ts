@@ -25,8 +25,8 @@ export interface AuthResult {
 const SESSION_KEY = 'user_session';
 
 export const login = (phone: string, password: string): AuthResult => {
-    const superAdmin = getSuperAdmins().find(sa => sa.email === 'super@admin.com'); // Special case for login
-    if (superAdmin && phone === "0912345678" && password === "Admin@123") {
+    const superAdmin = getSuperAdmins().find(sa => sa.phone === phone && sa.tempPassword === password);
+    if (superAdmin) {
         const user: AuthenticatedUser = { id: superAdmin.id, name: superAdmin.name, role: 'super-admin' };
         
         setCookie(null, SESSION_KEY, JSON.stringify(user), {

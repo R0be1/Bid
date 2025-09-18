@@ -60,8 +60,8 @@ function SuperAdminLayout({ children }: { children: React.ReactNode }) {
             <SidebarFooter className="p-0">
               <SidebarMenu>
                   <SidebarMenuItem>
-                      <SidebarMenuButton asChild tooltip="Profile">
-                          <Link href="/super-admin/manage-auctioneer">
+                      <SidebarMenuButton asChild isActive={pathname === '/super-admin/profile'} tooltip="Profile">
+                          <Link href="/super-admin/profile">
                               <User />
                               <span className="group-data-[collapsible=icon]:hidden">Profile</span>
                           </Link>

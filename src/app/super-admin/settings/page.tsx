@@ -27,6 +27,7 @@ import { Info, Copy } from "lucide-react";
 const formSchema = z.object({
   name: z.string().min(1, "Name is required."),
   email: z.string().email("Invalid email address."),
+  phone: z.string().min(1, "Phone number is required."),
 });
 
 export default function SettingsPage() {
@@ -39,12 +40,13 @@ export default function SettingsPage() {
         defaultValues: {
             name: "",
             email: "",
+            phone: "",
         },
     });
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         // In a real app, this would call a server action to create a new super admin user
-        const newAdmin = addSuperAdmin({name: values.name, email: values.email});
+        const newAdmin = addSuperAdmin({name: values.name, email: values.email, phone: values.phone});
         setAdmins(prev => [...prev, newAdmin]);
         
         toast({
@@ -102,6 +104,19 @@ export default function SettingsPage() {
                                         <FormLabel>Email Address</FormLabel>
                                         <FormControl>
                                             <Input type="email" placeholder="jane.doe@example.com" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                 <FormField
+                                    control={form.control}
+                                    name="phone"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <FormLabel>Phone Number</FormLabel>
+                                        <FormControl>
+                                            <Input type="tel" placeholder="0911223344" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                         </FormItem>
