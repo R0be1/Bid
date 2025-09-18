@@ -77,7 +77,7 @@ export default function SuperAdminDashboard() {
         <CardContent className="flex items-center justify-center">
           <ChartContainer config={chartConfig} className="min-h-[200px] w-full max-w-[300px]">
             <PieChart>
-                <Tooltip
+                <ChartTooltip
                     cursor={false}
                     content={<ChartTooltipContent hideLabel />} 
                 />
