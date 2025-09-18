@@ -36,7 +36,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                             <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
                                 <Link href={item.href}>
                                     <item.icon />
-                                    <span>{item.label}</span>
+                                    <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
@@ -47,7 +47,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                <SidebarTrigger />
             </SidebarFooter>
         </Sidebar>
-        <main className="flex-1 p-4 md:p-8">
+        <main className="flex-1 py-4 md:py-8">
             {children}
         </main>
     </SidebarProvider>
