@@ -3,21 +3,17 @@
 "use client";
 
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
-import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog, Home } from "lucide-react";
+import { Shield, LayoutGrid, Users, Settings, Home } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
 
-export default function AuctioneerLayout({ children }: { children: React.ReactNode }) {
+export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const navItems = [
-    { href: "/auctioneer", label: "Dashboard", icon: LayoutGrid },
-    { href: "/auctioneer/categories", label: "Categories", icon: Tag },
-    { href: "/auctioneer/users", label: "Users", icon: UserCog },
-    { href: "/auctioneer/results", label: "Results", icon: Trophy },
-    { href: "/auctioneer/messages", label: "Messages", icon: MessageSquare },
-    { href: "/auctioneer/communications", label: "Communications", icon: Send },
+    { href: "/super-admin", label: "Dashboard", icon: LayoutGrid },
+    { href: "/super-admin/manage-auctioneer", label: "Manage Auctioneer", icon: Users },
+    { href: "/super-admin/settings", label: "Settings", icon: Settings },
   ];
 
   return (
@@ -25,9 +21,9 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
         <Sidebar>
             <SidebarHeader className="p-0">
                 <div className="flex items-center gap-2 p-4">
-                    <Gavel className="h-7 w-7 text-primary" />
+                    <Shield className="h-7 w-7 text-primary" />
                     <span className="font-bold text-xl text-foreground group-data-[collapsible=icon]:hidden">
-                        BidCraft Admin
+                        Super Admin
                     </span>
                 </div>
             </SidebarHeader>
@@ -35,7 +31,7 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
                 <SidebarMenu>
                     {navItems.map((item) => (
                         <SidebarMenuItem key={item.label}>
-                            <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
+                            <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={item.label}>
                                 <Link href={item.href}>
                                     <item.icon />
                                     <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>

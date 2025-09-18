@@ -54,3 +54,17 @@ export type CommunicationLog = {
   recipientsCount: number;
   sentAt: Date;
 }
+
+export type Auctioneer = {
+  id: string;
+  name: string;
+  address: string;
+  status: 'active' | 'inactive';
+  user: {
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+  };
+  createdAt: Date;
+};

@@ -11,7 +11,7 @@ import {
 export function Header() {
   const navItems = [
     { href: "/", label: "Auctions" },
-    { href: "/admin", label: "Admin" },
+    { href: "/auctioneer", label: "Auctioneer Portal" },
     { href: "/dashboard", label: "Dashboard" },
   ];
   
@@ -37,6 +37,12 @@ export function Header() {
               {item.label}
             </Link>
           ))}
+           <Link
+              href="/super-admin"
+              className="text-foreground/60 transition-colors hover:text-foreground/80"
+            >
+              Super Admin
+            </Link>
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
           {isLoggedIn ? (
@@ -81,6 +87,12 @@ export function Header() {
                     {item.label}
                   </Link>
                 ))}
+                 <Link
+                  href="/super-admin"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Super Admin
+                </Link>
               </nav>
             </SheetContent>
           </Sheet>

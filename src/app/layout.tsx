@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import type { Metadata } from "next";
@@ -16,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
-  const isAdminPage = pathname.startsWith("/admin");
+  const isPortalPage = pathname.startsWith("/auctioneer") || pathname.startsWith("/super-admin");
 
   return (
     <html lang="en" className="h-full">
@@ -31,8 +32,8 @@ export default function RootLayout({
       <body
         className={`${inter.variable} font-body antialiased flex flex-col min-h-screen bg-background text-foreground`}
       >
-        {!isAdminPage && <Header />}
-        <div className={`flex-grow ${!isAdminPage ? 'container mx-auto px-4 sm:px-6 lg:px-8 py-8' : ''}`}>
+        {!isPortalPage && <Header />}
+        <div className={`flex-grow ${!isPortalPage ? 'container mx-auto px-4 sm:px-6 lg:px-8 py-8' : 'flex'}`}>
           {children}
         </div>
         <Toaster />
