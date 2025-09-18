@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { PlusCircle, Edit, Power, Info } from "lucide-react";
+import { PlusCircle, Edit, Power, Info, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -35,6 +35,16 @@ export default function ManageAuctioneerPage() {
         description: `${updatedAuctioneer.name}'s status has been set to ${newStatus}.`
       });
     }
+  };
+
+  const handleCopyPassword = (password: string | undefined) => {
+    if (!password) return;
+    navigator.clipboard.writeText(password).then(() => {
+      toast({
+        title: "Copied!",
+        description: "Temporary password copied to clipboard.",
+      });
+    });
   };
 
   return (
@@ -78,7 +88,12 @@ export default function ManageAuctioneerPage() {
                                     <span className="cursor-help underline decoration-dashed">{auctioneer.name}</span>
                                   </TooltipTrigger>
                                   <TooltipContent>
-                                    <p>Temp Password: <span className="font-bold">{auctioneer.user.tempPassword}</span></p>
+                                    <div className="flex items-center gap-2">
+                                        <p>Temp Password: <span className="font-bold">{auctioneer.user.tempPassword}</span></p>
+                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopyPassword(auctioneer.user.tempPassword)}>
+                                            <Copy className="h-4 w-4" />
+                                        </Button>
+                                    </div>
                                   </TooltipContent>
                                 </Tooltip>
                               </TableCell>
