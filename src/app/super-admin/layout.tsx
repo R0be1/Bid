@@ -58,14 +58,6 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                           </Link>
                       </SidebarMenuButton>
                   </SidebarMenuItem>
-                  <SidebarMenuItem>
-                      <SidebarMenuButton asChild tooltip="Customer Portal">
-                          <Link href="/">
-                              <Home />
-                              <span className="group-data-[collapsible=icon]:hidden">Customer Portal</span>
-                          </Link>
-                      </SidebarMenuButton>
-                  </SidebarMenuItem>
                    <SidebarMenuItem>
                       <SidebarMenuButton asChild tooltip="Logout">
                           <Link href="/login">
