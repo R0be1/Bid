@@ -60,85 +60,87 @@ export default function SettingsPage() {
                 <p className="text-muted-foreground">Manage super admin users.</p>
             </div>
             
-            <Card>
-                <CardHeader>
-                    <CardTitle>Register New Super Admin</CardTitle>
-                    <CardDescription>Add another user with super administrative privileges.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                            <FormField
-                                control={form.control}
-                                name="name"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Full Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Jane Doe" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="email"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Email Address</FormLabel>
-                                    <FormControl>
-                                        <Input type="email" placeholder="jane.doe@example.com" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                            <FormField
-                                control={form.control}
-                                name="password"
-                                render={({ field }) => (
-                                    <FormItem>
-                                    <FormLabel>Temporary Password</FormLabel>
-                                    <FormControl>
-                                        <Input type="password" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
-                             <Button type="submit" variant="accent" className="w-full">Register Admin</Button>
-                        </form>
-                    </Form>
-                </CardContent>
-            </Card>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Register New Super Admin</CardTitle>
+                        <CardDescription>Add another user with super administrative privileges.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                                <FormField
+                                    control={form.control}
+                                    name="name"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <FormLabel>Full Name</FormLabel>
+                                        <FormControl>
+                                            <Input placeholder="Jane Doe" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="email"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <FormLabel>Email Address</FormLabel>
+                                        <FormControl>
+                                            <Input type="email" placeholder="jane.doe@example.com" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="password"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                        <FormLabel>Temporary Password</FormLabel>
+                                        <FormControl>
+                                            <Input type="password" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                                <Button type="submit" variant="accent" className="w-full">Register Admin</Button>
+                            </form>
+                        </Form>
+                    </CardContent>
+                </Card>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Registered Super Admins</CardTitle>
-                    <CardDescription>List of all users with super administrative privileges.</CardDescription>
-                </CardHeader>
-                <CardContent>
-                   <div className="overflow-x-auto border rounded-lg">
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Name</TableHead>
-                                <TableHead>Email</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {admins.map((admin) => (
-                                <TableRow key={admin.id}>
-                                    <TableCell className="font-medium">{admin.name}</TableCell>
-                                    <TableCell>{admin.email}</TableCell>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Registered Super Admins</CardTitle>
+                        <CardDescription>List of all users with super administrative privileges.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                    <div className="overflow-x-auto border rounded-lg">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Name</TableHead>
+                                    <TableHead>Email</TableHead>
                                 </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                    </div>
-                </CardContent>
-            </Card>
+                            </TableHeader>
+                            <TableBody>
+                                {admins.map((admin) => (
+                                    <TableRow key={admin.id}>
+                                        <TableCell className="font-medium">{admin.name}</TableCell>
+                                        <TableCell>{admin.email}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }
