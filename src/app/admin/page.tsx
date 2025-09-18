@@ -3,7 +3,7 @@
 import { getAuctionItems } from "@/lib/data";
 import { getUsers } from "@/lib/users";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Gavel, Users, Clock, Calendar, CheckCircle } from "lucide-react";
+import { Gavel, Users, Clock, Calendar, CheckCircle, DollarSign } from "lucide-react";
 
 
 export default function AdminPage() {
@@ -17,6 +17,21 @@ export default function AdminPage() {
   const activeAuctions = auctionItems.filter(item => new Date(item.startDate) <= now && new Date(item.endDate) > now).length;
   const upcomingAuctions = auctionItems.filter(item => new Date(item.startDate) > now).length;
   const endedAuctions = auctionItems.filter(item => new Date(item.endDate) <= now).length;
+  
+  // Calculate total fees. This is a simplified calculation.
+  // In a real app, you would link payments to specific auctions/users.
+  const usersWhoPaidParticipation = users.filter(u => u.paidParticipation).length;
+  const totalParticipationFees = auctionItems.reduce((total, item) => {
+      // Assuming a user pays the fee once to participate in any auction that requires it.
+      // This is a simplification based on the current data model.
+      return total + (item.participationFee || 0);
+  }, 0);
+
+  const usersWhoPaidDeposit = users.filter(u => u.paidDeposit).length;
+  const totalSecurityDeposits = auctionItems.reduce((total, item) => {
+      // Similar simplification for security deposits.
+      return total + (item.securityDeposit || 0);
+  }, 0);
 
 
   return (
@@ -94,6 +109,34 @@ export default function AdminPage() {
             <div className="text-2xl font-bold">{endedAuctions}</div>
              <p className="text-xs text-muted-foreground">
               auctions that have completed
+            </p>
+          </CardContent>
+        </Card>
+         <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Participation Fees
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${totalParticipationFees.toLocaleString()}</div>
+             <p className="text-xs text-muted-foreground">
+              from {usersWhoPaidParticipation} user(s) across all fee-based auctions
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">
+              Total Security Deposits
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">${totalSecurityDeposits.toLocaleString()}</div>
+             <p className="text-xs text-muted-foreground">
+              from {usersWhoPaidDeposit} user(s) across all deposit-based auctions
             </p>
           </CardContent>
         </Card>
