@@ -1,6 +1,10 @@
 
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
-import { getAuctioneers } from "@/lib/auctioneers";
+import { getAuctioneers, updateAuctioneerStatus } from "@/lib/auctioneers";
+import type { Auctioneer } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -14,9 +18,23 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { PlusCircle, Edit, Power } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function ManageAuctioneerPage() {
-  const auctioneers = getAuctioneers();
+  const [auctioneers, setAuctioneers] = useState<Auctioneer[]>(getAuctioneers());
+  const { toast } = useToast();
+
+  const handleToggleStatus = (auctioneerId: string, currentStatus: 'active' | 'inactive') => {
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    const updatedAuctioneer = updateAuctioneerStatus(auctioneerId, newStatus);
+    if (updatedAuctioneer) {
+      setAuctioneers(prev => prev.map(a => a.id === auctioneerId ? updatedAuctioneer : a));
+      toast({
+        title: "Status Updated",
+        description: `${updatedAuctioneer.name}'s status has been set to ${newStatus}.`
+      });
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -64,14 +82,17 @@ export default function ManageAuctioneerPage() {
                               <TableCell>{format(auctioneer.createdAt, "PPP")}</TableCell>
                               <TableCell className="text-right">
                                   <div className="flex items-center justify-end gap-2">
-                                    <Button variant="ghost" size="icon" title="Edit Auctioneer">
-                                        <Edit className="h-4 w-4" />
+                                    <Button asChild variant="ghost" size="icon" title="Edit Auctioneer">
+                                        <Link href={`/super-admin/manage-auctioneer/${auctioneer.id}/edit`}>
+                                            <Edit className="h-4 w-4" />
+                                        </Link>
                                     </Button>
                                     <Button 
                                         variant="ghost" 
                                         size="icon" 
                                         title={auctioneer.status === 'active' ? 'Deactivate' : 'Activate'}
                                         className={auctioneer.status === 'active' ? 'text-green-600 hover:text-green-700' : 'text-destructive hover:text-destructive/80'}
+                                        onClick={() => handleToggleStatus(auctioneer.id, auctioneer.status)}
                                     >
                                         <Power className="h-4 w-4" />
                                     </Button>

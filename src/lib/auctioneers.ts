@@ -63,3 +63,31 @@ export function addAuctioneer(data: Omit<Auctioneer, 'id' | 'createdAt' | 'statu
     auctioneers.push(newAuctioneer);
     return newAuctioneer;
 }
+
+export function updateAuctioneerStatus(id: string, status: 'active' | 'inactive'): Auctioneer | undefined {
+    const auctioneer = auctioneers.find(a => a.id === id);
+    if (auctioneer) {
+        auctioneer.status = status;
+        return auctioneer;
+    }
+    return undefined;
+}
+
+export function updateAuctioneer(id: string, data: Partial<Omit<Auctioneer, 'id' | 'createdAt' | 'status'>>): Auctioneer | undefined {
+    const auctioneerIndex = auctioneers.findIndex(a => a.id === id);
+    if (auctioneerIndex > -1) {
+        const auctioneer = auctioneers[auctioneerIndex];
+        
+        const updatedUser = { ...auctioneer.user, ...data.user };
+        const updatedAuctioneer: Auctioneer = {
+            ...auctioneer,
+            name: data.name ?? auctioneer.name,
+            address: data.address ?? auctioneer.address,
+            user: updatedUser,
+        };
+
+        auctioneers[auctioneerIndex] = updatedAuctioneer;
+        return updatedAuctioneer;
+    }
+    return undefined;
+}
