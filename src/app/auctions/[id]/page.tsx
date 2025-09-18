@@ -138,7 +138,7 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
                   </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button asChild className="w-full" disabled={!auctionEnded} style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                <Button asChild className="w-full" disabled={!auctionEnded}>
                     <Link href={`/auctions/${item.id}/results`}>
                         <Trophy className="mr-2 h-4 w-4" />
                         View Results

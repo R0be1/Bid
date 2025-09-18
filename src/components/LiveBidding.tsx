@@ -97,7 +97,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
                 <AlertTitle>Registration Required</AlertTitle>
                 <AlertDescription>
                    You need to be logged in to participate in this auction. Please register or log in to continue.
-                    <Button asChild className="w-full mt-4" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                    <Button asChild className="w-full mt-4">
                         <Link href="/register">Register or Log In</Link>
                     </Button>
                 </AlertDescription>
@@ -119,7 +119,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
                 <AlertTitle>Payment Required</AlertTitle>
                 <AlertDescription>
                     This auction requires payment of fees. Please visit your dashboard to complete the payment.
-                    <Button asChild className="w-full mt-4" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                    <Button asChild className="w-full mt-4">
                         <Link href="/dashboard">Go to Dashboard</Link>
                     </Button>
                 </AlertDescription>
@@ -167,7 +167,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full font-bold" disabled={MOCK_USER_STATUS !== 'approved'} style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+            <Button type="submit" className="w-full font-bold" disabled={MOCK_USER_STATUS !== 'approved'}>
               Place Bid
             </Button>
           </form>

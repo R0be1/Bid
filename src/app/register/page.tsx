@@ -89,7 +89,7 @@ export default function RegisterPage() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+              <Button type="submit" className="w-full">
                 Send Verification Code
               </Button>
                <div className="text-center text-sm">
@@ -130,7 +130,7 @@ export default function RegisterPage() {
               </Alert>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+              <Button type="submit" className="w-full">
                 Verify Code
               </Button>
               <Button variant="link" onClick={() => setStep("phone")}>
@@ -169,7 +169,7 @@ export default function RegisterPage() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button type="submit" className="w-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+              <Button type="submit" className="w-full">
                 Create Account
               </Button>
             </CardFooter>

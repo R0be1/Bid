@@ -56,7 +56,7 @@ export function Header() {
               <Button variant="ghost" asChild>
                 <Link href="/login">Log in</Link>
               </Button>
-              <Button asChild style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+              <Button asChild>
                 <Link href="/register">Sign up</Link>
               </Button>
             </>

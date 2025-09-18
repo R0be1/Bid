@@ -34,7 +34,7 @@ const MOCK_USER_HAS_PAID = false;
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="w-full font-bold" disabled={pending || MOCK_USER_STATUS !== 'approved'} style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+    <Button type="submit" className="w-full font-bold" disabled={pending || MOCK_USER_STATUS !== 'approved'}>
       {pending ? "Submitting..." : "Submit Sealed Bid"}
     </Button>
   );
@@ -96,7 +96,7 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
                 <AlertTitle>Registration Required</AlertTitle>
                 <AlertDescription>
                    You need to be logged in to participate in this auction. Please register or log in to continue.
-                    <Button asChild className="w-full mt-4" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                    <Button asChild className="w-full mt-4">
                         <Link href="/register">Register or Log In</Link>
                     </Button>
                 </AlertDescription>
@@ -118,7 +118,7 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
                 <AlertTitle>Payment Required</AlertTitle>
                 <AlertDescription>
                     This auction requires payment of fees. Please visit your dashboard to complete the payment.
-                    <Button asChild className="w-full mt-4" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+                    <Button asChild className="w-full mt-4">
                         <Link href="/dashboard">Go to Dashboard</Link>
                     </Button>
                 </AlertDescription>

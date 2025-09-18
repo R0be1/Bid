@@ -394,7 +394,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
             </div>
 
 
-            <Button type="submit" className="w-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+            <Button type="submit" className="w-full">
               Create Auction Item
             </Button>
           </form>

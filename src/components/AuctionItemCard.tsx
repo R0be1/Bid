@@ -47,7 +47,7 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
           </div>
         </CardContent>
         <CardFooter className="p-4 pt-0">
-          <Button className="w-full" style={{ backgroundColor: 'var(--accent)', color: 'var(--accent-foreground)' }}>
+          <Button className="w-full">
             {item.type === "live" ? "Bid Now" : "View Details"}
           </Button>
         </CardFooter>
