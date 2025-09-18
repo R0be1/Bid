@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { PlusCircle } from "lucide-react";
+import { PlusCircle, Edit, Power } from "lucide-react";
 
 export default function ManageAuctioneerPage() {
   const auctioneers = getAuctioneers();
@@ -47,6 +47,7 @@ export default function ManageAuctioneerPage() {
                           <TableHead>Email</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead>Date Registered</TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
                       </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -56,11 +57,26 @@ export default function ManageAuctioneerPage() {
                               <TableCell>{auctioneer.user.firstName} {auctioneer.user.lastName}</TableCell>
                               <TableCell>{auctioneer.user.email}</TableCell>
                               <TableCell>
-                                  <Badge variant={auctioneer.status === 'active' ? 'default' : 'secondary'}>
+                                  <Badge variant={auctioneer.status === 'active' ? 'default' : 'destructive'}>
                                       {auctioneer.status}
                                   </Badge>
                               </TableCell>
                               <TableCell>{format(auctioneer.createdAt, "PPP")}</TableCell>
+                              <TableCell className="text-right">
+                                  <div className="flex items-center justify-end gap-2">
+                                    <Button variant="ghost" size="icon" title="Edit Auctioneer">
+                                        <Edit className="h-4 w-4" />
+                                    </Button>
+                                    <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        title={auctioneer.status === 'active' ? 'Deactivate' : 'Activate'}
+                                        className={auctioneer.status === 'active' ? 'text-green-600 hover:text-green-700' : 'text-destructive hover:text-destructive/80'}
+                                    >
+                                        <Power className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                              </TableCell>
                           </TableRow>
                       ))}
                   </TableBody>
