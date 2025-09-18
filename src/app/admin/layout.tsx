@@ -1,8 +1,8 @@
 
 "use client";
 
-import { Sidebar, SidebarProvider, SidebarTrigger, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarInset } from "@/components/ui/sidebar";
-import { CircleUser, Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog } from "lucide-react";
+import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarInset, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
+import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -21,11 +21,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <SidebarProvider>
         <Sidebar>
-            <SidebarHeader>
+            <SidebarHeader className="p-4">
                 <div className="flex items-center gap-2">
-                    <Gavel className="h-6 w-6 text-primary" />
-                    <span className="font-bold text-lg text-primary font-headline">
-                        BidCraft Admin
+                    <Gavel className="h-7 w-7 text-sidebar-primary" />
+                    <span className="font-bold text-xl text-sidebar-foreground group-data-[collapsible=icon]:hidden">
+                        BidCraft
                     </span>
                 </div>
             </SidebarHeader>
@@ -33,22 +33,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <SidebarMenu>
                     {navItems.map((item) => (
                         <SidebarMenuItem key={item.label}>
-                            <SidebarMenuButton asChild isActive={pathname === item.href}>
+                            <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
                                 <Link href={item.href}>
                                     <item.icon />
-                                    <span>{item.label}</span>
+                                    <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
                                 </Link>
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     ))}
                 </SidebarMenu>
             </SidebarContent>
+            <SidebarFooter>
+               <SidebarTrigger />
+            </SidebarFooter>
         </Sidebar>
         <SidebarInset>
              <div className="p-4 md:p-8">
-                <div className="md:hidden mb-4">
-                    <SidebarTrigger />
-                </div>
                 {children}
             </div>
         </SidebarInset>
