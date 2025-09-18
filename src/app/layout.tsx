@@ -1,21 +1,23 @@
+
+"use client";
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Toaster } from "@/components/ui/toaster";
+import { usePathname } from "next/navigation";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-
-export const metadata: Metadata = {
-  title: "BidCraft | Online Auction System",
-  description: "Bid on unique items in our live and sealed-bid auctions.",
-};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+  const isAdminPage = pathname.startsWith("/admin");
+
   return (
     <html lang="en" className="h-full">
       <head>
@@ -29,10 +31,10 @@ export default function RootLayout({
       <body
         className={`${inter.variable} font-body antialiased flex flex-col min-h-screen bg-background text-foreground`}
       >
-        <Header />
-        <main className="flex-grow py-8">
+        {!isAdminPage && <Header />}
+        <div className={`flex-grow ${!isAdminPage ? 'container mx-auto px-4 sm:px-6 lg:px-8 py-8' : ''}`}>
           {children}
-        </main>
+        </div>
         <Toaster />
       </body>
     </html>

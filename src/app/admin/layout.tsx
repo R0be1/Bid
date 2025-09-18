@@ -21,8 +21,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <SidebarProvider>
       <Sidebar>
-          <SidebarHeader className="p-0">
-              <div className="flex items-center gap-2 px-4 py-4">
+          <SidebarHeader>
+              <div className="flex items-center gap-2 p-4">
                   <Gavel className="h-7 w-7 text-primary" />
                   <span className="font-bold text-xl text-foreground group-data-[collapsible=icon]:hidden">
                       BidCraft Admin
@@ -43,11 +43,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   ))}
               </SidebarMenu>
           </SidebarContent>
-          <SidebarFooter className="p-0">
+          <SidebarFooter>
              <SidebarTrigger />
           </SidebarFooter>
       </Sidebar>
-      <main className="flex-1 px-4 md:px-8 pb-8">
+      <main className="flex-1 p-4 md:p-8">
           {children}
       </main>
     </SidebarProvider>
