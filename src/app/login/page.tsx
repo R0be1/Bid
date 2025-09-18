@@ -17,7 +17,7 @@ import { Phone, KeyRound } from "lucide-react";
 
 export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center py-12">
+    <div className="flex items-center justify-center min-h-full">
       <Card className="w-full max-w-sm shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl font-headline">Login</CardTitle>
