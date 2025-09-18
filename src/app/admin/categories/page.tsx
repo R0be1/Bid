@@ -8,7 +8,7 @@ export default function CategoriesPage() {
   const categories = getCategories();
 
   return (
-    <div className="max-w-2xl mx-auto py-8">
+    <div className="max-w-2xl py-8">
         <div className="mb-8">
             <h1 className="text-3xl font-bold font-headline text-primary">Manage Categories</h1>
             <p className="text-muted-foreground">Add, view, and manage auction categories.</p>
