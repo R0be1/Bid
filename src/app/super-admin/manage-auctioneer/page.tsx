@@ -43,7 +43,7 @@ export default function ManageAuctioneerPage() {
             <h1 className="text-3xl font-bold font-headline text-primary">Manage Auctioneers</h1>
             <p className="text-muted-foreground">View and register new auctioneers.</p>
         </div>
-        <Button asChild>
+        <Button asChild className="bg-accent text-accent-foreground hover:bg-accent/90">
             <Link href="/super-admin/manage-auctioneer/register">
                 <PlusCircle className="mr-2 h-4 w-4" />
                 Register Auctioneer

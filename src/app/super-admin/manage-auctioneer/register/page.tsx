@@ -173,7 +173,7 @@ export default function RegisterAuctioneerPage() {
                     </CardContent>
                 </Card>
 
-                <Button type="submit" size="lg" className="w-full">Register Auctioneer</Button>
+                <Button type="submit" size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">Register Auctioneer</Button>
             </form>
         </Form>
     </div>
