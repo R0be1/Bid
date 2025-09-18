@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 
@@ -71,6 +74,12 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
+              <SheetHeader>
+                  <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                  <SheetDescription className="sr-only">
+                    A list of links to navigate the site.
+                  </SheetDescription>
+              </SheetHeader>
               <nav className="grid gap-6 text-lg font-medium mt-8">
                 {navItems.map((item) => (
                   <Link
