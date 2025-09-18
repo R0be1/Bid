@@ -5,8 +5,8 @@ import { getAuctioneers } from "@/lib/auctioneers";
 import { getAuctionItems } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users, Gavel } from "lucide-react";
-import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
-import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
+import { Pie, PieChart, ResponsiveContainer, Cell } from "recharts";
+import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 
 export default function SuperAdminDashboard() {
   const auctioneers = getAuctioneers();
@@ -18,21 +18,21 @@ export default function SuperAdminDashboard() {
   const totalBidItems = auctionItems.length;
 
   const auctioneerStatusData = [
-    { status: 'Active', count: activeAuctioneers, fill: 'hsl(var(--primary))' },
-    { status: 'Inactive', count: inactiveAuctioneers, fill: 'hsl(var(--destructive))' },
+    { name: 'Active', count: activeAuctioneers, fill: 'hsl(var(--primary))' },
+    { name: 'Inactive', count: inactiveAuctioneers, fill: 'hsl(var(--destructive))' },
   ];
   
   const chartConfig = {
     count: {
       label: "Count",
     },
-    active: {
+    Active: {
       label: "Active",
-      color: "hsl(var(--chart-1))",
+      color: "hsl(var(--primary))",
     },
-    inactive: {
+    Inactive: {
       label: "Inactive",
-      color: "hsl(var(--chart-2))",
+      color: "hsl(var(--destructive))",
     },
   }
 
@@ -74,29 +74,31 @@ export default function SuperAdminDashboard() {
           <CardTitle>Auctioneer Status</CardTitle>
           <CardDescription>A visual breakdown of active vs. inactive auctioneers.</CardDescription>
         </CardHeader>
-        <CardContent>
-          <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-            <BarChart accessibilityLayer data={auctioneerStatusData}>
-                <XAxis
-                    dataKey="status"
-                    stroke="#888888"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                />
-                <YAxis
-                    stroke="#888888"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(value) => `${value}`}
-                />
+        <CardContent className="flex items-center justify-center">
+          <ChartContainer config={chartConfig} className="min-h-[200px] w-full max-w-[300px]">
+            <PieChart>
                 <Tooltip
                     cursor={false}
                     content={<ChartTooltipContent hideLabel />} 
                 />
-                <Bar dataKey="count" radius={[4, 4, 0, 0]} />
-            </BarChart>
+                <Pie 
+                    data={auctioneerStatusData} 
+                    dataKey="count" 
+                    nameKey="name" 
+                    cx="50%" 
+                    cy="50%" 
+                    outerRadius={80} 
+                    label
+                >
+                    {auctioneerStatusData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                </Pie>
+                <ChartLegend
+                  content={<ChartLegendContent />}
+                  className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+                />
+            </PieChart>
           </ChartContainer>
         </CardContent>
       </Card>
