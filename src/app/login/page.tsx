@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,6 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getAuctioneers } from "@/lib/auctioneers";
 import { getUsers } from "@/lib/users";
 import { getSuperAdmins } from "@/lib/super-admins";
+import { login, AuthResult } from "@/lib/auth";
 
 export default function LoginPage() {
   const [phone, setPhone] = useState("");
@@ -27,46 +28,34 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = (e: FormEvent) => {
     e.preventDefault();
 
-    const superAdmin = getSuperAdmins()[0]; // Assuming one super admin for now
-    const auctioneers = getAuctioneers();
-    const users = getUsers();
+    const authResult: AuthResult = login(phone, password);
 
-    // Super Admin Check
-    if (phone === "0912345678" && password === "Admin@123") {
-      toast({ title: "Login Successful", description: "Redirecting to Super Admin Dashboard." });
-      router.push("/super-admin");
-      return;
+    if (authResult.success) {
+      toast({ title: "Login Successful", description: authResult.message });
+      switch (authResult.role) {
+        case "super-admin":
+          router.push("/super-admin");
+          break;
+        case "admin":
+          router.push("/admin");
+          break;
+        case "user":
+          router.push("/dashboard");
+          break;
+        default:
+          router.push("/");
+          break;
+      }
+    } else {
+      toast({
+        title: "Invalid Credentials",
+        description: authResult.message,
+        variant: "destructive",
+      });
     }
-
-    // Auctioneer Check
-    const auctioneer = auctioneers.find(
-      (a) => a.user.phone === phone && a.user.tempPassword === password
-    );
-    if (auctioneer) {
-      // In a real app, you would force a password change here.
-      toast({ title: "Login Successful", description: `Welcome, ${auctioneer.name}.` });
-      router.push("/admin");
-      return;
-    }
-    
-    // Bidder/Customer check (mocked)
-    // In a real app, you would check a hashed password from your database.
-    const user = users.find(u => u.email.split('@')[0] === phone); // MOCK: using user's name as phone for demo
-    if (user && password === "password") {
-       toast({ title: "Login Successful", description: `Welcome back, ${user.name}!` });
-       router.push("/dashboard");
-       return;
-    }
-
-
-    toast({
-      title: "Invalid Credentials",
-      description: "Please check your phone number and password.",
-      variant: "destructive",
-    });
   };
 
 

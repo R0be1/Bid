@@ -5,14 +5,17 @@
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
 import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog, User, LogOut } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { logout } from "@/lib/auth";
+import withAuth from "@/components/withAuth";
 
 // MOCK: In a real app, this would come from the logged-in user's session
 const MOCK_AUCTIONEER_NAME = "Vintage Treasures LLC";
 
-export default function AuctioneerLayout({ children }: { children: React.ReactNode }) {
+function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutGrid },
@@ -23,6 +26,11 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
     { href: "/admin/messages", label: "Messages", icon: MessageSquare },
     { href: "/admin/communications", label: "Communications", icon: Send },
   ];
+  
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  };
 
   return (
       <SidebarProvider>
@@ -60,11 +68,9 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
                       </SidebarMenuButton>
                   </SidebarMenuItem>
                    <SidebarMenuItem>
-                      <SidebarMenuButton asChild tooltip="Logout">
-                          <Link href="/login">
-                              <LogOut />
-                              <span className="group-data-[collapsible=icon]:hidden">Logout</span>
-                          </Link>
+                      <SidebarMenuButton onClick={handleLogout} tooltip="Logout">
+                            <LogOut />
+                            <span className="group-data-[collapsible=icon]:hidden">Logout</span>
                       </SidebarMenuButton>
                   </SidebarMenuItem>
               </SidebarMenu>
@@ -77,3 +83,5 @@ export default function AuctioneerLayout({ children }: { children: React.ReactNo
       </SidebarProvider>
   );
 }
+
+export default withAuth(AdminLayout, ['admin', 'super-admin']);
