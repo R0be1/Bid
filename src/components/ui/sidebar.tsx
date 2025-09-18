@@ -1,3 +1,4 @@
+
 "use client"
 
 import * as React from "react"
@@ -216,7 +217,7 @@ const Sidebar = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "group peer hidden md:block text-sidebar-foreground",
+          "group peer hidden md:block text-sidebar-foreground sticky top-0 h-screen",
           "transition-all duration-200 ease-in-out",
            state === "expanded" ? "w-[var(--sidebar-width)]" : "w-[var(--sidebar-width-icon)]"
         )}

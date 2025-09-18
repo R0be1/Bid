@@ -58,7 +58,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                <SidebarTrigger />
             </SidebarFooter>
         </Sidebar>
-        <main className="flex-1 p-4 md:p-8">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto">
             {children}
         </main>
       </SidebarProvider>
