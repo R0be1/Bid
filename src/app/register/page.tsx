@@ -107,12 +107,6 @@ export default function RegisterPage() {
               <Button type="submit" className="w-full">
                 Create Account
               </Button>
-              <div className="text-center text-sm">
-                Already have an account?{" "}
-                <Link href="/login" className="underline text-primary">
-                  Login
-                </Link>
-              </div>
             </CardFooter>
           </form>
         </Card>
