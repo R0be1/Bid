@@ -19,6 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { getAuctioneers } from "@/lib/auctioneers";
 import { User, Lock } from "lucide-react";
+import { Label } from "@/components/ui/label";
 
 // MOCK: In a real app, you'd get the logged-in user's ID from an auth context.
 const MOCK_AUCTIONEER_ID = "auc-1";
