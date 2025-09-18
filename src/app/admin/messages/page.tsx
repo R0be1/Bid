@@ -13,8 +13,6 @@ import { List } from "lucide-react";
 
 
 export default function MessagesPage() {
-  const templates = getMessageTemplates();
-
   const availablePlaceholders = [
     { placeholder: "{itemName}", description: "The name of the auction item." },
     { placeholder: "{winnerName}", description: "The name of the winning bidder." },
@@ -43,7 +41,7 @@ export default function MessagesPage() {
                     <p className="text-sm text-muted-foreground mb-4">
                         Use these placeholders in your templates. They will be automatically replaced with the correct values.
                     </p>
-                    <ul className="grid md:grid-cols-2 gap-x-8 gap-y-2 text-sm">
+                    <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2 text-sm">
                        {availablePlaceholders.map(p => (
                             <li key={p.placeholder}>
                                 <code className="font-semibold bg-secondary px-1 py-0.5 rounded-sm">{p.placeholder}</code> - <span className="text-muted-foreground">{p.description}</span>
@@ -55,7 +53,7 @@ export default function MessagesPage() {
         </Accordion>
 
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1">
                  <Card>
                     <CardHeader>
@@ -74,7 +72,7 @@ export default function MessagesPage() {
                         <CardDescription>View, edit, or delete your saved templates.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <MessageTemplateList initialTemplates={templates} />
+                        <MessageTemplateList />
                     </CardContent>
                 </Card>
             </div>

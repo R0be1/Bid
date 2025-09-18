@@ -41,7 +41,7 @@ export default function RegisterPage() {
 
   if (isSubmitted) {
     return (
-       <div className="flex items-center justify-center py-12">
+       <div className="flex items-center justify-center min-h-full w-full px-4">
         <Card className="w-full max-w-sm shadow-lg text-center">
             <CardHeader>
                 <div className="mx-auto bg-green-100 rounded-full p-2 w-fit">
@@ -70,7 +70,7 @@ export default function RegisterPage() {
 
 
   return (
-    <div className="flex items-center justify-center py-12">
+    <div className="flex items-center justify-center min-h-full w-full px-4">
         <Card className="w-full max-w-md shadow-lg">
           <form onSubmit={handleDetailsSubmit}>
             <CardHeader>
@@ -80,7 +80,7 @@ export default function RegisterPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4">
-               <div className="grid grid-cols-2 gap-4">
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <div className="grid gap-2">
                     <Label htmlFor="first-name">First Name</Label>
                     <Input id="first-name" name="first-name" placeholder="John" required />

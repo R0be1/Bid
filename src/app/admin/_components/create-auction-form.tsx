@@ -149,7 +149,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
               )}
             />
             
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormField
                 control={form.control}
                 name="category"
@@ -189,7 +189,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
               />
             </div>
             
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                <FormField
                 control={form.control}
                 name="type"
@@ -228,7 +228,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                 )}
               />
             </div>
-             <div className="grid md:grid-cols-2 gap-8">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormField
                 control={form.control}
                 name="startDate"
@@ -309,7 +309,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
               />
             </div>
             
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                <FormField
                 control={form.control}
                 name="securityDeposit"

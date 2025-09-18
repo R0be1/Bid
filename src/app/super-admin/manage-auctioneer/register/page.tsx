@@ -116,7 +116,7 @@ export default function RegisterAuctioneerPage() {
                         <CardDescription>This user will manage the auctioneer portal. Their credentials will be used for login.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
-                        <div className="grid md:grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FormField
                             control={form.control}
                             name="firstName"

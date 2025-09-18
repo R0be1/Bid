@@ -20,6 +20,7 @@ import { ListFilter, Gavel } from "lucide-react";
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedAuctioneer, setSelectedAuctioneer] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState("live");
 
   const allItems = getAuctionItems();
   const categories = getCategories();
@@ -42,7 +43,7 @@ export default function Home() {
 
   return (
     <div className="space-y-8">
-      <div className="text-center">
+      <div className="text-center px-4">
         <h1 className="text-4xl font-bold tracking-tight text-primary sm:text-5xl lg:text-6xl font-headline">
           Welcome to NIBtera ጨረታ
         </h1>
@@ -51,65 +52,62 @@ export default function Home() {
         </p>
       </div>
 
-      <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-        <Tabs defaultValue="live" className="w-full md:w-auto">
+       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4 sticky top-16 bg-background/95 backdrop-blur-sm z-10 py-4 px-2 border-b">
           <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
             <TabsTrigger value="live">Live Auctions</TabsTrigger>
             <TabsTrigger value="sealed">Sealed Bid Auctions</TabsTrigger>
           </TabsList>
-        </Tabs>
-        <div className="w-full md:w-auto md:min-w-[250px]">
-           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-full">
-                <div className="flex items-center gap-2">
-                    <ListFilter className="h-4 w-4 text-muted-foreground" />
-                    <SelectValue placeholder="Filter by category..." />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((category: Category) => (
-                  <SelectItem key={category.id} value={category.name}>
-                    {category.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="w-full md:w-auto md:min-w-[200px]">
+             <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+                <SelectTrigger className="w-full">
+                  <div className="flex items-center gap-2">
+                      <ListFilter className="h-4 w-4 text-muted-foreground" />
+                      <SelectValue placeholder="Filter by category..." />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((category: Category) => (
+                    <SelectItem key={category.id} value={category.name}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+          </div>
+          <div className="w-full md:w-auto md:min-w-[200px]">
+             <Select value={selectedAuctioneer} onValueChange={setSelectedAuctioneer}>
+                <SelectTrigger className="w-full">
+                  <div className="flex items-center gap-2">
+                      <Gavel className="h-4 w-4 text-muted-foreground" />
+                      <SelectValue placeholder="Filter by auctioneer..." />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Auctioneers</SelectItem>
+                  {auctioneers.filter(a => a.status === 'active').map((auctioneer: Auctioneer) => (
+                    <SelectItem key={auctioneer.id} value={auctioneer.name}>
+                      {auctioneer.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+          </div>
         </div>
-        <div className="w-full md:w-auto md:min-w-[250px]">
-           <Select value={selectedAuctioneer} onValueChange={setSelectedAuctioneer}>
-              <SelectTrigger className="w-full">
-                <div className="flex items-center gap-2">
-                    <Gavel className="h-4 w-4 text-muted-foreground" />
-                    <SelectValue placeholder="Filter by auctioneer..." />
-                </div>
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Auctioneers</SelectItem>
-                {auctioneers.filter(a => a.status === 'active').map((auctioneer: Auctioneer) => (
-                  <SelectItem key={auctioneer.id} value={auctioneer.name}>
-                    {auctioneer.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-        </div>
-      </div>
 
-
-      <Tabs defaultValue="live" className="w-full">
-         <TabsContent value="live">
-            <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 mt-6">
-                {liveItems.length > 0 ? (
-                liveItems.map((item) => (
-                    <AuctionItemCard key={item.id} item={item} />
-                ))
-                ) : (
-                <p className="col-span-full text-center text-muted-foreground">
-                    No live auctions match your criteria.
-                </p>
-                )}
-            </div>
+        <TabsContent value="live">
+          <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 mt-6">
+              {liveItems.length > 0 ? (
+              liveItems.map((item) => (
+                  <AuctionItemCard key={item.id} item={item} />
+              ))
+              ) : (
+              <p className="col-span-full text-center text-muted-foreground py-10">
+                  No live auctions match your criteria.
+              </p>
+              )}
+          </div>
         </TabsContent>
         <TabsContent value="sealed">
             <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8 mt-6">
@@ -118,7 +116,7 @@ export default function Home() {
                     <AuctionItemCard key={item.id} item={item} />
                 ))
                 ) : (
-                <p className="col-span-full text-center text-muted-foreground">
+                <p className="col-span-full text-center text-muted-foreground py-10">
                     No sealed bid auctions match your criteria.
                 </p>
                 )}

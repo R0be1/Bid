@@ -1,8 +1,9 @@
 
 "use client";
 
+import { getMessageTemplates } from "@/lib/messages";
 import type { MessageTemplate } from "@/lib/types";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,16 +22,21 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
 
-interface MessageTemplateListProps {
-  initialTemplates: MessageTemplate[];
-}
-
-export function MessageTemplateList({ initialTemplates }: MessageTemplateListProps) {
+export function MessageTemplateList() {
+  const initialTemplates = useMemo(() => getMessageTemplates(), []);
   const [templates, setTemplates] = useState<MessageTemplate[]>(initialTemplates);
   const { toast } = useToast();
   const router = useRouter();
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  const paginatedTemplates = useMemo(() => {
+    const startIndex = (page - 1) * rowsPerPage;
+    return templates.slice(startIndex, startIndex + rowsPerPage);
+  }, [templates, page, rowsPerPage]);
 
   const handleDelete = (templateId: string) => {
     try {
@@ -56,7 +62,7 @@ export function MessageTemplateList({ initialTemplates }: MessageTemplateListPro
 
   return (
     <div className="space-y-4">
-        {templates.map((template) => (
+        {paginatedTemplates.map((template) => (
             <Card key={template.id} className="shadow-sm">
                 <CardHeader>
                     <div className="flex justify-between items-start">
@@ -104,6 +110,13 @@ export function MessageTemplateList({ initialTemplates }: MessageTemplateListPro
                 </CardFooter>
             </Card>
         ))}
+         <DataTablePagination
+            page={page}
+            setPage={setPage}
+            rowsPerPage={rowsPerPage}
+            setRowsPerPage={setRowsPerPage}
+            totalRows={templates.length}
+        />
     </div>
   );
 }

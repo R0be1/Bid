@@ -1,9 +1,8 @@
 
-
 "use client";
 
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
-import { Shield, LayoutGrid, Users, Settings, Home, User, LogOut } from "lucide-react";
+import { Shield, LayoutGrid, Users, Settings, User, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

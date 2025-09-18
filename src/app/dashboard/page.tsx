@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,17 +30,17 @@ import { Label } from "@/components/ui/label";
 const MOCK_USER_ID = "2"; 
 
 export default function DashboardPage() {
-    const [user, setUser] = useState<User | undefined>(getUser(MOCK_USER_ID));
+    const [user, setUser] = useState<User | undefined>(() => getUser(MOCK_USER_ID));
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const { toast } = useToast();
+
+    const allItems = useMemo(() => getAuctionItems(), []);
+    const feeItems = useMemo(() => allItems.filter(item => (item.participationFee || 0) > 0 || (item.securityDeposit || 0) > 0), [allItems]);
 
     if (!user) {
         // This should ideally redirect to login
         return <div>Please log in to view your dashboard.</div>
     }
-
-    const allItems = getAuctionItems();
-    const feeItems = allItems.filter(item => (item.participationFee || 0) > 0 || (item.securityDeposit || 0) > 0);
 
     const statusVariantMap: { [key in User['status']]: 'default' | 'secondary' | 'destructive' } = {
         approved: 'default',
@@ -93,7 +93,7 @@ export default function DashboardPage() {
                         Account Status
                     </CardTitle>
                 </CardHeader>
-                <CardContent className="flex items-center gap-4">
+                <CardContent className="flex flex-wrap items-center gap-4">
                     <p>Your current status is:</p>
                     <Badge variant={statusVariantMap[user.status]} className="capitalize text-lg px-4 py-1">{user.status}</Badge>
                 </CardContent>
@@ -138,8 +138,8 @@ export default function DashboardPage() {
                         if (pendingPayments.length === 0) return null;
 
                         return (
-                            <div key={item.id} className="p-4 border rounded-lg flex flex-col md:flex-row justify-between items-start gap-4">
-                                <div>
+                            <div key={item.id} className="p-4 border rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                                <div className="flex-1">
                                     <h3 className="font-semibold">
                                         <Link href={`/auctions/${item.id}`} className="hover:underline text-primary">
                                             {item.name}
@@ -147,7 +147,7 @@ export default function DashboardPage() {
                                     </h3>
                                     <p className="text-sm text-muted-foreground">Requires payment to participate.</p>
                                 </div>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full md:w-auto">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full md:w-auto shrink-0">
                                     {pendingPayments.map(p => (
                                         <div key={p.type} className="space-y-2">
                                             <p className="text-sm font-medium text-center capitalize">{p.type} Fee: {p.amount} Birr</p>

@@ -38,6 +38,7 @@ export function AnnouncementHistory({ announcements }: AnnouncementHistoryProps)
 
   return (
     <>
+    <div className="overflow-x-auto border rounded-lg">
       <Table>
         <TableHeader>
           <TableRow>
@@ -62,6 +63,7 @@ export function AnnouncementHistory({ announcements }: AnnouncementHistoryProps)
           ))}
         </TableBody>
       </Table>
+      </div>
       <DataTablePagination
         page={page}
         setPage={setPage}

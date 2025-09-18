@@ -38,10 +38,10 @@ export default function AuctionResultsPage() {
     notFound();
   }
   
-  const bids = getAuctionBids(id);
+  const bids = useMemo(() => getAuctionBids(id), [id]);
   const auctionEnded = new Date() >= new Date(item.endDate);
   const participantCount = new Set(bids.map(b => b.bidderName)).size;
-  const messageTemplates = getMessageTemplates();
+  const messageTemplates = useMemo(() => getMessageTemplates(), []);
   const [announcements, setAnnouncements] = useState<CommunicationLog[]>([]);
 
   const [winnersPage, setWinnersPage] = useState(1);
@@ -63,12 +63,12 @@ export default function AuctionResultsPage() {
     setAnnouncements(prev => [announcement, ...prev]);
   };
 
-  const bidCounts = bids.reduce((acc, bid) => {
+  const bidCounts = useMemo(() => bids.reduce((acc, bid) => {
       const priceRange = Math.floor(bid.amount / 100) * 100;
       const rangeLabel = `${priceRange} - ${priceRange + 99} Birr`;
       acc[rangeLabel] = (acc[rangeLabel] || 0) + 1;
       return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<string, number>), [bids]);
 
   if (!auctionEnded) {
     return (
@@ -88,8 +88,8 @@ export default function AuctionResultsPage() {
   return (
     <div className="max-w-4xl mx-auto py-8 space-y-8">
         <div>
-            <h1 className="text-3xl font-bold font-headline text-primary">Auction Results</h1>
-            <p className="text-lg text-muted-foreground">{item.name}</p>
+            <h1 className="text-3xl font-bold font-headline text-primary">{item.name}</h1>
+            <p className="text-lg text-muted-foreground">Auction Results</p>
         </div>
       
        <Card>
@@ -115,7 +115,7 @@ export default function AuctionResultsPage() {
           </CardTitle>
           <CardDescription>A log of all announcements sent for this auction.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <AnnouncementHistory announcements={announcements} />
         </CardContent>
       </Card>
@@ -130,7 +130,8 @@ export default function AuctionResultsPage() {
             Bids for this auction, sorted by amount. The highest bidder is the winner.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="overflow-x-auto border rounded-lg">
           <Table>
             <TableHeader>
               <TableRow>
@@ -160,6 +161,7 @@ export default function AuctionResultsPage() {
               )}
             </TableBody>
           </Table>
+          </div>
            <DataTablePagination
               page={winnersPage}
               setPage={setWinnersPage}
@@ -177,7 +179,7 @@ export default function AuctionResultsPage() {
             Bid Summary
           </CardTitle>
         </CardHeader>
-        <CardContent className="grid md:grid-cols-2 gap-6">
+        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex items-center gap-4 p-4 rounded-lg bg-card-foreground/5">
                 <Users className="h-8 w-8 text-primary" />
                 <div>
@@ -201,6 +203,9 @@ export default function AuctionResultsPage() {
                             <Badge variant="secondary">{count} bid{count > 1 ? 's' : ''}</Badge>
                         </div>
                     ))}
+                     {Object.keys(bidCounts).length === 0 && (
+                        <p className="text-sm text-muted-foreground">No bid data available.</p>
+                     )}
                 </div>
             </div>
         </CardContent>

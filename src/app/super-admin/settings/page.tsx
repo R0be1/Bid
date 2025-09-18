@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -19,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { useToast } from "@/hooks/use-toast";
 import { addSuperAdmin, getSuperAdmins } from "@/lib/super-admins";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { SuperAdmin } from "@/lib/types";
 
 const formSchema = z.object({
@@ -30,7 +29,8 @@ const formSchema = z.object({
 
 export default function SettingsPage() {
     const { toast } = useToast();
-    const [admins, setAdmins] = useState<SuperAdmin[]>(getSuperAdmins());
+    const initialAdmins = useMemo(() => getSuperAdmins(), []);
+    const [admins, setAdmins] = useState<SuperAdmin[]>(initialAdmins);
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -43,8 +43,8 @@ export default function SettingsPage() {
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         // In a real app, this would call a server action to create a new super admin user
-        addSuperAdmin({name: values.name, email: values.email});
-        setAdmins(getSuperAdmins());
+        const newAdmin = addSuperAdmin({name: values.name, email: values.email});
+        setAdmins(prev => [...prev, newAdmin]);
         
         toast({
             title: "Super Admin Registered",
@@ -54,7 +54,7 @@ export default function SettingsPage() {
     }
 
     return (
-        <div className="space-y-8 max-w-xl">
+        <div className="space-y-8 max-w-2xl mx-auto">
             <div>
                 <h1 className="text-3xl font-bold font-headline text-primary">Settings</h1>
                 <p className="text-muted-foreground">Manage super admin users.</p>
@@ -119,6 +119,7 @@ export default function SettingsPage() {
                     <CardDescription>List of all users with super administrative privileges.</CardDescription>
                 </CardHeader>
                 <CardContent>
+                   <div className="overflow-x-auto border rounded-lg">
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -135,6 +136,7 @@ export default function SettingsPage() {
                             ))}
                         </TableBody>
                     </Table>
+                    </div>
                 </CardContent>
             </Card>
         </div>
