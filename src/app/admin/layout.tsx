@@ -1,7 +1,7 @@
 
 "use client";
 
-import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarInset, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
+import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
 import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -23,9 +23,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <Sidebar>
             <SidebarHeader className="p-4">
                 <div className="flex items-center gap-2">
-                    <Gavel className="h-7 w-7 text-sidebar-primary" />
-                    <span className="font-bold text-xl text-sidebar-foreground group-data-[collapsible=icon]:hidden">
-                        BidCraft
+                    <Gavel className="h-7 w-7 text-primary" />
+                    <span className="font-bold text-xl text-foreground group-data-[collapsible=icon]:hidden">
+                        BidCraft Admin
                     </span>
                 </div>
             </SidebarHeader>
@@ -47,11 +47,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                <SidebarTrigger />
             </SidebarFooter>
         </Sidebar>
-        <SidebarInset>
-             <div className="p-4 md:p-8">
-                {children}
-            </div>
-        </SidebarInset>
+        <main className="flex-1 p-4 md:p-8">
+            {children}
+        </main>
     </SidebarProvider>
   );
 }
