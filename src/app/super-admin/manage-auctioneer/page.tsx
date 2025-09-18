@@ -19,7 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { PlusCircle, Edit, Power, Info, Copy } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 
 export default function ManageAuctioneerPage() {
   const [auctioneers, setAuctioneers] = useState<Auctioneer[]>(getAuctioneers());
@@ -68,6 +68,7 @@ export default function ManageAuctioneerPage() {
               <CardDescription>A list of all registered auctioneer portals.</CardDescription>
           </CardHeader>
           <CardContent>
+            <TooltipProvider>
               <Table>
                   <TableHeader>
                       <TableRow>
@@ -85,7 +86,10 @@ export default function ManageAuctioneerPage() {
                               <TableCell className="font-medium">
                                 <Tooltip>
                                   <TooltipTrigger asChild>
-                                    <span className="cursor-help underline decoration-dashed">{auctioneer.name}</span>
+                                    <div className="flex items-center gap-2 cursor-help">
+                                      <span>{auctioneer.name}</span>
+                                      <Info className="h-4 w-4 text-muted-foreground"/>
+                                    </div>
                                   </TooltipTrigger>
                                   <TooltipContent>
                                     <div className="flex items-center gap-2">
@@ -127,6 +131,7 @@ export default function ManageAuctioneerPage() {
                       ))}
                   </TableBody>
               </Table>
+            </TooltipProvider>
           </CardContent>
       </Card>
 
