@@ -66,7 +66,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-4 md:p-8">
         <div>
             <h1 className="text-3xl font-bold font-headline text-primary">Your Profile</h1>
             <p className="text-muted-foreground">View your account details and manage your password.</p>
