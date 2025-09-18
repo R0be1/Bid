@@ -2,9 +2,10 @@
 "use client";
 
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
-import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog } from "lucide-react";
+import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog, Home } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -19,37 +20,47 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <SidebarProvider>
-      <Sidebar>
-          <SidebarHeader>
-              <div className="flex items-center gap-2 p-4">
-                  <Gavel className="h-7 w-7 text-primary" />
-                  <span className="font-bold text-xl text-foreground group-data-[collapsible=icon]:hidden">
-                      BidCraft Admin
-                  </span>
-              </div>
-          </SidebarHeader>
-          <SidebarContent>
+      <SidebarProvider>
+        <Sidebar>
+            <SidebarHeader>
+                <div className="flex items-center gap-2 p-4">
+                    <Gavel className="h-7 w-7 text-primary" />
+                    <span className="font-bold text-xl text-foreground group-data-[collapsible=icon]:hidden">
+                        BidCraft Admin
+                    </span>
+                </div>
+            </SidebarHeader>
+            <SidebarContent>
+                <SidebarMenu>
+                    {navItems.map((item) => (
+                        <SidebarMenuItem key={item.label}>
+                            <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
+                                <Link href={item.href}>
+                                    <item.icon />
+                                    <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                    ))}
+                </SidebarMenu>
+            </SidebarContent>
+            <SidebarFooter>
               <SidebarMenu>
-                  {navItems.map((item) => (
-                      <SidebarMenuItem key={item.label}>
-                          <SidebarMenuButton asChild isActive={pathname === item.href} tooltip={item.label}>
-                              <Link href={item.href}>
-                                  <item.icon />
-                                  <span className="group-data-[collapsible=icon]:hidden">{item.label}</span>
-                              </Link>
-                          </SidebarMenuButton>
-                      </SidebarMenuItem>
-                  ))}
+                  <SidebarMenuItem>
+                      <SidebarMenuButton asChild tooltip="Customer Portal">
+                          <Link href="/">
+                              <Home />
+                              <span className="group-data-[collapsible=icon]:hidden">Customer Portal</span>
+                          </Link>
+                      </SidebarMenuButton>
+                  </SidebarMenuItem>
               </SidebarMenu>
-          </SidebarContent>
-          <SidebarFooter>
-             <SidebarTrigger />
-          </SidebarFooter>
-      </Sidebar>
-      <main className="flex-1 p-4 md:p-8">
-          {children}
-      </main>
-    </SidebarProvider>
+               <SidebarTrigger />
+            </SidebarFooter>
+        </Sidebar>
+        <main className="flex-1 p-4 md:p-8">
+            {children}
+        </main>
+      </SidebarProvider>
   );
 }
