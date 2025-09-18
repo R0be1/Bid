@@ -1,8 +1,12 @@
 
+"use client"
+
 import { getAuctioneers } from "@/lib/auctioneers";
 import { getAuctionItems } from "@/lib/data";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Gavel, UserCheck, UserX } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Users, Gavel } from "lucide-react";
+import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
+import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart";
 
 export default function SuperAdminDashboard() {
   const auctioneers = getAuctioneers();
@@ -12,6 +16,26 @@ export default function SuperAdminDashboard() {
   const activeAuctioneers = auctioneers.filter(a => a.status === 'active').length;
   const inactiveAuctioneers = auctioneers.filter(a => a.status === 'inactive').length;
   const totalBidItems = auctionItems.length;
+
+  const auctioneerStatusData = [
+    { status: 'Active', count: activeAuctioneers, fill: 'hsl(var(--primary))' },
+    { status: 'Inactive', count: inactiveAuctioneers, fill: 'hsl(var(--destructive))' },
+  ];
+  
+  const chartConfig = {
+    count: {
+      label: "Count",
+    },
+    active: {
+      label: "Active",
+      color: "hsl(var(--chart-1))",
+    },
+    inactive: {
+      label: "Inactive",
+      color: "hsl(var(--chart-2))",
+    },
+  }
+
 
   return (
     <div className="space-y-8">
@@ -35,28 +59,6 @@ export default function SuperAdminDashboard() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Active Auctioneers
-            </CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{activeAuctioneers}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Inactive Auctioneers
-            </CardTitle>
-            <UserX className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{inactiveAuctioneers}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
               Total Auction Items
             </CardTitle>
             <Gavel className="h-4 w-4 text-muted-foreground" />
@@ -66,6 +68,38 @@ export default function SuperAdminDashboard() {
           </CardContent>
         </Card>
       </div>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Auctioneer Status</CardTitle>
+          <CardDescription>A visual breakdown of active vs. inactive auctioneers.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+            <BarChart accessibilityLayer data={auctioneerStatusData}>
+                <XAxis
+                    dataKey="status"
+                    stroke="#888888"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                />
+                <YAxis
+                    stroke="#888888"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) => `${value}`}
+                />
+                <Tooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />} 
+                />
+                <Bar dataKey="count" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
     </div>
   );
 }
