@@ -1,4 +1,5 @@
 
+
 export type AuctionItem = {
   id: string;
   name: string;
@@ -56,7 +57,7 @@ export type CommunicationLog = {
 }
 
 export type Auctioneer = {
-  id: string;
+  id:string;
   name: string;
   address: string;
   status: 'active' | 'inactive';
@@ -67,4 +68,10 @@ export type Auctioneer = {
     email: string;
   };
   createdAt: Date;
+};
+
+export type SuperAdmin = {
+  id: string;
+  name: string;
+  email: string;
 };

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -16,6 +17,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { addSuperAdmin, getSuperAdmins } from "@/lib/super-admins";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useState } from "react";
+import type { SuperAdmin } from "@/lib/types";
 
 const formSchema = z.object({
   name: z.string().min(1, "Name is required."),
@@ -25,6 +30,8 @@ const formSchema = z.object({
 
 export default function SettingsPage() {
     const { toast } = useToast();
+    const [admins, setAdmins] = useState<SuperAdmin[]>(getSuperAdmins());
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -36,7 +43,9 @@ export default function SettingsPage() {
 
     function onSubmit(values: z.infer<typeof formSchema>) {
         // In a real app, this would call a server action to create a new super admin user
-        console.log("New Super Admin to register:", values);
+        const newAdmin = addSuperAdmin({name: values.name, email: values.email});
+        setAdmins(prev => [...prev, newAdmin]);
+        
         toast({
             title: "Super Admin Registered",
             description: `${values.name} has been added as a super admin.`,
@@ -101,6 +110,31 @@ export default function SettingsPage() {
                              <Button type="submit" className="w-full">Register Admin</Button>
                         </form>
                     </Form>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Registered Super Admins</CardTitle>
+                    <CardDescription>List of all users with super administrative privileges.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Name</TableHead>
+                                <TableHead>Email</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {admins.map((admin) => (
+                                <TableRow key={admin.id}>
+                                    <TableCell className="font-medium">{admin.name}</TableCell>
+                                    <TableCell>{admin.email}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
                 </CardContent>
             </Card>
         </div>
