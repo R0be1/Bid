@@ -18,8 +18,10 @@ export async function getCategoriesForAdmin() {
   }
 }
 
-export type UserForAdminTable = Pick<User, 'id' | 'email' | 'status' | 'paidParticipation' | 'paidDeposit' | 'paymentMethod' | 'receiptUrl'> & {
+export type UserForAdminTable = Pick<User, 'id' | 'email' | 'status' | 'paymentMethod' | 'receiptUrl'> & {
     name: string;
+    paidParticipation: boolean;
+    paidDeposit: boolean;
 };
 
 export async function getUsersForAdmin(): Promise<UserForAdminTable[]> {
@@ -70,7 +72,7 @@ export async function getAuctionItemsForAdmin(userId: string) {
 
     try {
         const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
-            where: { userId }
+            where: { userId: userId }
         });
 
         if (!auctioneerProfile) {
@@ -94,7 +96,7 @@ export async function getAuctionItemForEdit(itemId: string, userId: string) {
     noStore();
     try {
         const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
-            where: { userId }
+            where: { userId: userId }
         });
 
         if (!auctioneerProfile) {
