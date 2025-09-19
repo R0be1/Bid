@@ -35,8 +35,11 @@ export function CategoryForm() {
     },
   });
 
-  const onSubmit = (formData: FormData) => {
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
     startTransition(async () => {
+      const formData = new FormData();
+      formData.append('name', values.name);
+      
       const result = await addCategory(formData);
       if (result.success) {
         toast({
@@ -57,7 +60,7 @@ export function CategoryForm() {
 
   return (
     <Form {...form}>
-      <form action={form.handleSubmit(() => onSubmit(new FormData(form.control._formValues)))} className="flex items-end gap-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-end gap-4">
         <FormField
           control={form.control}
           name="name"
