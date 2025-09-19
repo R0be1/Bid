@@ -50,7 +50,7 @@ async function main() {
         email: "superadmin@example.com",
         status: UserStatus.APPROVED,
         roles: {
-          connect: [{ id: superAdminRole.id }], // ✅ assign relation
+          connect: [{ id: superAdminRole.id }],
         },
       },
     });
