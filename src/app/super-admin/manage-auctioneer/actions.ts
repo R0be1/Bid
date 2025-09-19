@@ -49,7 +49,7 @@ export async function registerAuctioneer(data: z.infer<typeof AuctioneerSchema>)
         create: {
           companyName: name,
           address,
-          tempPassword: tempPassword, // Storing plain temp password here
+          tempPassword: tempPassword,
         },
       },
     },
