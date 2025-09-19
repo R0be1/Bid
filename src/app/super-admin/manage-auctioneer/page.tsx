@@ -1,12 +1,12 @@
 
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
-import Link from "next/link";
-import { getAuctioneers, updateAuctioneerStatus } from "@/lib/auctioneers";
-import type { Auctioneer } from "@/lib/types";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useMemo, useTransition } from 'react';
+import Link from 'next/link';
+import { toggleAuctioneerStatus } from './actions';
+import type { UserStatus } from '@prisma/client';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
   TableBody,
@@ -14,16 +14,32 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import { PlusCircle, Edit, Power, Info, Copy } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
-import { DataTablePagination } from "@/components/ui/data-table-pagination";
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
+import { PlusCircle, Edit, Power, Info, Copy } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
+import { DataTablePagination } from '@/components/ui/data-table-pagination';
 
-export default function ManageAuctioneerPage() {
-  const [auctioneers, setAuctioneers] = useState<Auctioneer[]>(getAuctioneers());
+type AuctioneerForTable = {
+    id: string;
+    name: string;
+    contact: string;
+    email: string;
+    status: UserStatus;
+    createdAt: Date;
+    tempPassword: string | null;
+}
+
+interface ManageAuctioneerPageProps {
+  auctioneers: AuctioneerForTable[];
+}
+
+
+export default function ManageAuctioneerPage({ auctioneers: initialAuctioneers }: ManageAuctioneerPageProps) {
+  const [auctioneers, setAuctioneers] = useState<AuctioneerForTable[]>(initialAuctioneers);
+  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -33,19 +49,27 @@ export default function ManageAuctioneerPage() {
     return auctioneers.slice(startIndex, startIndex + rowsPerPage);
   }, [auctioneers, page, rowsPerPage]);
 
-  const handleToggleStatus = (auctioneerId: string, currentStatus: 'active' | 'inactive') => {
-    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-    const updatedAuctioneer = updateAuctioneerStatus(auctioneerId, newStatus);
-    if (updatedAuctioneer) {
-      setAuctioneers(prev => prev.map(a => a.id === auctioneerId ? updatedAuctioneer : a));
-      toast({
-        title: "Status Updated",
-        description: `${updatedAuctioneer.name}'s status has been set to ${newStatus}.`
-      });
-    }
+  const handleToggleStatus = (auctioneerId: string, currentStatus: UserStatus) => {
+    startTransition(async () => {
+      try {
+        await toggleAuctioneerStatus(auctioneerId, currentStatus);
+        const newStatus = currentStatus === 'APPROVED' ? 'BLOCKED' : 'APPROVED';
+        setAuctioneers(prev => prev.map(a => a.id === auctioneerId ? {...a, status: newStatus} : a));
+        toast({
+          title: 'Status Updated',
+          description: `Auctioneer status has been set to ${newStatus.toLowerCase()}.`,
+        });
+      } catch (error) {
+         toast({
+          title: 'Error',
+          description: 'Failed to update status.',
+          variant: 'destructive'
+        });
+      }
+    });
   };
 
-  const handleCopyPassword = (password: string | undefined) => {
+  const handleCopyPassword = (password: string | null) => {
     if (!password) return;
     navigator.clipboard.writeText(password).then(() => {
       toast({
@@ -77,68 +101,71 @@ export default function ManageAuctioneerPage() {
           </CardHeader>
           <CardContent>
             <TooltipProvider>
-              <Table>
-                  <TableHeader>
-                      <TableRow>
-                          <TableHead>Name</TableHead>
-                          <TableHead>Primary Contact</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Date Registered</TableHead>
-                          <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                      {paginatedAuctioneers.map((auctioneer) => (
-                          <TableRow key={auctioneer.id}>
-                              <TableCell className="font-medium">
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <div className="flex items-center gap-2 cursor-help">
-                                      <span>{auctioneer.name}</span>
-                                      <Info className="h-4 w-4 text-muted-foreground"/>
+              <div className="border rounded-lg">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Company Name</TableHead>
+                            <TableHead>Primary Contact</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Status</TableHead>
+                            <TableHead>Date Registered</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {paginatedAuctioneers.map((auctioneer) => (
+                            <TableRow key={auctioneer.id}>
+                                <TableCell className="font-medium">
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <div className="flex items-center gap-2 cursor-help">
+                                        <span>{auctioneer.name}</span>
+                                        <Info className="h-4 w-4 text-muted-foreground"/>
+                                      </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <div className="flex items-center gap-2">
+                                          <p>Temp Password: <span className="font-bold">{auctioneer.tempPassword}</span></p>
+                                          {auctioneer.tempPassword && <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopyPassword(auctioneer.tempPassword)}>
+                                              <Copy className="h-4 w-4" />
+                                          </Button>}
+                                      </div>
+                                    </TooltipContent>
+                                  </Tooltip>
+                                </TableCell>
+                                <TableCell>{auctioneer.contact}</TableCell>
+                                <TableCell>{auctioneer.email}</TableCell>
+                                <TableCell>
+                                    <Badge variant={auctioneer.status === 'APPROVED' ? 'default' : 'destructive'}>
+                                        {auctioneer.status}
+                                    </Badge>
+                                </TableCell>
+                                <TableCell>{format(auctioneer.createdAt, "PPP")}</TableCell>
+                                <TableCell className="text-right">
+                                    <div className="flex items-center justify-end gap-2">
+                                      <Button asChild variant="ghost" size="icon" title="Edit Auctioneer">
+                                          <Link href={`/super-admin/manage-auctioneer/${auctioneer.id}/edit`}>
+                                              <Edit className="h-4 w-4" />
+                                          </Link>
+                                      </Button>
+                                      <Button 
+                                          variant="ghost" 
+                                          size="icon" 
+                                          title={auctioneer.status === 'APPROVED' ? 'Deactivate' : 'Activate'}
+                                          className={auctioneer.status === 'APPROVED' ? 'text-green-600 hover:text-green-700' : 'text-destructive hover:text-destructive/80'}
+                                          onClick={() => handleToggleStatus(auctioneer.id, auctioneer.status)}
+                                          disabled={isPending}
+                                      >
+                                          <Power className="h-4 w-4" />
+                                      </Button>
                                     </div>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <div className="flex items-center gap-2">
-                                        <p>Temp Password: <span className="font-bold">{auctioneer.user.tempPassword}</span></p>
-                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopyPassword(auctioneer.user.tempPassword)}>
-                                            <Copy className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                  </TooltipContent>
-                                </Tooltip>
-                              </TableCell>
-                              <TableCell>{auctioneer.user.firstName} {auctioneer.user.lastName}</TableCell>
-                              <TableCell>{auctioneer.user.email}</TableCell>
-                              <TableCell>
-                                  <Badge variant={auctioneer.status === 'active' ? 'default' : 'destructive'}>
-                                      {auctioneer.status}
-                                  </Badge>
-                              </TableCell>
-                              <TableCell>{format(auctioneer.createdAt, "PPP")}</TableCell>
-                              <TableCell className="text-right">
-                                  <div className="flex items-center justify-end gap-2">
-                                    <Button asChild variant="ghost" size="icon" title="Edit Auctioneer">
-                                        <Link href={`/super-admin/manage-auctioneer/${auctioneer.id}/edit`}>
-                                            <Edit className="h-4 w-4" />
-                                        </Link>
-                                    </Button>
-                                    <Button 
-                                        variant="ghost" 
-                                        size="icon" 
-                                        title={auctioneer.status === 'active' ? 'Deactivate' : 'Activate'}
-                                        className={auctioneer.status === 'active' ? 'text-green-600 hover:text-green-700' : 'text-destructive hover:text-destructive/80'}
-                                        onClick={() => handleToggleStatus(auctioneer.id, auctioneer.status)}
-                                    >
-                                        <Power className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                              </TableCell>
-                          </TableRow>
-                      ))}
-                  </TableBody>
-              </Table>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+              </div>
               <DataTablePagination
                 page={page}
                 setPage={setPage}

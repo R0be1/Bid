@@ -17,8 +17,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { updateAuctioneer, getAuctioneerById } from "@/lib/auctioneers";
+import { updateAuctioneer } from "../../actions";
 import { useRouter, useParams, notFound } from "next/navigation";
+import { useTransition } from "react";
+
+type AuctioneerForEdit = {
+    id: string;
+    name: string;
+    address: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+}
 
 const formSchema = z.object({
   name: z.string().min(1, "Auctioneer name is required."),
@@ -29,12 +40,16 @@ const formSchema = z.object({
   email: z.string().email("Invalid email address."),
 });
 
-export default function EditAuctioneerPage() {
+interface EditAuctioneerPageProps {
+  auctioneer: AuctioneerForEdit;
+}
+
+export default function EditAuctioneerPage({ auctioneer }: EditAuctioneerPageProps) {
   const { toast } = useToast();
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
-  const auctioneer = getAuctioneerById(id);
 
   if (!auctioneer) {
       notFound();
@@ -45,42 +60,41 @@ export default function EditAuctioneerPage() {
     defaultValues: {
         name: auctioneer.name,
         address: auctioneer.address,
-        firstName: auctioneer.user.firstName,
-        lastName: auctioneer.user.lastName,
-        phone: auctioneer.user.phone,
-        email: auctioneer.user.email
+        firstName: auctioneer.firstName,
+        lastName: auctioneer.lastName,
+        phone: auctioneer.phone,
+        email: auctioneer.email
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    updateAuctioneer(id, {
-        name: values.name,
-        address: values.address,
-        user: {
-            firstName: values.firstName,
-            lastName: values.lastName,
-            phone: values.phone,
-            email: values.email
+    startTransition(async () => {
+        try {
+            await updateAuctioneer(id, values);
+            toast({
+                title: "Auctioneer Updated",
+                description: `The details for "${values.name}" have been saved.`,
+            });
+            router.push("/super-admin/manage-auctioneer");
+        } catch (error) {
+            toast({
+                title: "Error",
+                description: "Failed to update auctioneer.",
+                variant: "destructive",
+            });
         }
     });
-    
-    toast({
-      title: "Auctioneer Updated",
-      description: `The details for "${values.name}" have been saved.`,
-    });
-    
-    router.push("/super-admin/manage-auctioneer");
   }
 
   return (
     <div className="max-w-2xl mx-auto">
-        <div className="mb-8 pt-8 px-8">
+        <div className="mb-8 pt-8 px-4 md:px-0">
             <h1 className="text-3xl font-bold font-headline text-primary">Edit Auctioneer</h1>
             <p className="text-muted-foreground">Modify the details for {auctioneer.name}.</p>
         </div>
 
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-8 pb-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-4 md:px-0 pb-8">
                 <Card>
                     <CardHeader>
                         <CardTitle>Auctioneer Details</CardTitle>
@@ -170,7 +184,7 @@ export default function EditAuctioneerPage() {
                                 <FormItem>
                                 <FormLabel>Phone Number</FormLabel>
                                 <FormControl>
-                                    <Input type="tel" placeholder="111-222-3333" {...field} />
+                                    <Input type="tel" placeholder="0911223344" {...field} />
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -179,7 +193,9 @@ export default function EditAuctioneerPage() {
                     </CardContent>
                 </Card>
 
-                <Button type="submit" size="lg" variant="accent" className="w-full">Save Changes</Button>
+                <Button type="submit" size="lg" variant="accent" className="w-full" disabled={isPending}>
+                    {isPending ? 'Saving...' : 'Save Changes'}
+                </Button>
             </form>
         </Form>
     </div>

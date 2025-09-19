@@ -18,8 +18,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { addAuctioneer } from "@/lib/auctioneers";
+import { registerAuctioneer } from "../actions";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 
 const formSchema = z.object({
   name: z.string().min(1, "Auctioneer name is required."),
@@ -33,6 +34,7 @@ const formSchema = z.object({
 export default function RegisterAuctioneerPage() {
   const { toast } = useToast();
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,34 +49,33 @@ export default function RegisterAuctioneerPage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    addAuctioneer({
-        name: values.name,
-        address: values.address,
-        user: {
-            firstName: values.firstName,
-            lastName: values.lastName,
-            phone: values.phone,
-            email: values.email
-        }
+    startTransition(async () => {
+      try {
+        await registerAuctioneer(values);
+        toast({
+          title: "Auctioneer Registered",
+          description: `The portal for "${values.name}" has been created.`,
+        });
+        router.push("/super-admin/manage-auctioneer");
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to register auctioneer.",
+          variant: "destructive",
+        });
+      }
     });
-    
-    toast({
-      title: "Auctioneer Registered",
-      description: `The portal for "${values.name}" has been created.`,
-    });
-    
-    router.push("/super-admin/manage-auctioneer");
   }
 
   return (
     <div className="max-w-2xl mx-auto">
-        <div className="mb-8 pt-8 px-8">
+        <div className="mb-8 pt-8 px-4 md:px-0">
             <h1 className="text-3xl font-bold font-headline text-primary">Register New Auctioneer</h1>
             <p className="text-muted-foreground">Create a new portal for an auctioneer.</p>
         </div>
 
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-8 pb-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-4 md:px-0 pb-8">
                 <Card>
                     <CardHeader>
                         <CardTitle>Auctioneer Details</CardTitle>
@@ -164,7 +165,7 @@ export default function RegisterAuctioneerPage() {
                                 <FormItem>
                                 <FormLabel>Phone Number</FormLabel>
                                 <FormControl>
-                                    <Input type="tel" placeholder="111-222-3333" {...field} />
+                                    <Input type="tel" placeholder="0911223344" {...field} />
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -173,7 +174,9 @@ export default function RegisterAuctioneerPage() {
                     </CardContent>
                 </Card>
 
-                <Button type="submit" size="lg" variant="accent" className="w-full">Register Auctioneer</Button>
+                <Button type="submit" size="lg" variant="accent" className="w-full" disabled={isPending}>
+                  {isPending ? 'Registering...' : 'Register Auctioneer'}
+                </Button>
             </form>
         </Form>
     </div>
