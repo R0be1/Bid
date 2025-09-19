@@ -34,8 +34,8 @@ export function Header() {
   const handleLogout = async () => {
     await logout();
     setUser(null);
-    // Force a full refresh to ensure all states are cleared
-    window.location.href = '/login';
+    router.push('/login');
+    router.refresh();
   };
 
   return (
@@ -61,26 +61,28 @@ export function Header() {
         <div className="flex flex-1 items-center justify-end space-x-4">
           {user ? (
             <>
-              <Button variant="ghost" asChild>
-                <Link href="/dashboard">
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Dashboard
-                </Link>
-              </Button>
-               <Button variant="outline" onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Log out
-              </Button>
+              <div className="hidden md:flex items-center space-x-4">
+                 <Button variant="ghost" asChild>
+                    <Link href="/dashboard">
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        Dashboard
+                    </Link>
+                 </Button>
+                <Button variant="outline" onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log out
+                </Button>
+              </div>
             </>
           ) : (
-            <>
+            <div className="hidden md:flex items-center space-x-2">
               <Button variant="ghost" asChild>
                 <Link href="/login">Log in</Link>
               </Button>
               <Button asChild>
                 <Link href="/register">Sign up</Link>
               </Button>
-            </>
+            </div>
           )}
         </div>
         <div className="md:hidden ml-4">
@@ -108,6 +110,23 @@ export function Header() {
                     {item.label}
                   </Link>
                 ))}
+                <div className="pt-6">
+                 {user ? (
+                    <Button className="w-full" variant="outline" onClick={handleLogout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Log out
+                    </Button>
+                  ) : (
+                    <div className="grid gap-4">
+                      <Button asChild className="w-full">
+                        <Link href="/login">Log In</Link>
+                      </Button>
+                      <Button asChild className="w-full" variant="secondary">
+                        <Link href="/register">Sign Up</Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </nav>
             </SheetContent>
           </Sheet>
