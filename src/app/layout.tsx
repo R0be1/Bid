@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
   const isPortalPage = pathname.startsWith("/admin") || pathname.startsWith("/super-admin");
-  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname.startsWith("/auth");
 
   const showHeader = !isPortalPage && !isAuthPage;
 
