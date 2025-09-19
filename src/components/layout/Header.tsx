@@ -15,7 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth-client";
 import { logout } from "@/app/actions";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 export function Header() {
   const navItems = [
@@ -26,10 +26,11 @@ export function Header() {
   
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     setUser(getCurrentUserClient());
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async () => {
     await logout();
