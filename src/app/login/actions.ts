@@ -2,7 +2,6 @@
 "use server";
 
 import prisma from '@/lib/prisma';
-import { setCookie } from 'nookies';
 import bcrypt from 'bcrypt';
 import type { AuthenticatedUser, UserRole, AuthResult } from '@/lib/auth';
 import { cookies } from "next/headers";
@@ -24,7 +23,7 @@ export async function login(phone: string, password: string): Promise<AuthResult
         const passwordMatch = user.password ? await bcrypt.compare(password, user.password) : false;
         
         // Also check against temp password if main password doesn't match
-        if (!passwordMatch && password !== user.tempPassword) {
+        if (!passwordMatch && (!user.tempPassword || password !== user.tempPassword)) {
             return { success: false, message: "Invalid phone number or password." };
         }
 

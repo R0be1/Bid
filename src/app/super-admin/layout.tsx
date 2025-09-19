@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useEffect, useState, ReactNode } from 'react';
@@ -7,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
 import { Shield, LayoutGrid, Users, Settings, User, LogOut } from "lucide-react";
 import Link from "next/link";
-import { logout } from "@/lib/auth";
+import { logout } from '@/app/actions';
 
 export default function SuperAdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -18,8 +17,8 @@ export default function SuperAdminLayout({ children }: { children: ReactNode }) 
     { href: "/super-admin/settings", label: "Settings", icon: Settings },
   ];
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push('/login');
     router.refresh();
   };

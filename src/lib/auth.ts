@@ -1,6 +1,7 @@
 
-"use client";
+'use server';
 
+import { cookies } from 'next/headers';
 import { parseCookies, destroyCookie } from 'nookies';
 
 export type UserRole = 'user' | 'admin' | 'super-admin';
@@ -17,17 +18,24 @@ export interface AuthResult {
     role?: UserRole;
 }
 
-
 const SESSION_KEY = 'user_session';
 
+export function getCurrentUser(): AuthenticatedUser | null {
+    const sessionCookie = cookies().get(SESSION_KEY);
 
-export const logout = (): void => {
-    destroyCookie(null, SESSION_KEY, { path: '/' });
-};
+    if (!sessionCookie) return null;
 
-export const getCurrentUser = (): AuthenticatedUser | null => {
-    const cookies = parseCookies();
-    const session = cookies[SESSION_KEY];
+    try {
+        const user: AuthenticatedUser = JSON.parse(sessionCookie.value);
+        return user;
+    } catch (e) {
+        return null;
+    }
+}
+
+export function getCurrentUserClient(): AuthenticatedUser | null {
+    const clientCookies = parseCookies();
+    const session = clientCookies[SESSION_KEY];
 
     if (!session) return null;
 
@@ -39,6 +47,7 @@ export const getCurrentUser = (): AuthenticatedUser | null => {
     }
 }
 
-export const isAuthenticated = (): boolean => {
-    return !!getCurrentUser();
-};
+
+export async function logout() {
+    cookies().delete(SESSION_KEY);
+}

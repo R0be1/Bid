@@ -1,8 +1,10 @@
+
 "use server";
 
 import { validateSealedBid, type ValidateSealedBidInput } from "@/ai/flows/sealed-bid-validation";
 import { z } from "zod";
-import { getAuctionItem } from "@/lib/data";
+import { getAuctionItemForListing } from "@/lib/data/public";
+import { logout as serverLogout } from "@/lib/auth";
 
 const BidSchema = z.object({
   bidAmount: z.coerce.number().positive("Bid amount must be positive."),
@@ -28,7 +30,7 @@ export async function handleSealedBid(prevState: FormState, formData: FormData):
   }
 
   const { bidAmount, itemId } = validatedFields.data;
-  const item = getAuctionItem(itemId);
+  const item = await getAuctionItemForListing(itemId);
 
   if (!item || item.type !== "sealed" || !item.maxAllowedValue) {
     return {
@@ -66,4 +68,9 @@ export async function handleSealedBid(prevState: FormState, formData: FormData):
       message: "An unexpected error occurred while validating your bid. Please try again.",
     };
   }
+}
+
+
+export async function logout() {
+  await serverLogout();
 }

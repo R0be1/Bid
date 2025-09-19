@@ -1,6 +1,6 @@
 
-
-import { getSuperAdminProfile, updatePassword } from "./actions";
+import { getSuperAdminProfile } from "./actions";
+import { updateUserPassword } from "@/app/profile/actions";
 import { User, Lock } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -49,11 +49,10 @@ export default async function SuperAdminProfilePage() {
                     <CardDescription>Update your password here. Remember to choose a strong one.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <ChangePasswordForm onUpdatePassword={updatePassword} />
+                    <ChangePasswordForm onUpdatePassword={updateUserPassword} />
                 </CardContent>
             </Card>
         </div>
     </div>
   );
 }
-

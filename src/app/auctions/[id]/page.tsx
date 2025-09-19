@@ -1,5 +1,5 @@
 
-import { getAuctionItem } from "@/lib/data";
+import { getAuctionItemForListing } from "@/lib/data/public";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,8 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 
-export default function AuctionDetailPage({ params }: { params: { id: string } }) {
-  const item = getAuctionItem(params.id);
+export default async function AuctionDetailPage({ params }: { params: { id: string } }) {
+  const item = await getAuctionItemForListing(params.id);
 
   if (!item) {
     notFound();
@@ -28,10 +28,10 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
     <div className="max-w-6xl mx-auto">
        <div className="mb-4">
         <div className="flex items-center gap-2 mb-2">
-            <Badge variant={item.type === 'live' ? 'destructive' : 'secondary'}>
-            {item.type === 'live' ? 'Live Auction' : 'Sealed Bid'}
+            <Badge variant={item.type === 'LIVE' ? 'destructive' : 'secondary'}>
+            {item.type === 'LIVE' ? 'Live Auction' : 'Sealed Bid'}
             </Badge>
-            <Badge variant="outline">{item.category}</Badge>
+            <Badge variant="outline">{item.categoryName}</Badge>
         </div>
         <h1 className="text-3xl md:text-4xl font-bold font-headline text-primary">{item.name}</h1>
         <p className="text-md text-muted-foreground flex items-center gap-2 mt-2"><Gavel className="h-4 w-4" /> Sold by {item.auctioneerName}</p>
@@ -70,7 +70,7 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
           
           {auctionActive && (
             <>
-              {item.type === "live" ? (
+              {item.type === "LIVE" ? (
                 <LiveBidding item={item} />
               ) : (
                 <SealedBidForm item={item} />
@@ -126,7 +126,7 @@ export default function AuctionDetailPage({ params }: { params: { id: string } }
               <div className="flex items-center space-x-3">
                  <Hammer className="h-5 w-5 text-accent" />
                  <span className="font-medium">Auction Type:</span>
-                 <span className="text-foreground/90 capitalize">{item.type}</span>
+                 <span className="text-foreground/90 capitalize">{item.type.toLowerCase()}</span>
               </div>
             </CardContent>
           </Card>

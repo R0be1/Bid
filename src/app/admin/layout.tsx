@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useEffect, useState, ReactNode } from 'react';
@@ -7,7 +6,8 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
 import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog, User, LogOut } from "lucide-react";
 import Link from "next/link";
-import { logout, getCurrentUser } from "@/lib/auth";
+import { getCurrentUserClient } from "@/lib/auth";
+import { logout } from "../actions";
 
 // MOCK: In a real app, this would come from the logged-in user's session
 const MOCK_AUCTIONEER_NAME = "Vintage Treasures LLC";
@@ -26,8 +26,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     { href: "/admin/communications", label: "Communications", icon: Send },
   ];
   
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     router.push('/login');
     router.refresh();
   };
