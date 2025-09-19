@@ -1,8 +1,9 @@
 
+
 'use server';
 
 import { cookies } from 'next/headers';
-import { parseCookies, destroyCookie } from 'nookies';
+import { parseCookies } from 'nookies';
 
 export type UserRole = 'user' | 'admin' | 'super-admin';
 

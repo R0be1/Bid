@@ -1,6 +1,6 @@
 
 
-import type { User as PrismaUser, Role as PrismaRole, AuctioneerProfile as PrismaAuctioneerProfile, AuctionItem as PrismaAuctionItem, Bid as PrismaBid, UserStatus, PaymentMethod } from '@prisma/client';
+import type { User as PrismaUser, Role as PrismaRole, AuctioneerProfile as PrismaAuctioneerProfile, AuctionItem as PrismaAuctionItem, Bid as PrismaBid, UserStatus, PaymentMethod, AuctionItemType } from '@prisma/client';
 
 export type AuctionItem = {
   id: string;
@@ -8,9 +8,9 @@ export type AuctionItem = {
   description: string;
   imageUrls: string[];
   imageHints: string[];
-  category: string;
+  categoryName: string;
   auctioneerName: string;
-  type: 'live' | 'sealed';
+  type: AuctionItemType;
   startDate: string; // ISO string
   endDate: string; // ISO string
   startingPrice: number;
