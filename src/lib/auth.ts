@@ -20,7 +20,7 @@ export interface AuthResult {
 const SESSION_KEY = 'user_session';
 
 export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
-    const sessionCookie = cookies().get(SESSION_KEY);
+    const sessionCookie = (await cookies()).get(SESSION_KEY);
 
     if (!sessionCookie) return null;
 

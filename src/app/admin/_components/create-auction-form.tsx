@@ -378,7 +378,8 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
-                  )}
+                    )}
+                  />
               )}
             </div>
 
