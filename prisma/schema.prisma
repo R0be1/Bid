@@ -1,0 +1,127 @@
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                String   @id @default(uuid())
+  firstName         String
+  lastName          String
+  email             String   @unique
+  phone             String   @unique
+  password          String
+  status            String   @default("pending") // 'pending', 'approved', 'blocked'
+  role              String   @default("USER") // 'USER', 'ADMIN', 'SUPER_ADMIN'
+  paidParticipation Boolean  @default(false)
+  paidDeposit       Boolean  @default(false)
+  paymentMethod     String? // 'direct' or 'receipt'
+  receiptUrl        String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  auctioneer      Auctioneer?
+  bids            Bid[]
+  communications  CommunicationLog[]
+
+  @@map("users")
+}
+
+model Auctioneer {
+  id        String   @id @default(uuid())
+  name      String
+  address   String
+  status    String   @default("active") // 'active' or 'inactive'
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+
+  auctionItems AuctionItem[]
+
+  @@map("auctioneers")
+}
+
+model Category {
+  id   String @id @default(uuid())
+  name String @unique
+
+  auctionItems AuctionItem[]
+
+  @@map("categories")
+}
+
+model AuctionItem {
+  id                String    @id @default(uuid())
+  name              String
+  description       String
+  imageUrls         String[]
+  imageHints        String[]
+  type              String // 'live' or 'sealed'
+  startDate         DateTime
+  endDate           DateTime
+  startingPrice     Float
+  participationFee  Float?
+  securityDeposit   Float?
+  currentBid        Float?
+  highBidder        String?
+  maxAllowedValue   Float? // for sealed bids
+  minIncrement      Float? // for live auctions
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  categoryId     String
+  category       Category @relation(fields: [categoryId], references: [id])
+
+  auctioneerId   String
+  auctioneer     Auctioneer @relation(fields: [auctioneerId], references: [id])
+
+  bids            Bid[]
+  communicationLogs CommunicationLog[]
+
+  @@map("auction_items")
+}
+
+model Bid {
+  id        String   @id @default(uuid())
+  amount    Float
+  createdAt DateTime @default(now())
+
+  userId    String
+  bidder    User @relation(fields: [userId], references: [id])
+
+  auctionItemId String
+  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id])
+
+  @@map("bids")
+}
+
+model MessageTemplate {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  channel   String // 'email' or 'sms'
+  template  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("message_templates")
+}
+
+model CommunicationLog {
+  id              String   @id @default(uuid())
+  templateName    String
+  channel         String // 'email' or 'sms'
+  recipientsCount Int
+  sentAt          DateTime @default(now())
+
+  auctionItemId String
+  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id])
+  
+  recipients User[]
+
+  @@map("communication_logs")
+}
