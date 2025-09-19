@@ -9,9 +9,9 @@ async function main() {
   // Seed Roles
   console.log('Seeding roles...');
   const roles = [
-    { name: RoleName.SUPER_ADMIN },
-    { name: RoleName.AUCTIONEER },
-    { name: RoleName.BIDDER },
+    { name: 'SUPER_ADMIN' as RoleName },
+    { name: 'AUCTIONEER' as RoleName },
+    { name: 'BIDDER' as RoleName },
   ];
 
   for (const role of roles) {
@@ -36,7 +36,7 @@ async function main() {
   const hashedPassword = await bcrypt.hash(superAdminPassword, saltRounds);
 
   const superAdminRole = await prisma.role.findUnique({
-    where: { name: RoleName.SUPER_ADMIN },
+    where: { name: 'SUPER_ADMIN' },
   });
 
   if (!superAdminRole) {
