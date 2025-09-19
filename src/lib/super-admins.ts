@@ -2,7 +2,6 @@
 'use server';
 
 import prisma from '@/lib/prisma';
-import bcrypt from 'bcrypt';
 import { UserStatus } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 
@@ -19,7 +18,11 @@ export async function getSuperAdmins() {
             lastName: true,
             email: true,
             phone: true,
-            tempPassword: true,
+            auctioneerProfile: {
+                select: {
+                    tempPassword: true
+                }
+            }
         },
         orderBy: {
             createdAt: 'asc',
@@ -31,7 +34,7 @@ export async function getSuperAdmins() {
         name: `${sa.firstName} ${sa.lastName}`,
         email: sa.email,
         phone: sa.phone,
-        tempPassword: sa.tempPassword
+        tempPassword: sa.auctioneerProfile?.tempPassword
     }));
 }
 
@@ -44,10 +47,7 @@ export async function addSuperAdmin({name, email, phone}: {name: string, email: 
         throw new Error('SUPER_ADMIN role not found. Please seed the database.');
     }
     
-    // In a real app, you'd generate a more secure random password.
     const tempPassword = Math.random().toString(36).slice(-8);
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(tempPassword, saltRounds);
 
     const [firstName, ...lastNameParts] = name.split(' ');
     const lastName = lastNameParts.join(' ');
@@ -55,8 +55,7 @@ export async function addSuperAdmin({name, email, phone}: {name: string, email: 
     await prisma.user.create({
         data: {
             phone,
-            password: hashedPassword,
-            tempPassword,
+            password: '', // Password will be set by the user on first login.
             firstName: firstName || 'Super',
             lastName: lastName || 'Admin',
             email,
@@ -64,6 +63,13 @@ export async function addSuperAdmin({name, email, phone}: {name: string, email: 
             roles: {
                 connect: { id: superAdminRole.id },
             },
+            auctioneerProfile: {
+                create: {
+                    companyName: `${firstName} ${lastName}`,
+                    address: 'N/A',
+                    tempPassword: tempPassword,
+                }
+            }
         },
     });
 
