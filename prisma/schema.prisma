@@ -8,21 +8,33 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum RoleName {
+  SUPER_ADMIN
+  AUCTIONEER
+  BIDDER
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  BLOCKED
+}
+
 model User {
-  id                String   @id @default(uuid())
+  id                String     @id @default(uuid())
   firstName         String
   lastName          String
-  email             String   @unique
-  phone             String   @unique
+  email             String     @unique
+  phone             String     @unique
   password          String
-  status            String   @default("pending") // 'pending', 'approved', 'blocked'
-  role              String   @default("USER") // 'USER', 'ADMIN', 'SUPER_ADMIN'
-  paidParticipation Boolean  @default(false)
-  paidDeposit       Boolean  @default(false)
-  paymentMethod     String? // 'direct' or 'receipt'
+  status            UserStatus @default(PENDING)
+  role              RoleName   @default(BIDDER)
+  paidParticipation Boolean    @default(false)
+  paidDeposit       Boolean    @default(false)
+  paymentMethod     String?
   receiptUrl        String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
 
   auctioneer      Auctioneer?
   bids            Bid[]
