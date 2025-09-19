@@ -1,4 +1,4 @@
-
+// app/super-admin/page.tsx
 import prisma from "@/lib/prisma";
 import {
   Card,
@@ -8,40 +8,28 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Users, Gavel } from "lucide-react";
-import { Pie, PieChart, Cell } from "recharts";
-import {
-  ChartContainer,
-  ChartLegend,
-  ChartLegendContent,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
 import { UserStatus } from "@prisma/client";
+import AuctioneerChart from "./_components/AuctioneerChart";
 
 export default async function SuperAdminDashboard() {
+  // Server-side Prisma queries
   const totalAuctioneers = await prisma.user.count({
     where: {
-      roles: {
-        some: { name: "AUCTIONEER" },
-      },
+      roles: { some: { name: "AUCTIONEER" } },
     },
   });
 
   const activeAuctioneers = await prisma.user.count({
     where: {
       status: UserStatus.APPROVED,
-      roles: {
-        some: { name: "AUCTIONEER" },
-      },
+      roles: { some: { name: "AUCTIONEER" } },
     },
   });
 
   const inactiveAuctioneers = await prisma.user.count({
     where: {
       status: { not: UserStatus.APPROVED },
-      roles: {
-        some: { name: "AUCTIONEER" },
-      },
+      roles: { some: { name: "AUCTIONEER" } },
     },
   });
 
@@ -57,17 +45,9 @@ export default async function SuperAdminDashboard() {
   ];
 
   const chartConfig = {
-    count: {
-      label: "Count",
-    },
-    Active: {
-      label: "Active",
-      color: "hsl(var(--accent))",
-    },
-    Inactive: {
-      label: "Inactive",
-      color: "hsl(var(--destructive))",
-    },
+    count: { label: "Count" },
+    Active: { label: "Active", color: "hsl(var(--accent))" },
+    Inactive: { label: "Inactive", color: "hsl(var(--destructive))" },
   };
 
   return (
@@ -93,6 +73,7 @@ export default async function SuperAdminDashboard() {
             <div className="text-2xl font-bold">{totalAuctioneers}</div>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -114,33 +95,10 @@ export default async function SuperAdminDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-center">
-          <ChartContainer
-            config={chartConfig}
-            className="min-h-[200px] w-full max-w-[300px]"
-          >
-            <PieChart>
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent indicator="dot" />}
-              />
-              <Pie
-                data={auctioneerStatusData}
-                dataKey="count"
-                nameKey="name"
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-              >
-                {auctioneerStatusData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.fill} />
-                ))}
-              </Pie>
-              <ChartLegend
-                content={<ChartLegendContent />}
-                className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
-              />
-            </PieChart>
-          </ChartContainer>
+          <AuctioneerChart
+            data={auctioneerStatusData}
+            chartConfig={chartConfig}
+          />
         </CardContent>
       </Card>
     </div>
