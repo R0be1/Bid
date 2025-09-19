@@ -14,17 +14,20 @@ import {
 } from "@/components/ui/sheet";
 import { getCurrentUserClient } from "@/lib/auth-client";
 import { logout } from "@/app/actions";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { AuthenticatedUser } from "@/lib/auth";
 
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setUser(getCurrentUserClient());
-  }, []);
+    setIsLoading(false);
+  }, [pathname]);
 
   const handleLogout = async () => {
     await logout();
@@ -33,11 +36,16 @@ export function Header() {
     router.refresh();
   };
 
-  const navItems = [
+  const baseNavItems = [
     { href: "/", label: "Auctions" },
+  ];
+
+  const userNavItems = [
     { href: "/dashboard", label: "Dashboard" },
     { href: "/profile", label: "Profile" },
   ];
+  
+  const navItems = user ? [...baseNavItems, ...userNavItems] : baseNavItems;
   
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
@@ -60,33 +68,37 @@ export function Header() {
           ))}
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          {user ? (
+          {!isLoading && (
             <>
-              <Button variant="ghost" asChild>
-                <Link href={user.role === 'admin' ? '/admin' : user.role === 'super-admin' ? '/super-admin' : '/dashboard'}>
-                    <LayoutDashboard className="mr-2 h-4 w-4" />
-                    Dashboard
-                </Link>
-              </Button>
-               <Button variant="outline" onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Log out
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="ghost" asChild>
-                <Link href="/login">
-                  <LogIn className="mr-2 h-4 w-4" />
-                  Log in
-                </Link>
-              </Button>
-              <Button asChild>
-                <Link href="/register">
-                  <UserPlus className="mr-2 h-4 w-4" />
-                  Sign up
-                </Link>
-              </Button>
+            {user ? (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link href={user.role === 'admin' ? '/admin' : user.role === 'super-admin' ? '/super-admin' : '/dashboard'}>
+                      <LayoutDashboard className="mr-2 h-4 w-4" />
+                      Dashboard
+                  </Link>
+                </Button>
+                <Button variant="outline" onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Log out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link href="/login">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Log in
+                  </Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/register">
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Sign up
+                  </Link>
+                </Button>
+              </>
+            )}
             </>
           )}
         </div>
