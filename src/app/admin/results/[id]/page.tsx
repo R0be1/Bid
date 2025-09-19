@@ -4,7 +4,8 @@
 import { notFound, useParams } from "next/navigation";
 import { useState, useEffect, useMemo, useTransition } from "react";
 import type { Bid, CommunicationLog } from "@/lib/types";
-import { getAuctionItemForListing, getAuctionBidsForResults } from "@/lib/data/public";
+import { getAuctionItemForListing } from "@/lib/data/public";
+import { getAuctionBidsForResults } from "@/lib/data";
 import type { AuctionItem as PublicAuctionItem } from "@/lib/types";
 import {
   Card,
@@ -49,11 +50,11 @@ export default function AuctionResultsPage() {
 
   useEffect(() => {
     startTransition(async () => {
-      const [itemData, bidsData] = await Promise.all([
-        getAuctionItemForListing(id),
-        getAuctionBidsForResults(id)
-      ]);
+      const itemData = await getAuctionItemForListing(id);
       setItem(itemData);
+
+      // Bids are mocked for now for demonstration purposes
+      const bidsData = getAuctionBidsForResults(id);
       setBids(bidsData);
 
       const allCommunications = getCommunications();

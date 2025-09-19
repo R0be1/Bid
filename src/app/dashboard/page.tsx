@@ -70,18 +70,6 @@ export default function DashboardPage() {
     });
   };
 
-  const getPendingPayments = (item: AuctionItemFee) => {
-      if (!data?.user) return [];
-      const payments = [];
-      if (item.participationFee && !data.user.paidParticipation) {
-          payments.push({ type: 'participation' as const, amount: item.participationFee });
-      }
-      if (item.securityDeposit && !data.user.paidDeposit) {
-          payments.push({ type: 'deposit' as const, amount: item.securityDeposit });
-      }
-      return payments;
-  }
-
   if (isLoading) {
     return <DashboardSkeleton />;
   }
@@ -153,67 +141,75 @@ export default function DashboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {feeItems.map(item => {
-            const pendingPayments = getPendingPayments(item);
-            if (pendingPayments.length === 0) return null;
+          {feeItems.length > 0 ? (
+            feeItems.map(item => {
+              const pendingPayments = [];
+              if (item.participationFee && !user.paidParticipation) {
+                  pendingPayments.push({ type: 'participation' as const, amount: item.participationFee });
+              }
+              if (item.securityDeposit && !user.paidDeposit) {
+                  pendingPayments.push({ type: 'deposit' as const, amount: item.securityDeposit });
+              }
 
-            return (
-              <div key={item.id} className="p-4 border rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div className="flex-1">
-                  <h3 className="font-semibold">
-                    <Link href={`/auctions/${item.id}`} className="hover:underline text-primary">
-                      {item.name}
-                    </Link>
-                  </h3>
-                  <p className="text-sm text-muted-foreground">Requires payment to participate.</p>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full md:w-auto shrink-0">
-                  {pendingPayments.map(p => (
-                    <div key={p.type} className="space-y-2">
-                      <p className="text-sm font-medium text-center capitalize">{p.type} Fee: {p.amount} Birr</p>
-                      <div className="flex flex-col gap-2">
-                        <Button onClick={() => handlePayment(p.type, 'direct')} disabled={user.status === 'BLOCKED' || isPending}>
-                          <Banknote className="mr-2 h-4 w-4" />
-                          {isPending ? 'Processing...' : 'Pay Now'}
-                        </Button>
-                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                          <DialogTrigger asChild>
-                            <Button variant="secondary" disabled={user.status === 'BLOCKED'}>
-                              <Upload className="mr-2 h-4 w-4" />
-                              Upload Receipt
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Upload Payment Receipt</DialogTitle>
-                              <DialogDescription>
-                                Upload a screenshot or document of your payment for the {p.type} fee of {p.amount} Birr. An admin will review it.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                              <div className="grid w-full max-w-sm items-center gap-1.5">
-                                <Label htmlFor="receipt">Receipt File</Label>
-                                <Input id="receipt" type="file" />
-                              </div>
-                            </div>
-                            <DialogFooter>
-                              <DialogClose asChild>
-                                <Button type="button" variant="outline">Cancel</Button>
-                              </DialogClose>
-                              <Button type="button" onClick={() => handlePayment(p.type, 'receipt')} disabled={isPending}>
-                               {isPending ? 'Submitting...' : 'Submit for Review'}
+              if (pendingPayments.length === 0) return null;
+
+              return (
+                <div key={item.id} className="p-4 border rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                  <div className="flex-1">
+                    <h3 className="font-semibold">
+                      <Link href={`/auctions/${item.id}`} className="hover:underline text-primary">
+                        {item.name}
+                      </Link>
+                    </h3>
+                    <p className="text-sm text-muted-foreground">Requires payment to participate.</p>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full md:w-auto shrink-0">
+                    {pendingPayments.map(p => (
+                      <div key={p.type} className="space-y-2">
+                        <p className="text-sm font-medium text-center capitalize">{p.type} Fee: {p.amount} Birr</p>
+                        <div className="flex flex-col gap-2">
+                          <Button onClick={() => handlePayment(p.type, 'direct')} disabled={user.status === 'BLOCKED' || isPending}>
+                            <Banknote className="mr-2 h-4 w-4" />
+                            {isPending ? 'Processing...' : 'Pay Now'}
+                          </Button>
+                          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                            <DialogTrigger asChild>
+                              <Button variant="secondary" disabled={user.status === 'BLOCKED'}>
+                                <Upload className="mr-2 h-4 w-4" />
+                                Upload Receipt
                               </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>Upload Payment Receipt</DialogTitle>
+                                <DialogDescription>
+                                  Upload a screenshot or document of your payment for the {p.type} fee of {p.amount} Birr. An admin will review it.
+                                </DialogDescription>
+                              </DialogHeader>
+                              <div className="grid gap-4 py-4">
+                                <div className="grid w-full max-w-sm items-center gap-1.5">
+                                  <Label htmlFor="receipt">Receipt File</Label>
+                                  <Input id="receipt" type="file" />
+                                </div>
+                              </div>
+                              <DialogFooter>
+                                <DialogClose asChild>
+                                  <Button type="button" variant="outline">Cancel</Button>
+                                </DialogClose>
+                                <Button type="button" onClick={() => handlePayment(p.type, 'receipt')} disabled={isPending}>
+                                {isPending ? 'Submitting...' : 'Submit for Review'}
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )
-          })}
-          {feeItems.every(item => getPendingPayments(item).length === 0) && (
+              )
+            })
+          ) : (
             <div className="text-center text-muted-foreground py-8">
               <CheckCircle className="h-12 w-12 mx-auto text-green-500 mb-4" />
               <p className="font-semibold">You have no pending payments.</p>

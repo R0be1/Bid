@@ -4,7 +4,8 @@
 import { notFound, useParams } from "next/navigation";
 import { useState, useEffect, useMemo, useTransition } from "react";
 import type { Bid, CommunicationLog, AuctionItem } from "@/lib/types";
-import { getAuctionItemForListing, getAuctionBidsForResults } from "@/lib/data/public";
+import { getAuctionItemForListing } from "@/lib/data/public";
+import { getAuctionBidsForResults } from "@/lib/data";
 import {
   Card,
   CardContent,
@@ -48,11 +49,11 @@ export default function AuctionResultsPage() {
 
   useEffect(() => {
     startTransition(async () => {
-      const [itemData, bidsData] = await Promise.all([
-        getAuctionItemForListing(id),
-        getAuctionBidsForResults(id)
-      ]);
+      const itemData = await getAuctionItemForListing(id);
       setItem(itemData);
+      
+      // For now, bids are mocked client-side for demonstration
+      const bidsData = getAuctionBidsForResults(id)
       setBids(bidsData);
 
       // Load initial announcements for this auction (from mock)
@@ -239,4 +240,3 @@ export default function AuctionResultsPage() {
     </div>
   );
 }
-

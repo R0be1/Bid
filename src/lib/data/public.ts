@@ -1,10 +1,9 @@
+"use server";
 
-'use server';
-
-import prisma from '@/lib/prisma';
-import { unstable_noStore as noStore } from 'next/cache';
-import type { AuctionItem, Bid } from '../types';
-import { UserStatus } from '@prisma/client';
+import prisma from "@/lib/prisma";
+import { unstable_noStore as noStore } from "next/cache";
+import type { AuctionItem, Bid } from "../types";
+import { UserStatus } from "@prisma/client";
 
 export async function getAuctionItemsForListing(): Promise<AuctionItem[]> {
   noStore();
@@ -12,13 +11,15 @@ export async function getAuctionItemsForListing(): Promise<AuctionItem[]> {
     const items = await prisma.auctionItem.findMany({
       where: {
         auctioneer: {
+          is: {
             user: {
-                status: UserStatus.APPROVED,
-            }
+              status: "APPROVED",
+            },
+          },
         },
         endDate: {
-            gte: new Date(), // Only show active or upcoming auctions
-        }
+          gte: new Date(),
+        },
       },
       include: {
         category: true,
@@ -26,22 +27,22 @@ export async function getAuctionItemsForListing(): Promise<AuctionItem[]> {
         images: true,
         bids: {
           orderBy: {
-            amount: 'desc',
+            amount: "desc",
           },
           take: 1,
         },
       },
       orderBy: {
-        endDate: 'asc',
+        endDate: "asc",
       },
     });
 
-    return items.map(item => ({
+    return items.map((item) => ({
       id: item.id,
       name: item.name,
       description: item.description,
-      imageUrls: item.images.map(img => img.url),
-      imageHints: item.images.map(img => img.hint ?? ''),
+      imageUrls: item.images.map((img) => img.url),
+      imageHints: item.images.map((img) => img.hint ?? ""),
       categoryName: item.category.name,
       auctioneerName: item.auctioneer.companyName,
       type: item.type,
@@ -50,19 +51,21 @@ export async function getAuctionItemsForListing(): Promise<AuctionItem[]> {
       startingPrice: item.startingPrice,
       participationFee: item.participationFee ?? undefined,
       securityDeposit: item.securityDeposit ?? undefined,
-      currentBid: item.bids.length > 0 ? item.bids[0].amount : item.startingPrice,
-      highBidder: item.bids.length > 0 ? 'A bidder' : undefined,
+      currentBid:
+        item.bids.length > 0 ? item.bids[0].amount : item.startingPrice,
+      highBidder: item.bids.length > 0 ? "A bidder" : undefined,
       maxAllowedValue: item.maxAllowedValue ?? undefined,
       minIncrement: item.minIncrement ?? undefined,
     }));
-
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch auction items.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch auction items.");
   }
 }
 
-export async function getAuctionItemForListing(id: string): Promise<AuctionItem | null> {
+export async function getAuctionItemForListing(
+  id: string,
+): Promise<AuctionItem | null> {
   noStore();
   try {
     const item = await prisma.auctionItem.findUnique({
@@ -73,7 +76,7 @@ export async function getAuctionItemForListing(id: string): Promise<AuctionItem 
         images: true,
         bids: {
           orderBy: {
-            amount: 'desc',
+            amount: "desc",
           },
           take: 1,
         },
@@ -86,8 +89,8 @@ export async function getAuctionItemForListing(id: string): Promise<AuctionItem 
       id: item.id,
       name: item.name,
       description: item.description,
-      imageUrls: item.images.map(img => img.url),
-      imageHints: item.images.map(img => img.hint ?? ''),
+      imageUrls: item.images.map((img) => img.url),
+      imageHints: item.images.map((img) => img.hint ?? ""),
       categoryName: item.category.name,
       auctioneerName: item.auctioneer.companyName,
       type: item.type,
@@ -97,78 +100,75 @@ export async function getAuctionItemForListing(id: string): Promise<AuctionItem 
       participationFee: item.participationFee ?? undefined,
       securityDeposit: item.securityDeposit ?? undefined,
       currentBid: item.bids.length > 0 ? item.bids[0].amount : undefined,
-      highBidder: item.bids.length > 0 ? 'A Bidder' : undefined,
+      highBidder: item.bids.length > 0 ? "A Bidder" : undefined,
       maxAllowedValue: item.maxAllowedValue ?? undefined,
       minIncrement: item.minIncrement ?? undefined,
     };
   } catch (error) {
-    console.error('Database Error:', error);
-    throw new Error('Failed to fetch auction item.');
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch auction item.");
   }
 }
 
-
 export async function getAuctionBidsForResults(itemId: string): Promise<Bid[]> {
-    noStore();
-    try {
-        const bids = await prisma.bid.findMany({
-            where: {
-                auctionItemId: itemId
-            },
-            include: {
-                bidder: true
-            },
-            orderBy: {
-                amount: 'desc'
-            }
-        });
+  noStore();
+  try {
+    const bids = await prisma.bid.findMany({
+      where: {
+        auctionItemId: itemId,
+      },
+      include: {
+        bidder: true,
+      },
+      orderBy: {
+        amount: "desc",
+      },
+    });
 
-        return bids.map(bid => ({
-            bidderName: `${bid.bidder.firstName} ${bid.bidder.lastName}`,
-            amount: bid.amount,
-            date: bid.createdAt.toISOString()
-        }));
-
-    } catch (error) {
-        console.error('Database Error:', error);
-        throw new Error('Failed to fetch bids.');
-    }
+    return bids.map((bid) => ({
+      bidderName: `${bid.bidder.firstName} ${bid.bidder.lastName}`,
+      amount: bid.amount,
+      date: bid.createdAt.toISOString(),
+    }));
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch bids.");
+  }
 }
 
-
 export async function getCategoriesForListing() {
-    noStore();
-    try {
-        const categories = await prisma.category.findMany({
-            orderBy: { name: 'asc' }
-        });
-        return categories;
-    } catch (error) {
-        console.error('Database Error:', error);
-        throw new Error('Failed to fetch categories.');
-    }
+  noStore();
+  try {
+    const categories = await prisma.category.findMany({
+      orderBy: { name: "asc" },
+    });
+    return categories;
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch categories.");
+  }
 }
 
 export async function getAuctioneersForListing() {
-    noStore();
-    try {
-        const auctioneers = await prisma.auctioneerProfile.findMany({
-            where: {
-                user: {
-                    status: UserStatus.APPROVED
-                }
-            },
-            select: {
-                id: true,
-                companyName: true,
-            },
-            orderBy: {
-                companyName: 'asc'
-            }
-        });
-        return auctioneers.map(a => ({ id: a.id, name: a.companyName}));
-    } catch (error) {
-        console.error('Database Error:', error);
-        throw new Error('Failed to fetch auctioneers.');
-    }
+  noStore();
+  try {
+    const auctioneers = await prisma.auctioneerProfile.findMany({
+      where: {
+        user: {
+          status: UserStatus.APPROVED,
+        },
+      },
+      select: {
+        id: true,
+        companyName: true,
+      },
+      orderBy: {
+        companyName: "asc",
+      },
+    });
+    return auctioneers.map((a) => ({ id: a.id, name: a.companyName }));
+  } catch (error) {
+    console.error("Database Error:", error);
+    throw new Error("Failed to fetch auctioneers.");
+  }
 }
