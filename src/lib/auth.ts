@@ -14,6 +14,7 @@ export interface AuthResult {
     success: boolean;
     message: string;
     role?: UserRole;
+    forcePasswordChange?: boolean;
 }
 
 const SESSION_KEY = 'user_session';

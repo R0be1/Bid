@@ -12,6 +12,7 @@ export type UserProfileData = {
     name: string;
     email: string;
     phone: string;
+    hasTempPassword?: boolean;
 };
 
 type ActionResult<T> = {
@@ -36,6 +37,11 @@ export async function getUserProfile(): Promise<ActionResult<UserProfileData>> {
                 lastName: true,
                 email: true,
                 phone: true,
+                auctioneerProfile: {
+                    select: {
+                        tempPassword: true
+                    }
+                }
             },
         });
 
@@ -48,6 +54,7 @@ export async function getUserProfile(): Promise<ActionResult<UserProfileData>> {
             name: user.role === 'admin' ? user.name : `${dbUser.firstName} ${dbUser.lastName}`,
             email: dbUser.email,
             phone: dbUser.phone,
+            hasTempPassword: !!dbUser.auctioneerProfile?.tempPassword,
         };
 
         return { success: true, message: 'Profile fetched.', data: profileData };
@@ -85,16 +92,20 @@ export async function updateUserPassword(data: unknown): Promise<{ success: bool
     const { currentPassword, newPassword } = validatedFields.data;
 
     try {
-        const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
+        const dbUser = await prisma.user.findUnique({ 
+            where: { id: user.id },
+            include: { auctioneerProfile: true }
+         });
 
         if (!dbUser) {
             return { success: false, message: 'User not found.' };
         }
         
         const passwordMatch = dbUser.password ? await bcrypt.compare(currentPassword, dbUser.password) : false;
+        const tempPasswordMatch = dbUser.auctioneerProfile?.tempPassword && dbUser.auctioneerProfile.tempPassword === currentPassword;
+
         
-        // Also check against temp password if main password doesn't match
-        if (!passwordMatch && dbUser.tempPassword !== currentPassword) {
+        if (!passwordMatch && !tempPasswordMatch) {
             return { success: false, message: 'Incorrect current password.' };
         }
 
@@ -105,9 +116,16 @@ export async function updateUserPassword(data: unknown): Promise<{ success: bool
             where: { id: user.id },
             data: { 
                 password: hashedPassword,
-                tempPassword: null, // Clear temp password after a successful change
             },
         });
+
+        // If a temp password was used and exists, clear it
+        if (tempPasswordMatch && dbUser.auctioneerProfile) {
+            await prisma.auctioneerProfile.update({
+                where: { id: dbUser.auctioneerProfile.id },
+                data: { tempPassword: null }
+            });
+        }
 
         revalidatePath('/profile');
         revalidatePath('/admin/profile');

@@ -1,5 +1,5 @@
 
-"use server";
+'use server';
 
 import prisma from '@/lib/prisma';
 import bcrypt from 'bcrypt';
@@ -21,9 +21,9 @@ export async function login(phone: string, password: string): Promise<AuthResult
         }
         
         const passwordMatch = user.password ? await bcrypt.compare(password, user.password) : false;
-        
-        // Also check against temp password if main password doesn't match
-        if (!passwordMatch && (!user.tempPassword || password !== user.tempPassword)) {
+        const tempPasswordMatch = user.auctioneerProfile?.tempPassword && user.auctioneerProfile.tempPassword === password;
+
+        if (!passwordMatch && !tempPasswordMatch) {
             return { success: false, message: "Invalid phone number or password." };
         }
 
@@ -43,9 +43,8 @@ export async function login(phone: string, password: string): Promise<AuthResult
         }
 
         if (role === 'admin' && user.status !== 'APPROVED') {
-        return { success: false, message: "Your auctioneer account is currently inactive. Please contact the administrator." };
+            return { success: false, message: "Your auctioneer account is currently inactive. Please contact the administrator." };
         }
-
 
         const authenticatedUser: AuthenticatedUser = { id: user.id, name: userName, role: role };
         
@@ -56,7 +55,12 @@ export async function login(phone: string, password: string): Promise<AuthResult
             secure: process.env.NODE_ENV === 'production',
         });
 
-        return { success: true, message: `Welcome back, ${userName}!`, role: role };
+        return { 
+            success: true, 
+            message: `Welcome back, ${userName}!`, 
+            role: role,
+            forcePasswordChange: tempPasswordMatch 
+        };
 
     } catch (error) {
         console.error("Login error:", error);

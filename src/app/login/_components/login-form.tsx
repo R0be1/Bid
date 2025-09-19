@@ -38,6 +38,12 @@ export function LoginForm() {
       if (authResult.success) {
         toast({ title: "Login Successful", description: authResult.message });
 
+        if (authResult.forcePasswordChange) {
+            router.push('/admin/profile');
+            router.refresh();
+            return;
+        }
+
         if (redirectUrl) {
           router.push(redirectUrl);
         } else {

@@ -3,7 +3,6 @@
 
 import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-import bcrypt from 'bcrypt';
 import { z } from 'zod';
 import { UserStatus } from '@prisma/client';
 
@@ -26,8 +25,6 @@ export async function registerAuctioneer(data: z.infer<typeof AuctioneerSchema>)
 
   // In a real app, you'd generate a more secure random password.
   const tempPassword = Math.random().toString(36).slice(-8);
-  const saltRounds = 10;
-  const hashedPassword = await bcrypt.hash(tempPassword, saltRounds);
 
   const auctioneerRole = await prisma.role.findUnique({
     where: { name: 'AUCTIONEER' },
@@ -37,10 +34,12 @@ export async function registerAuctioneer(data: z.infer<typeof AuctioneerSchema>)
     throw new Error('Auctioneer role not found. Please seed roles first.');
   }
 
-  const newUser = await prisma.user.create({
+  await prisma.user.create({
     data: {
       phone,
-      password: hashedPassword,
+      // We no longer store a hashed temporary password in the main user table.
+      // The password will be set by the user on first login.
+      password: '', 
       firstName,
       lastName,
       email,
@@ -52,14 +51,13 @@ export async function registerAuctioneer(data: z.infer<typeof AuctioneerSchema>)
         create: {
           companyName: name,
           address,
-          tempPassword: tempPassword, // Storing temp password for display
+          tempPassword: tempPassword, // Storing plain temp password here
         },
       },
     },
   });
 
   revalidatePath('/super-admin/manage-auctioneer');
-  return newUser;
 }
 
 export async function updateAuctioneer(userId: string, data: z.infer<typeof AuctioneerSchema>) {
