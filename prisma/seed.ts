@@ -6,6 +6,21 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("Start seeding ...");
 
+  // Ensure roles exist
+  console.log("Seeding roles...");
+  const roleNames = [
+    RoleName.SUPER_ADMIN,
+    RoleName.AUCTIONEER,
+    RoleName.BIDDER,
+  ];
+  for (const name of roleNames) {
+    await prisma.role.upsert({
+      where: { name },
+      update: {},
+      create: { name },
+    });
+  }
+
   // Seed Super Admin
   console.log("Seeding super admin...");
   const superAdminPhone = "0912348714";
@@ -17,6 +32,14 @@ async function main() {
   });
 
   if (!existingSuperAdmin) {
+    const superAdminRole = await prisma.role.findUnique({
+      where: { name: RoleName.SUPER_ADMIN },
+    });
+
+    if (!superAdminRole) {
+      throw new Error("SUPER_ADMIN role not found");
+    }
+
     await prisma.user.create({
       data: {
         phone: superAdminPhone,
@@ -25,7 +48,9 @@ async function main() {
         lastName: "Admin",
         email: "superadmin@example.com",
         status: UserStatus.APPROVED,
-        role: RoleName.SUPER_ADMIN,
+        roles: {
+          connect: [{ id: superAdminRole.id }], // ✅ assign relation
+        },
       },
     });
     console.log("Created super admin user.");
