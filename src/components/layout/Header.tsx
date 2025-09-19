@@ -31,7 +31,7 @@ export function Header() {
           </span>
         </Link>
         
-        <HeaderNav navItems={navItems} className="hidden md:flex md:items-center md:space-x-6 text-sm font-medium" />
+        <HeaderNav navItems={navItems} />
 
         <div className="flex flex-1 items-center justify-end space-x-4">
           <HeaderAuth />

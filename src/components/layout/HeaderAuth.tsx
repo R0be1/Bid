@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, LogOut } from "lucide-react";
 import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth-client";
@@ -12,16 +12,15 @@ import { cn } from "@/lib/utils";
 
 export function HeaderAuth() {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
-  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     setUser(getCurrentUserClient());
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async () => {
     await logout();
     setUser(null);
-    // Force a full page reload to ensure all states are cleared
     window.location.href = '/login';
   };
 
@@ -29,7 +28,7 @@ export function HeaderAuth() {
     return (
       <div className="hidden md:flex items-center space-x-2">
         <Button variant="ghost" asChild>
-          <Link href="/dashboard">
+          <Link href={user.role === 'admin' ? '/admin' : user.role === 'super-admin' ? '/super-admin' : '/dashboard'}>
             <LayoutDashboard className="mr-2 h-4 w-4" />
             Dashboard
           </Link>
@@ -67,11 +66,11 @@ interface HeaderNavProps {
 
 export function HeaderNav({ navItems, className, mobile = false }: HeaderNavProps) {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
-  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     setUser(getCurrentUserClient());
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async () => {
     await logout();
@@ -82,15 +81,20 @@ export function HeaderNav({ navItems, className, mobile = false }: HeaderNavProp
   if (mobile) {
       return (
           <nav className={className}>
-              {navItems.map((item) => (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    {item.label}
-                  </Link>
-                ))}
+              {navItems.map((item) => {
+                 if (!user && (item.href === '/dashboard' || item.href === '/profile')) {
+                    return null;
+                 }
+                 return (
+                    <Link
+                      key={item.label}
+                      href={item.href}
+                      className="text-muted-foreground hover:text-foreground"
+                    >
+                      {item.label}
+                    </Link>
+                 )
+              })}
                 <div className="pt-6">
                  {user ? (
                     <Button className="w-full" variant="outline" onClick={handleLogout}>
@@ -113,7 +117,7 @@ export function HeaderNav({ navItems, className, mobile = false }: HeaderNavProp
   }
 
   return (
-    <nav className={className}>
+    <nav className={cn(className, "flex items-center space-x-6 text-sm font-medium")}>
       {navItems.map((item) => {
         if (!user && (item.href === '/dashboard' || item.href === '/profile')) {
             return null;
