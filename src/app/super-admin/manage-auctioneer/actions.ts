@@ -37,9 +37,7 @@ export async function registerAuctioneer(data: z.infer<typeof AuctioneerSchema>)
   await prisma.user.create({
     data: {
       phone,
-      // We no longer store a hashed temporary password in the main user table.
-      // The password will be set by the user on first login.
-      password: '', 
+      password: '', // Password will be set by the user on first login.
       firstName,
       lastName,
       email,
