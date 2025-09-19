@@ -1,6 +1,6 @@
 
 
-import type { User as PrismaUser, Role as PrismaRole, AuctioneerProfile as PrismaAuctioneerProfile, AuctionItem as PrismaAuctionItem, Bid as PrismaBid } from '@prisma/client';
+import type { User as PrismaUser, Role as PrismaRole, AuctioneerProfile as PrismaAuctioneerProfile, AuctionItem as PrismaAuctionItem, Bid as PrismaBid, UserStatus, PaymentMethod } from '@prisma/client';
 
 export type AuctionItem = {
   id: string;
@@ -22,6 +22,10 @@ export type AuctionItem = {
   minIncrement?: number; // for live auctions
 };
 
+export type AuctionItemFee = Pick<AuctionItem, 'id' | 'name' | 'participationFee' | 'securityDeposit'>;
+export type PaymentType = 'participation' | 'deposit';
+
+
 export type Category = {
   id: string;
   name: string;
@@ -31,11 +35,12 @@ export type User = {
   id: string;
   name: string;
   email: string;
-  status: 'pending' | 'approved' | 'blocked';
-  paidParticipation?: boolean;
-  paidDeposit?: boolean;
-  paymentMethod?: 'direct' | 'receipt';
-  receiptUrl?: string;
+  phone: string;
+  status: UserStatus;
+  paidParticipation: boolean;
+  paidDeposit: boolean;
+  paymentMethod?: PaymentMethod | null;
+  receiptUrl?: string | null;
 };
 
 export type Bid = {

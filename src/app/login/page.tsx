@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,45 +17,45 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Phone, KeyRound } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { getAuctioneers } from "@/lib/auctioneers";
-import { getUsers } from "@/lib/users";
-import { getSuperAdmins } from "@/lib/super-admins";
 import { login, AuthResult } from "@/lib/auth";
 
 export default function LoginPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const { toast } = useToast();
 
   const handleLogin = (e: FormEvent) => {
     e.preventDefault();
+    startTransition(async () => {
+      const authResult: AuthResult = await login(phone, password);
 
-    const authResult: AuthResult = login(phone, password);
-
-    if (authResult.success) {
-      toast({ title: "Login Successful", description: authResult.message });
-      switch (authResult.role) {
-        case "super-admin":
-          router.push("/super-admin");
-          break;
-        case "admin":
-          router.push("/admin");
-          break;
-        case "user":
-          router.push("/dashboard");
-          break;
-        default:
-          router.push("/");
-          break;
+      if (authResult.success) {
+        toast({ title: "Login Successful", description: authResult.message });
+        switch (authResult.role) {
+          case "super-admin":
+            router.push("/super-admin");
+            break;
+          case "admin":
+            router.push("/admin");
+            break;
+          case "user":
+            router.push("/dashboard");
+            break;
+          default:
+            router.push("/");
+            break;
+        }
+        router.refresh(); // Refresh layout to get new user state
+      } else {
+        toast({
+          title: "Invalid Credentials",
+          description: authResult.message,
+          variant: "destructive",
+        });
       }
-    } else {
-      toast({
-        title: "Invalid Credentials",
-        description: authResult.message,
-        variant: "destructive",
-      });
-    }
+    });
   };
 
 
@@ -105,7 +105,9 @@ export default function LoginPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
-            <Button className="w-full" type="submit">Sign in</Button>
+            <Button className="w-full" type="submit" disabled={isPending}>
+              {isPending ? 'Signing in...' : 'Sign in'}
+            </Button>
             <div className="text-center text-sm">
               Don&apos;t have an account?{" "}
               <Link href="/register" className="underline">

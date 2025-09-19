@@ -1,4 +1,8 @@
 
+
+// This file is no longer used for data manipulation and can be considered deprecated.
+// All user management logic has been moved to server actions.
+
 import type { User } from "./types";
 
 // In a real application, this would be a database.
