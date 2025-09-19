@@ -125,7 +125,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
           variant: "destructive"
         })
       }
-    })
+    });
   }
 
   return (
@@ -446,3 +446,5 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
     </Card>
   );
 }
+
+    

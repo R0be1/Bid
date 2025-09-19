@@ -129,7 +129,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
           variant: "destructive"
         })
       }
-    })
+    });
   }
 
   return (
@@ -450,3 +450,5 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
     </Card>
   );
 }
+
+    
