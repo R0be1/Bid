@@ -16,12 +16,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { getAuctioneers } from "@/lib/auctioneers";
 import { User, Lock } from "lucide-react";
 import { Label } from "@/components/ui/label";
-
-// MOCK: In a real app, you'd get the logged-in user's ID from an auth context.
-const MOCK_AUCTIONEER_ID = "auc-1";
+import { useEffect, useState, useTransition } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getUserProfile, updateUserPassword } from "@/app/profile/actions";
+import type { UserProfileData } from "@/app/profile/actions";
 
 const formSchema = z.object({
     currentPassword: z.string().min(1, "Current password is required."),
@@ -35,8 +35,21 @@ const formSchema = z.object({
 
 export default function ProfilePage() {
   const { toast } = useToast();
-  // MOCK: Fetching the specific auctioneer. In a real app, this would come from a session.
-  const auctioneer = getAuctioneers().find(a => a.id === MOCK_AUCTIONEER_ID);
+  const [user, setUser] = useState<UserProfileData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    getUserProfile()
+      .then(result => {
+        if (result.success && result.data) {
+          setUser(result.data);
+        } else {
+          toast({ title: "Error", description: result.message, variant: "destructive" });
+        }
+      })
+      .finally(() => setIsLoading(false));
+  }, [toast]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -48,21 +61,25 @@ export default function ProfilePage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // MOCK: In a real app, you'd call a server action here to verify the current password
-    // and update it in the database.
-    console.log("Password change values:", values);
-    
-    // Mocking success
-    toast({
-      title: "Password Updated",
-      description: "Your password has been changed successfully.",
+    startTransition(async () => {
+        const result = await updateUserPassword(values);
+        toast({
+            title: result.success ? "Success" : "Error",
+            description: result.message,
+            variant: result.success ? "default" : "destructive",
+        });
+        if (result.success) {
+            form.reset();
+        }
     });
-
-    form.reset();
   }
   
-  if (!auctioneer) {
-      return <div>Auctioneer not found.</div>
+  if (isLoading) {
+    return <ProfileSkeleton />;
+  }
+  
+  if (!user) {
+      return <div>User not found.</div>
   }
 
   return (
@@ -81,27 +98,15 @@ export default function ProfilePage() {
                 <CardContent className="space-y-4">
                     <div>
                         <Label htmlFor="companyName">Auctioneer/Company Name</Label>
-                        <Input id="companyName" value={auctioneer.name} readOnly disabled className="border-0 bg-secondary" />
+                        <Input id="companyName" value={user.name} readOnly disabled className="border-0 bg-secondary" />
                     </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="firstName">First Name</Label>
-                            <Input id="firstName" value={auctioneer.user.firstName} readOnly disabled className="border-0 bg-secondary" />
-                        </div>
-                        <div>
-                            <Label htmlFor="lastName">Last Name</Label>
-                            <Input id="lastName" value={auctioneer.user.lastName} readOnly disabled className="border-0 bg-secondary" />
-                        </div>
+                    <div>
+                        <Label htmlFor="email">Email Address</Label>
+                        <Input id="email" value={user.email} readOnly disabled className="border-0 bg-secondary" />
                     </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                            <Label htmlFor="email">Email Address</Label>
-                            <Input id="email" value={auctioneer.user.email} readOnly disabled className="border-0 bg-secondary" />
-                        </div>
-                        <div>
-                            <Label htmlFor="phone">Phone Number</Label>
-                            <Input id="phone" value={auctioneer.user.phone} readOnly disabled className="border-0 bg-secondary" />
-                        </div>
+                    <div>
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input id="phone" value={user.phone} readOnly disabled className="border-0 bg-secondary" />
                     </div>
                 </CardContent>
             </Card>
@@ -153,7 +158,9 @@ export default function ProfilePage() {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit">Update Password</Button>
+                            <Button type="submit" disabled={isPending}>
+                                {isPending ? "Updating..." : "Update Password"}
+                            </Button>
                         </form>
                     </Form>
                 </CardContent>
@@ -161,4 +168,52 @@ export default function ProfilePage() {
         </div>
     </div>
   );
+}
+
+
+function ProfileSkeleton() {
+    return (
+        <div className="space-y-8 p-4 md:p-8">
+            <div>
+                <Skeleton className="h-10 w-3/4" />
+                <Skeleton className="h-4 w-1/2 mt-2" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <Card>
+                    <CardHeader><Skeleton className="h-8 w-1/3" /></CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="space-y-2">
+                           <Skeleton className="h-4 w-1/4" />
+                           <Skeleton className="h-10 w-full" />
+                        </div>
+                         <div className="space-y-2">
+                           <Skeleton className="h-4 w-1/4" />
+                           <Skeleton className="h-10 w-full" />
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-8 w-1/2" />
+                        <Skeleton className="h-4 w-3/4 mt-2" />
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="space-y-2">
+                           <Skeleton className="h-4 w-1/4" />
+                           <Skeleton className="h-10 w-full" />
+                        </div>
+                         <div className="space-y-2">
+                           <Skeleton className="h-4 w-1/4" />
+                           <Skeleton className="h-10 w-full" />
+                        </div>
+                         <div className="space-y-2">
+                           <Skeleton className="h-4 w-1/4" />
+                           <Skeleton className="h-10 w-full" />
+                        </div>
+                        <Skeleton className="h-10 w-32" />
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    )
 }

@@ -45,7 +45,7 @@ export async function getUserProfile(): Promise<ActionResult<UserProfileData>> {
 
         const profileData: UserProfileData = {
             id: dbUser.id,
-            name: `${dbUser.firstName} ${dbUser.lastName}`,
+            name: user.role === 'admin' ? user.name : `${dbUser.firstName} ${dbUser.lastName}`,
             email: dbUser.email,
             phone: dbUser.phone,
         };
@@ -77,7 +77,9 @@ export async function updateUserPassword(data: unknown): Promise<{ success: bool
     
     const validatedFields = passwordSchema.safeParse(data);
     if (!validatedFields.success) {
-        return { success: false, message: "Invalid form data." };
+        // A bit more specific error message
+        const errorMessage = validatedFields.error.errors[0]?.message || "Invalid form data.";
+        return { success: false, message: errorMessage };
     }
     
     const { currentPassword, newPassword } = validatedFields.data;
@@ -88,9 +90,11 @@ export async function updateUserPassword(data: unknown): Promise<{ success: bool
         if (!dbUser) {
             return { success: false, message: 'User not found.' };
         }
-
-        const passwordsMatch = await bcrypt.compare(currentPassword, dbUser.password);
-        if (!passwordsMatch) {
+        
+        const passwordMatch = dbUser.password ? await bcrypt.compare(currentPassword, dbUser.password) : false;
+        
+        // Also check against temp password if main password doesn't match
+        if (!passwordMatch && dbUser.tempPassword !== currentPassword) {
             return { success: false, message: 'Incorrect current password.' };
         }
 

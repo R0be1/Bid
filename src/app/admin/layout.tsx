@@ -6,15 +6,18 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
 import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog, User, LogOut } from "lucide-react";
 import Link from "next/link";
-import { getCurrentUserClient } from "@/lib/auth";
+import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth";
 import { logout } from "../actions";
-
-// MOCK: In a real app, this would come from the logged-in user's session
-const MOCK_AUCTIONEER_NAME = "Vintage Treasures LLC";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [user, setUser] = useState<AuthenticatedUser | null>(null);
+
+  useEffect(() => {
+    const currentUser = getCurrentUserClient();
+    setUser(currentUser);
+  }, []);
   
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutGrid },
@@ -39,7 +42,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 <div className="flex items-center gap-2 p-4">
                     <Gavel className="h-7 w-7 text-primary" />
                     <span className="font-bold text-lg text-white group-data-[collapsible=icon]:hidden">
-                        {MOCK_AUCTIONEER_NAME}
+                        {user?.name || "Auctioneer"}
                     </span>
                 </div>
             </SidebarHeader>
