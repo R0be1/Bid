@@ -42,26 +42,28 @@ export function LoginForm() {
 
         toast({ title: "Login Successful", description: authResult.message });
         const redirectUrl = searchParams.get('redirect');
-
+        
+        let destination = "/";
         if (redirectUrl) {
-          router.push(redirectUrl);
+          destination = redirectUrl;
         } else {
           switch (authResult.role) {
             case "super-admin":
-              router.push("/super-admin");
+              destination = "/super-admin";
               break;
             case "admin":
-              router.push("/admin");
+              destination = "/admin";
               break;
             case "user":
-              router.push("/");
+              destination = "/";
               break;
             default:
-              router.push("/");
+              destination = "/";
               break;
           }
         }
-        router.refresh();
+        // Force a full page reload to ensure all components are re-rendered with the new session state.
+        window.location.href = destination;
       } else {
         toast({
           title: "Invalid Credentials",
