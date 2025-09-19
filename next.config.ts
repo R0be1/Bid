@@ -30,6 +30,17 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    // Suppress warnings from handlebars library
+    config.externals.push({
+      // handlebars: 'commonjs handlebars'
+    });
+    config.ignoreWarnings = [
+        ...(config.ignoreWarnings || []),
+        /require\.extensions/,
+    ];
+    return config;
+  }
 };
 
 export default nextConfig;
