@@ -1,9 +1,10 @@
+
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -12,49 +13,52 @@ datasource db {
 }
 
 model User {
-  id                String              @id @default(uuid())
-  phone             String              @unique
-  password          String
-  tempPassword      String?
+  id                String   @id @default(cuid())
+  phone             String   @unique
+  password          String?
   firstName         String
   lastName          String
-  email             String              @unique
-  status            UserStatus          @default(PENDING)
-  roles             Role[]              @relation("UserRoles")
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
+  email             String   @unique
+  status            UserStatus @default(PENDING)
+  roles             Role[]   @relation()
   bids              Bid[]
-  auctioneerProfile AuctioneerProfile?  @relation(fields: [auctioneerProfileId], references: [id])
-  auctioneerProfileId String?            @unique
-  paidParticipation Boolean             @default(false)
-  paidDeposit       Boolean             @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  // Fields for bidder payment tracking
+  paidParticipation Boolean @default(false)
+  paidDeposit       Boolean @default(false)
   paymentMethod     PaymentMethod?
   receiptUrl        String?
+
+  // Relation to AuctioneerProfile
+  auctioneerProfile   AuctioneerProfile?
 }
 
 model Role {
-  id    String @id @default(uuid())
+  id    String   @id @default(cuid())
   name  RoleName @unique
-  users User[]   @relation("UserRoles")
+  users User[]   @relation()
 }
 
 model AuctioneerProfile {
-  id          String        @id @default(uuid())
-  companyName String
-  address     String
-  user        User?
-  auctionItems AuctionItem[]
-  tempPassword String?
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id])
+  companyName   String
+  address       String
+  tempPassword  String?
+  auctionItems  AuctionItem[]
 }
 
 model Category {
-  id          String        @id @default(uuid())
-  name        String        @unique
+  id           String        @id @default(cuid())
+  name         String        @unique
   auctionItems AuctionItem[]
 }
 
 model AuctionItem {
-  id                String          @id @default(uuid())
+  id                String         @id @default(cuid())
   name              String
   description       String
   startingPrice     Float
@@ -65,32 +69,38 @@ model AuctionItem {
   maxAllowedValue   Float?
   participationFee  Float?
   securityDeposit   Float?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  category          Category        @relation(fields: [categoryId], references: [id])
+  
   categoryId        String
-  auctioneer        AuctioneerProfile @relation(fields: [auctioneerId], references: [id])
+  category          Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
   auctioneerId      String
+  auctioneer        AuctioneerProfile @relation(fields: [auctioneerId], references: [id], onDelete: Cascade)
+
   images            Image[]
   bids              Bid[]
+
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 }
 
 model Image {
-  id            String      @id @default(uuid())
+  id            String      @id @default(cuid())
   url           String
   hint          String?
-  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
   auctionItemId String
+  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
 }
 
 model Bid {
-  id            String      @id @default(uuid())
+  id            String      @id @default(cuid())
   amount        Float
   createdAt     DateTime    @default(now())
-  bidder        User        @relation(fields: [bidderId], references: [id])
-  bidderId      String
-  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
+  
   auctionItemId String
+  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
+  
+  bidderId      String
+  bidder        User        @relation(fields: [bidderId], references: [id], onDelete: Cascade)
 }
 
 enum RoleName {
