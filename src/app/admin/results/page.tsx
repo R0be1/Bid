@@ -32,12 +32,7 @@ export default async function AdminResultsPage() {
   const completedAuctions = auctioneerItems.filter(item => new Date(item.endDate) < new Date());
 
   return (
-    <div className="space-y-8 p-4 md:p-8">
-      <div>
-        <h1 className="text-3xl font-bold font-headline text-primary">Auction Results</h1>
-        <p className="text-muted-foreground">View results for your completed auctions.</p>
-      </div>
-
+    <div className="space-y-8">
       <Card>
         <CardHeader>
           <CardTitle>Your Completed Auctions</CardTitle>
@@ -64,7 +59,7 @@ export default async function AdminResultsPage() {
                     <TableCell>{format(new Date(item.endDate), "PPP p")}</TableCell>
                     <TableCell className="text-right">
                       <Button asChild variant="outline" size="sm">
-                        <Link href={`/auctions/${item.id}/results`}>
+                        <Link href={`/admin/results/${item.id}`}>
                           <Eye className="mr-2 h-4 w-4" />
                           View Results
                         </Link>
