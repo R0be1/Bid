@@ -21,7 +21,6 @@ import { Label } from "@/components/ui/label";
 import { useEffect, useState, useTransition } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getUserProfile, updateUserPassword, type UserProfileData } from "@/app/profile/actions";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 
 const formSchema = z.object({
@@ -71,10 +70,6 @@ export default function ProfilePage() {
         });
         if (result.success) {
             form.reset();
-            // Refetch user data to check if temp password is gone
-            getUserProfile().then(res => {
-                if (res.success && res.data) setUser(res.data);
-            });
         }
     });
   }
@@ -93,16 +88,6 @@ export default function ProfilePage() {
             <h1 className="text-3xl font-bold font-headline text-primary">Your Profile</h1>
             <p className="text-muted-foreground">View your account details and manage your password.</p>
         </div>
-
-        {user.hasTempPassword && (
-             <Alert variant="destructive">
-              <AlertTriangle className="h-4 w-4" />
-              <AlertTitle>Action Required: Set Your Password</AlertTitle>
-              <AlertDescription>
-                You are currently using a temporary password. For security, please set a new, permanent password below.
-              </AlertDescription>
-            </Alert>
-        )}
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
             <Card>
@@ -139,7 +124,7 @@ export default function ProfilePage() {
                                 name="currentPassword"
                                 render={({ field }) => (
                                     <FormItem>
-                                    <FormLabel>{user.hasTempPassword ? 'Temporary Password' : 'Current Password'}</FormLabel>
+                                    <FormLabel>Current Password</FormLabel>
                                     <FormControl>
                                         <Input type="password" {...field} className="bg-secondary/50"/>
                                     </FormControl>

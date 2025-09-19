@@ -24,7 +24,16 @@ export async function login(phone: string, password: string): Promise<AuthResult
         const passwordMatch = user.password ? await bcrypt.compare(password, user.password) : false;
         const tempPasswordMatch = user.auctioneerProfile?.tempPassword && user.auctioneerProfile.tempPassword === password;
 
-        if (!passwordMatch && !tempPasswordMatch) {
+        if (tempPasswordMatch) {
+            return {
+                success: true,
+                message: "Temporary password verified.",
+                forcePasswordChange: true,
+                userId: user.id, // Pass userId for the next step
+            };
+        }
+
+        if (!passwordMatch) {
             return { success: false, message: "Invalid phone number or password." };
         }
 
@@ -60,7 +69,6 @@ export async function login(phone: string, password: string): Promise<AuthResult
             success: true, 
             message: `Welcome back, ${userName}!`, 
             role: role,
-            forcePasswordChange: tempPasswordMatch 
         };
 
     } catch (error) {

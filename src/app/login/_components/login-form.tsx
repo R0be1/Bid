@@ -33,16 +33,15 @@ export function LoginForm() {
     e.preventDefault();
     startTransition(async () => {
       const authResult: AuthResult = await login(phone, password);
-      const redirectUrl = searchParams.get('redirect');
-
+      
       if (authResult.success) {
-        toast({ title: "Login Successful", description: authResult.message });
-
-        if (authResult.forcePasswordChange) {
-            router.push('/admin/profile');
-            router.refresh();
+        if (authResult.forcePasswordChange && authResult.userId) {
+            router.push(`/auth/force-change-password?userId=${authResult.userId}`);
             return;
         }
+
+        toast({ title: "Login Successful", description: authResult.message });
+        const redirectUrl = searchParams.get('redirect');
 
         if (redirectUrl) {
           router.push(redirectUrl);

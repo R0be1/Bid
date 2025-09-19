@@ -12,7 +12,6 @@ export type UserProfileData = {
     name: string;
     email: string;
     phone: string;
-    hasTempPassword?: boolean;
 };
 
 type ActionResult<T> = {
@@ -37,11 +36,6 @@ export async function getUserProfile(): Promise<ActionResult<UserProfileData>> {
                 lastName: true,
                 email: true,
                 phone: true,
-                auctioneerProfile: {
-                    select: {
-                        tempPassword: true
-                    }
-                }
             },
         });
 
@@ -54,7 +48,6 @@ export async function getUserProfile(): Promise<ActionResult<UserProfileData>> {
             name: user.role === 'admin' ? user.name : `${dbUser.firstName} ${dbUser.lastName}`,
             email: dbUser.email,
             phone: dbUser.phone,
-            hasTempPassword: !!dbUser.auctioneerProfile?.tempPassword,
         };
 
         return { success: true, message: 'Profile fetched.', data: profileData };
@@ -102,10 +95,8 @@ export async function updateUserPassword(data: unknown): Promise<{ success: bool
         }
         
         const passwordMatch = dbUser.password ? await bcrypt.compare(currentPassword, dbUser.password) : false;
-        const tempPasswordMatch = dbUser.auctioneerProfile?.tempPassword && dbUser.auctioneerProfile.tempPassword === currentPassword;
 
-        
-        if (!passwordMatch && !tempPasswordMatch) {
+        if (!passwordMatch) {
             return { success: false, message: 'Incorrect current password.' };
         }
 
@@ -118,14 +109,6 @@ export async function updateUserPassword(data: unknown): Promise<{ success: bool
                 password: hashedPassword,
             },
         });
-
-        // If a temp password was used and exists, clear it
-        if (tempPasswordMatch && dbUser.auctioneerProfile) {
-            await prisma.auctioneerProfile.update({
-                where: { id: dbUser.auctioneerProfile.id },
-                data: { tempPassword: null }
-            });
-        }
 
         revalidatePath('/profile');
         revalidatePath('/admin/profile');
