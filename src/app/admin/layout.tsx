@@ -6,7 +6,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
 import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog, User, LogOut } from "lucide-react";
 import Link from "next/link";
-import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth";
+import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth-client";
 import { logout } from "../actions";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

@@ -39,7 +39,7 @@ import { useRouter } from "next/navigation";
 const imageSchema = z.object({
   url: z.string().url("Invalid URL").min(1, "URL is required."),
   hint: z.string().max(20, "Hint is too long").optional(),
-})
+});
 
 const formSchema = z.object({
   name: z.string().min(1, "Item name is required."),

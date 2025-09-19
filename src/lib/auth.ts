@@ -1,7 +1,6 @@
 
 
 import { cookies } from 'next/headers';
-import { parseCookies } from 'nookies';
 
 export type UserRole = 'user' | 'admin' | 'super-admin';
 
@@ -26,20 +25,6 @@ export function getCurrentUser(): AuthenticatedUser | null {
 
     try {
         const user: AuthenticatedUser = JSON.parse(sessionCookie.value);
-        return user;
-    } catch (e) {
-        return null;
-    }
-}
-
-export function getCurrentUserClient(): AuthenticatedUser | null {
-    const clientCookies = parseCookies();
-    const session = clientCookies[SESSION_KEY];
-
-    if (!session) return null;
-
-    try {
-        const user: AuthenticatedUser = JSON.parse(session);
         return user;
     } catch (e) {
         return null;
