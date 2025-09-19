@@ -1,7 +1,8 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useFormState, useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -16,30 +17,44 @@ import { Label } from "@/components/ui/label";
 import { CheckCircle, Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
+import { registerUser, type RegisterFormState } from "./actions";
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+      {pending ? "Creating Account..." : "Create Account"}
+    </Button>
+  );
+}
 
 export default function RegisterPage() {
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
   const [showPassword, setShowPassword] = useState(false);
 
+  const initialState: RegisterFormState = { success: false, message: "" };
+  const [state, formAction] = useFormState(registerUser, initialState);
 
-  const handleDetailsSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    // In a real app, you would call a server action here to:
-    // 1. Validate the input
-    // 2. Hash the temporary password
-    // 3. Create the user in the database with a 'force password change' flag
-    // 4. Handle any potential errors (e.g., phone number already exists)
-    
-    const formData = new FormData(event.currentTarget);
-    const firstName = formData.get("first-name");
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
-    toast({
-      title: "Registration Submitted!",
-      description: `Welcome, ${firstName}! Your account is pending admin approval.`,
-    });
-    setIsSubmitted(true);
-  };
+  useEffect(() => {
+    if (state.message) {
+       if (state.success) {
+          toast({
+            title: "Registration Submitted!",
+            description: state.message,
+          });
+          setIsSubmitted(true);
+       } else {
+            toast({
+              title: "Registration Failed",
+              description: state.message,
+              variant: "destructive",
+            });
+       }
+    }
+  }, [state, toast]);
+  
 
   if (isSubmitted) {
     return (
@@ -74,7 +89,7 @@ export default function RegisterPage() {
   return (
     <div className="flex items-center justify-center min-h-full w-full px-4">
         <Card className="w-full max-w-md shadow-lg">
-          <form onSubmit={handleDetailsSubmit}>
+          <form action={formAction}>
             <CardHeader>
               <CardTitle className="text-2xl font-headline">Create Your Account</CardTitle>
               <CardDescription>
@@ -84,12 +99,12 @@ export default function RegisterPage() {
             <CardContent className="grid gap-4">
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <div className="grid gap-2">
-                    <Label htmlFor="first-name">First Name</Label>
-                    <Input id="first-name" name="first-name" placeholder="John" required />
+                    <Label htmlFor="firstName">First Name</Label>
+                    <Input id="firstName" name="firstName" placeholder="John" required />
                   </div>
                    <div className="grid gap-2">
-                    <Label htmlFor="last-name">Last Name</Label>
-                    <Input id="last-name" name="last-name" placeholder="Smith" required />
+                    <Label htmlFor="lastName">Last Name</Label>
+                    <Input id="lastName" name="lastName" placeholder="Smith" required />
                   </div>
                </div>
                <div className="grid gap-2">
@@ -98,7 +113,7 @@ export default function RegisterPage() {
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="phone">Phone Number</Label>
-                <Input id="phone" name="phone" type="tel" placeholder="(123) 456-7890" required />
+                <Input id="phone" name="phone" type="tel" placeholder="0912345678" required />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
@@ -116,9 +131,7 @@ export default function RegisterPage() {
               </div>
             </CardContent>
             <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full">
-                Create Account
-              </Button>
+              <SubmitButton />
                <div className="text-center text-sm">
                 Already have an account?{" "}
                 <Link href="/login" className="underline">
