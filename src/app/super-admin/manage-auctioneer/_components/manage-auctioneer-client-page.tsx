@@ -117,22 +117,24 @@ export function ManageAuctioneerClientPage({ auctioneers: initialAuctioneers }: 
                         {paginatedAuctioneers.map((auctioneer) => (
                             <TableRow key={auctioneer.id}>
                                 <TableCell className="font-medium">
-                                  <Tooltip>
-                                    <TooltipTrigger asChild>
-                                      <div className="flex items-center gap-2 cursor-help">
-                                        <span>{auctioneer.name}</span>
-                                        <Info className="h-4 w-4 text-muted-foreground"/>
-                                      </div>
-                                    </TooltipTrigger>
-                                    <TooltipContent>
-                                      <div className="flex items-center gap-2">
-                                          <p>Temp Password: <span className="font-bold">{auctioneer.tempPassword}</span></p>
-                                          {auctioneer.tempPassword && <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopyPassword(auctioneer.tempPassword)}>
-                                              <Copy className="h-4 w-4" />
-                                          </Button>}
-                                      </div>
-                                    </TooltipContent>
-                                  </Tooltip>
+                                  <div className="flex items-center gap-2">
+                                      <span>{auctioneer.name}</span>
+                                      {auctioneer.tempPassword && (
+                                        <Tooltip>
+                                          <TooltipTrigger asChild>
+                                              <Info className="h-4 w-4 text-muted-foreground cursor-help"/>
+                                          </TooltipTrigger>
+                                          <TooltipContent>
+                                            <div className="flex items-center gap-2">
+                                                <p>Temp Password: <span className="font-bold">{auctioneer.tempPassword}</span></p>
+                                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopyPassword(auctioneer.tempPassword)}>
+                                                    <Copy className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                          </TooltipContent>
+                                        </Tooltip>
+                                      )}
+                                    </div>
                                 </TableCell>
                                 <TableCell>{auctioneer.contact}</TableCell>
                                 <TableCell>{auctioneer.email}</TableCell>
