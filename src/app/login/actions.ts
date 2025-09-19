@@ -5,6 +5,7 @@ import prisma from '@/lib/prisma';
 import bcrypt from 'bcrypt';
 import type { AuthenticatedUser, UserRole, AuthResult } from '@/lib/auth';
 import { cookies } from "next/headers";
+import { UserStatus } from '@prisma/client';
 
 const SESSION_KEY = 'user_session';
 
@@ -42,8 +43,7 @@ export async function login(phone: string, password: string): Promise<AuthResult
             role = 'user';
         }
 
-
-        if (role === 'admin' && user.status !== 'APPROVED') {
+        if (role === 'admin' && user.status !== UserStatus.APPROVED) {
             return { success: false, message: "Your auctioneer account is currently inactive. Please contact the administrator." };
         }
 
