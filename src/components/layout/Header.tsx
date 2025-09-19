@@ -35,8 +35,8 @@ export function Header() {
   const handleLogout = async () => {
     await logout();
     setUser(null);
-    router.push('/login');
-    router.refresh();
+    // Force a full refresh to ensure all states are cleared
+    window.location.href = '/login';
   };
 
   return (
