@@ -28,7 +28,7 @@ export async function login(phone: string, password: string): Promise<AuthResult
         }
 
         const roles = user.roles.map(r => r.name);
-        let role: UserRole = 'user';
+        let role: UserRole = 'user'; // Default to user
         let userName = `${user.firstName} ${user.lastName}`;
 
         if (roles.includes('SUPER_ADMIN')) {
@@ -41,6 +41,7 @@ export async function login(phone: string, password: string): Promise<AuthResult
         } else if (roles.includes('BIDDER')) {
             role = 'user';
         }
+
 
         if (role === 'admin' && user.status !== 'APPROVED') {
             return { success: false, message: "Your auctioneer account is currently inactive. Please contact the administrator." };
