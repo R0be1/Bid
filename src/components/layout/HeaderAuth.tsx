@@ -12,9 +12,11 @@ import { cn } from "@/lib/utils";
 
 export function HeaderAuth() {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
+  const [isClient, setIsClient] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
+    setIsClient(true);
     setUser(getCurrentUserClient());
   }, [pathname]);
 
@@ -23,6 +25,19 @@ export function HeaderAuth() {
     setUser(null);
     window.location.href = '/login';
   };
+
+  if (!isClient) {
+    return (
+      <div className="hidden md:flex items-center space-x-2">
+        <Button variant="ghost" asChild>
+          <Link href="/login">Log in</Link>
+        </Button>
+        <Button asChild>
+          <Link href="/register">Sign up</Link>
+        </Button>
+      </div>
+    );
+  }
 
   if (user) {
     return (
@@ -66,9 +81,11 @@ interface HeaderNavProps {
 
 export function HeaderNav({ navItems, className, mobile = false }: HeaderNavProps) {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
+  const [isClient, setIsClient] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
+    setIsClient(true);
     setUser(getCurrentUserClient());
   }, [pathname]);
 
@@ -79,6 +96,7 @@ export function HeaderNav({ navItems, className, mobile = false }: HeaderNavProp
   };
   
   if (mobile) {
+      if (!isClient) return null;
       return (
           <nav className={className}>
               {navItems.map((item) => {
@@ -117,8 +135,8 @@ export function HeaderNav({ navItems, className, mobile = false }: HeaderNavProp
   }
 
   return (
-    <nav className={cn(className, "flex items-center space-x-6 text-sm font-medium")}>
-      {navItems.map((item) => {
+    <nav className={cn(className, "hidden md:flex items-center space-x-6 text-sm font-medium")}>
+      {isClient && navItems.map((item) => {
         if (!user && (item.href === '/dashboard' || item.href === '/profile')) {
             return null;
         }
