@@ -16,7 +16,7 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
 
   return (
     <Card className="group relative flex flex-col overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
-      <Link href={`/auctions/${item.id}`} className="flex flex-col h-full">
+      <Link href={`/auctions/${item.id}`} className="flex flex-col h-full flex-grow">
         <CardHeader className="p-0">
           <div className="aspect-w-16 aspect-h-9 overflow-hidden">
             <Image
@@ -34,7 +34,7 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
             <CardTitle className="text-lg font-semibold text-primary group-hover:text-accent transition-colors mb-2">
               {item.name}
             </CardTitle>
-            <Badge variant="outline" className="text-xs whitespace-nowrap">{item.category}</Badge>
+            <Badge variant="outline" className="text-xs whitespace-nowrap">{item.categoryName}</Badge>
           </div>
           <div className="mt-2 flex items-center text-sm text-foreground/80">
             <Gavel className="mr-2 h-4 w-4" />
@@ -42,7 +42,7 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
           </div>
           <div className="mt-2 flex items-center text-sm text-foreground/80">
             <Tag className="mr-2 h-4 w-4" />
-            <span>{item.type === 'live' ? 'Current Bid:' : 'Starts At:'}</span>
+            <span>{item.type === 'LIVE' ? 'Current Bid:' : 'Starts At:'}</span>
             <span className="ml-1 font-bold">{currentPrice.toLocaleString()} Birr</span>
           </div>
           <div className="mt-2 flex items-center text-sm text-foreground/80">
@@ -50,12 +50,14 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
             <CountdownTimer endDate={item.endDate} />
           </div>
         </CardContent>
-        <CardFooter className="p-4 pt-0">
-          <Button className="w-full">
-            {item.type === "live" ? "Bid Now" : "View Details"}
-          </Button>
-        </CardFooter>
       </Link>
+      <CardFooter className="p-4 pt-0">
+        <Button asChild className="w-full">
+            <Link href={`/auctions/${item.id}`}>
+              {item.type === "LIVE" ? "Bid Now" : "View Details"}
+            </Link>
+        </Button>
+      </CardFooter>
     </Card>
   );
 }
