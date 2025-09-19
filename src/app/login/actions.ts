@@ -59,10 +59,11 @@ export async function login(phone: string, password: string): Promise<AuthResult
         const authenticatedUser: AuthenticatedUser = { id: user.id, name: userName, role: role };
         
         cookies().set(SESSION_KEY, JSON.stringify(authenticatedUser), {
-            maxAge: 30 * 24 * 60 * 60,
+            maxAge: 30 * 24 * 60 * 60, // 30 days
             path: '/',
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
         });
 
         return { 

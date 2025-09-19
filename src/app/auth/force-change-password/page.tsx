@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from "react-hook-form";
@@ -49,7 +50,7 @@ function ForceChangePasswordComponent() {
 
   if (!userId) {
       return (
-          <div className="flex items-center justify-center min-h-full w-full bg-muted/40">
+          <div className="flex items-center justify-center min-h-full w-full bg-muted/40 p-4">
               <Card className="w-full max-w-sm shadow-lg">
                   <CardHeader>
                       <CardTitle>Invalid Request</CardTitle>
@@ -79,7 +80,7 @@ function ForceChangePasswordComponent() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-full w-full bg-muted/40">
+    <div className="flex items-center justify-center min-h-full w-full bg-muted/40 p-4">
         <Card className="w-full max-w-sm shadow-lg">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-2xl font-headline"><KeyRound /> Set Your New Password</CardTitle>

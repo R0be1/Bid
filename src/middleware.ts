@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import type { AuthenticatedUser, UserRole } from './lib/auth';
@@ -12,7 +13,7 @@ const protectedRoutesConfig = {
     '/super-admin': ['super-admin'],
 };
 
-const authRoutes = ['/login', '/register'];
+const authRoutes = ['/login', '/register', '/auth/force-change-password'];
 
 const roleRedirects: Record<UserRole, string> = {
   'user': '/dashboard',
@@ -37,17 +38,28 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = request.cookies.get(SESSION_KEY);
   let currentUser: AuthenticatedUser | null = null;
+  let response = NextResponse.next();
 
   if (sessionCookie) {
     try {
       currentUser = JSON.parse(sessionCookie.value) as AuthenticatedUser;
+      
+      // Refresh the cookie to implement a sliding session
+      const newCookie = {
+        name: SESSION_KEY,
+        value: sessionCookie.value,
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+        path: '/',
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+      };
+      response.cookies.set(newCookie);
+
     } catch (e) {
       // Invalid session cookie, treat as logged out
       currentUser = null;
       // It's a good idea to clear the invalid cookie
-      const response = NextResponse.next();
       response.cookies.delete(SESSION_KEY);
-      return response;
     }
   }
 
@@ -81,8 +93,8 @@ export function middleware(request: NextRequest) {
     }
   }
   
-  // No special logic needed, continue to the requested path
-  return NextResponse.next();
+  // No special logic needed, return the response (which may have a refreshed cookie)
+  return response;
 }
 
 export const config = {
