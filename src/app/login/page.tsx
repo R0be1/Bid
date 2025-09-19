@@ -17,7 +17,8 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Phone, KeyRound } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { login, AuthResult } from "@/lib/auth";
+import { login } from "./actions";
+import type { AuthResult } from "@/lib/auth";
 
 export default function LoginPage() {
   const [phone, setPhone] = useState("");
