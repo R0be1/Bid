@@ -1,12 +1,12 @@
 
 
-import { getCategories } from "@/lib/categories";
+import { getCategoriesForAdmin } from "@/lib/data/admin";
 import { CategoryForm } from "./_components/category-form";
 import { CategoryList } from "./_components/category-list";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function CategoriesPage() {
-  const categories = getCategories();
+export default async function CategoriesPage() {
+  const categories = await getCategoriesForAdmin();
 
   return (
     <div className="space-y-8 p-4 md:p-8">

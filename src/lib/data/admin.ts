@@ -3,7 +3,7 @@
 
 import prisma from '@/lib/prisma';
 import { unstable_noStore as noStore } from 'next/cache';
-
+import type { User, UserStatus } from '@prisma/client';
 
 export async function getCategoriesForAdmin() {
   noStore();
@@ -17,6 +17,53 @@ export async function getCategoriesForAdmin() {
     throw new Error('Failed to fetch categories.');
   }
 }
+
+export type UserForAdminTable = Pick<User, 'id' | 'email' | 'status' | 'paidParticipation' | 'paidDeposit' | 'paymentMethod' | 'receiptUrl'> & {
+    name: string;
+};
+
+export async function getUsersForAdmin(): Promise<UserForAdminTable[]> {
+    noStore();
+    try {
+        const users = await prisma.user.findMany({
+            where: {
+                roles: {
+                    some: { name: 'BIDDER' }
+                }
+            },
+            select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                status: true,
+                paidParticipation: true,
+                paidDeposit: true,
+                paymentMethod: true,
+                receiptUrl: true,
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+
+        return users.map(u => ({
+            id: u.id,
+            name: `${u.firstName} ${u.lastName}`,
+            email: u.email,
+            status: u.status,
+            paidParticipation: u.paidParticipation,
+            paidDeposit: u.paidDeposit,
+            paymentMethod: u.paymentMethod,
+            receiptUrl: u.receiptUrl
+        }))
+
+    } catch (error) {
+        console.error('Database Error:', error);
+        throw new Error('Failed to fetch users.');
+    }
+}
+
 
 export async function getAuctionItemsForAdmin(userId: string) {
     noStore();

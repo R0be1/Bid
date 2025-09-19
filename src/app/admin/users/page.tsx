@@ -1,12 +1,12 @@
 
 
-import { getUsers } from "@/lib/users";
+import { getUsersForAdmin } from "@/lib/data/admin";
 import { UserList } from "./_components/user-list";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserCog } from "lucide-react";
 
-export default function UsersPage() {
-  const users = getUsers();
+export default async function UsersPage() {
+  const users = await getUsersForAdmin();
 
   return (
     <div className="space-y-8 p-4 md:p-8">

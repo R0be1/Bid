@@ -1,8 +1,8 @@
 
 "use client";
 
-import type { Category } from "@/lib/types";
-import { useState, useMemo } from "react";
+import type { Category } from "@prisma/client";
+import { useState, useMemo, useTransition } from "react";
 import {
   Table,
   TableBody,
@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { Edit, Trash2, Check, X } from "lucide-react";
-import { deleteCategory, updateCategory } from "@/lib/categories";
+import { deleteCategory, updateCategory } from "@/app/admin/categories/actions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,7 +26,6 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
@@ -42,11 +41,20 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
   const router = useRouter();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [isPending, startTransition] = useTransition();
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState<Category | null>(null);
 
   const paginatedCategories = useMemo(() => {
     const startIndex = (page - 1) * rowsPerPage;
     return categories.slice(startIndex, startIndex + rowsPerPage);
   }, [categories, page, rowsPerPage]);
+  
+  // Update categories when initialCategories change
+  useState(() => {
+    setCategories(initialCategories);
+  }, [initialCategories]);
 
   const handleEditClick = (category: Category) => {
     setEditingCategoryId(category.id);
@@ -59,51 +67,60 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
   };
 
   const handleSaveEdit = (categoryId: string) => {
-    if (!editingName.trim()) {
-      toast({
-        title: "Error",
-        description: "Category name cannot be empty.",
-        variant: "destructive",
-      });
-      return;
-    }
-    try {
-      const updated = updateCategory(categoryId, editingName);
-      if (updated) {
-        setCategories(categories.map((c) => (c.id === categoryId ? updated : c)));
-        toast({
-          title: "Category Updated",
-          description: `Category has been updated to "${updated.name}".`,
-        });
-        router.refresh();
-      }
-      handleCancelEdit();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update category.",
-        variant: "destructive",
-      });
-    }
+     startTransition(async () => {
+        if (!editingName.trim()) {
+            toast({
+                title: "Error",
+                description: "Category name cannot be empty.",
+                variant: "destructive",
+            });
+            return;
+        }
+        const result = await updateCategory(categoryId, editingName);
+        if (result.success && result.category) {
+            setCategories(categories.map((c) => (c.id === categoryId ? result.category! : c)));
+            toast({
+                title: "Category Updated",
+                description: result.message,
+            });
+            handleCancelEdit();
+            router.refresh();
+        } else {
+            toast({
+                title: "Error",
+                description: result.message,
+                variant: "destructive",
+            });
+        }
+    });
   };
 
-  const handleDelete = (categoryId: string) => {
-    try {
-      deleteCategory(categoryId);
-      setCategories(categories.filter((c) => c.id !== categoryId));
-      toast({
-        title: "Category Deleted",
-        description: "The category has been successfully deleted.",
-      });
-      router.refresh();
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete category.",
-        variant: "destructive",
-      });
-    }
+  const handleDeleteClick = (category: Category) => {
+    setItemToDelete(category);
+    setDialogOpen(true);
   };
+
+  const confirmDelete = () => {
+    if (!itemToDelete) return;
+    startTransition(async () => {
+        const result = await deleteCategory(itemToDelete.id);
+        if (result.success) {
+            setCategories(prev => prev.filter(c => c.id !== itemToDelete.id));
+            toast({
+                title: "Category Deleted",
+                description: result.message
+            });
+        } else {
+            toast({
+                title: "Error",
+                description: result.message,
+                variant: "destructive"
+            });
+        }
+        setDialogOpen(false);
+        setItemToDelete(null);
+    });
+  }
 
   if (categories.length === 0) {
     return <p className="text-muted-foreground">No categories found.</p>;
@@ -111,10 +128,26 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
 
   return (
     <>
+      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the category.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} disabled={isPending}>
+              {isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>ID</TableHead>
           <TableHead>Name</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
@@ -122,7 +155,6 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
       <TableBody>
         {paginatedCategories.map((category) => (
           <TableRow key={category.id}>
-            <TableCell className="font-medium">{category.id}</TableCell>
             <TableCell>
               {editingCategoryId === category.id ? (
                 <Input
@@ -134,6 +166,7 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
                   }}
                   autoFocus
                   className="h-8"
+                  disabled={isPending}
                 />
               ) : (
                 category.name
@@ -142,38 +175,21 @@ export function CategoryList({ initialCategories }: CategoryListProps) {
             <TableCell className="text-right">
               {editingCategoryId === category.id ? (
                 <div className="flex justify-end gap-2">
-                  <Button variant="ghost" size="icon" onClick={() => handleSaveEdit(category.id)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleSaveEdit(category.id)} disabled={isPending}>
                     <Check className="h-4 w-4 text-green-600" />
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={handleCancelEdit}>
+                  <Button variant="ghost" size="icon" onClick={handleCancelEdit} disabled={isPending}>
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
               ) : (
                 <div className="flex justify-end gap-2">
-                  <Button variant="ghost" size="icon" onClick={() => handleEditClick(category)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleEditClick(category)} disabled={isPending}>
                     <Edit className="h-4 w-4" />
                   </Button>
-                   <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                       <Button variant="ghost" size="icon">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          This action cannot be undone. This will permanently delete the category
-                          and may affect auction items using it.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDelete(category.id)}>Delete</AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+                   <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(category)} disabled={isPending}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
                 </div>
               )}
             </TableCell>

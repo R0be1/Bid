@@ -1,16 +1,22 @@
 
+
+// This file is no longer used for data manipulation and can be considered deprecated.
+// All category management logic has been moved to server actions in 
+// src/app/admin/categories/actions.ts
+// and data fetching is done in src/lib/data/admin.ts
+
 import type { Category } from "./types";
 
 // In a real application, this would be a database.
 const categories: Category[] = [
-    { id: "1", name: "Antiques" },
-    { id: "2", name: "Art" },
-    { id: "3", name: "Furniture" },
-    { id: "4", name: "Collectibles" },
-    { id: "5", name: "Sports Memorabilia" },
-    { id: "6", name: "Books" },
-    { id: "7", name: "Fashion" },
-    { id: "8", name: "Musical Instruments" },
+    { id: "cat-1", name: "Antiques" },
+    { id: "cat-2", name: "Art" },
+    { id: "cat-3", name: "Furniture" },
+    { id: "cat-4", name: "Collectibles" },
+    { id: "cat-5", name: "Sports Memorabilia" },
+    { id: "cat-6", name: "Books" },
+    { id: "cat-7", name: "Fashion" },
+    { id: "cat-8", name: "Musical Instruments" },
 ];
 
 export function getCategories(): Category[] {

@@ -4,6 +4,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useTransition } from "react";
 import {
   Form,
   FormControl,
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { addCategory } from "@/lib/categories";
+import { addCategory } from "@/app/admin/categories/actions";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 
@@ -25,6 +26,7 @@ const formSchema = z.object({
 export function CategoryForm() {
   const { toast } = useToast();
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -33,27 +35,29 @@ export function CategoryForm() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-        addCategory(values.name);
+  const onSubmit = (formData: FormData) => {
+    startTransition(async () => {
+      const result = await addCategory(formData);
+      if (result.success) {
         toast({
             title: "Category Added",
-            description: `"${values.name}" has been added.`,
+            description: result.message,
         });
         form.reset();
-        router.refresh(); // Refresh the page to show the new category
-    } catch (error: any) {
+        router.refresh(); 
+      } else {
          toast({
             title: "Error",
-            description: error.message || "Failed to add category.",
+            description: result.message,
             variant: "destructive"
         });
-    }
+      }
+    });
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex items-end gap-4">
+      <form action={form.handleSubmit(() => onSubmit(new FormData(form.control._formValues)))} className="flex items-end gap-4">
         <FormField
           control={form.control}
           name="name"
@@ -67,7 +71,9 @@ export function CategoryForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Add Category</Button>
+        <Button type="submit" disabled={isPending}>
+          {isPending ? 'Adding...' : 'Add Category'}
+        </Button>
       </form>
     </Form>
   );

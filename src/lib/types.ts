@@ -1,6 +1,6 @@
 
 
-import type { User as PrismaUser, Role as PrismaRole, AuctioneerProfile as PrismaAuctioneerProfile, AuctionItem as PrismaAuctionItem, Bid as PrismaBid, UserStatus, PaymentMethod, AuctionItemType } from '@prisma/client';
+import type { User as PrismaUser, Role as PrismaRole, AuctioneerProfile as PrismaAuctioneerProfile, AuctionItem as PrismaAuctionItem, Bid as PrismaBid, UserStatus, PaymentMethod, AuctionItemType, Category as PrismaCategory } from '@prisma/client';
 
 export type AuctionItem = {
   id: string;
@@ -26,10 +26,7 @@ export type AuctionItemFee = Pick<AuctionItem, 'id' | 'name' | 'participationFee
 export type PaymentType = 'participation' | 'deposit';
 
 
-export type Category = {
-  id: string;
-  name: string;
-};
+export type Category = PrismaCategory;
 
 export type User = {
   id: string;

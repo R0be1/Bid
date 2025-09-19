@@ -1,8 +1,9 @@
 
 "use client";
 
-import type { User } from "@/lib/types";
-import { useState, useMemo } from "react";
+import type { UserForAdminTable } from "@/lib/data/admin";
+import type { UserStatus } from "@prisma/client";
+import { useState, useMemo, useTransition } from "react";
 import {
   Table,
   TableBody,
@@ -22,64 +23,75 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
-import { updateUserStatus } from "@/lib/users";
-import { Banknote, Paperclip, CheckCircle } from "lucide-react";
+import { updateUserStatus, bulkUpdateUserStatus } from "@/app/admin/users/actions";
+import { Banknote, Paperclip, CheckCircle, Ban } from "lucide-react";
 import Link from "next/link";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 
 
 interface UserListProps {
-  initialUsers: User[];
+  initialUsers: UserForAdminTable[];
 }
 
-const statusVariantMap: { [key in User['status']]: 'default' | 'secondary' | 'destructive' } = {
-  approved: 'default',
-  pending: 'secondary',
-  blocked: 'destructive'
+const statusVariantMap: { [key in UserStatus]: 'default' | 'secondary' | 'destructive' } = {
+  APPROVED: 'default',
+  PENDING: 'secondary',
+  BLOCKED: 'destructive'
 };
 
 export function UserList({ initialUsers }: UserListProps) {
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [users, setUsers] = useState<UserForAdminTable[]>(initialUsers);
   const [selectedUserIds, setSelectedUserIds] = useState<Set<string>>(new Set());
+  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const handleStatusChange = (userId: string, newStatus: User['status']) => {
-    try {
-      const updatedUser = updateUserStatus(userId, newStatus);
-      if (updatedUser) {
-        setUsers(users.map(u => u.id === userId ? updatedUser : u));
+  useState(() => {
+    setUsers(initialUsers);
+  }, [initialUsers]);
+
+  const handleStatusChange = (userId: string, newStatus: UserStatus) => {
+    startTransition(async () => {
+      const result = await updateUserStatus(userId, newStatus);
+      if (result.success && result.user) {
+        setUsers(users.map(u => u.id === userId ? {...u, status: newStatus} : u));
         toast({
           title: "Status Updated",
-          description: `User ${updatedUser.name}'s status changed to ${newStatus}.`,
+          description: `User status changed to ${newStatus}.`,
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to update user status.",
+          variant: "destructive",
         });
       }
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to update user status.",
-        variant: "destructive",
-      });
-    }
+    });
   };
   
-  const handleBulkApprove = () => {
-    const idsToApprove = Array.from(selectedUserIds);
-    let approvedCount = 0;
-    const updatedUsers = users.map(user => {
-      if (idsToApprove.includes(user.id) && user.status === 'pending') {
-        user.status = 'approved';
-        approvedCount++;
-      }
-      return user;
-    });
+  const handleBulkAction = (action: 'approve' | 'block') => {
+    const idsToUpdate = Array.from(selectedUserIds);
+    const newStatus = action === 'approve' ? 'APPROVED' : 'BLOCKED';
 
-    setUsers(updatedUsers);
-    setSelectedUserIds(new Set());
-    toast({
-      title: "Bulk Approval Successful",
-      description: `${approvedCount} user(s) have been approved.`,
+    startTransition(async () => {
+        const result = await bulkUpdateUserStatus(idsToUpdate, newStatus);
+        if (result.success) {
+            setUsers(users.map(user => 
+                idsToUpdate.includes(user.id) ? { ...user, status: newStatus } : user
+            ));
+            setSelectedUserIds(new Set());
+            toast({
+                title: `Bulk ${action === 'approve' ? 'Approval' : 'Block'} Successful`,
+                description: `${result.count} user(s) have been updated.`,
+            });
+        } else {
+            toast({
+                title: "Error",
+                description: result.message,
+                variant: "destructive",
+            });
+        }
     });
   };
 
@@ -107,8 +119,7 @@ export function UserList({ initialUsers }: UserListProps) {
     return users.slice(startIndex, startIndex + rowsPerPage);
   }, [users, page, rowsPerPage]);
 
-  const isAllSelected = useMemo(() => selectedUserIds.size > 0 && paginatedUsers.every(u => selectedUserIds.has(u.id)), [selectedUserIds, paginatedUsers]);
-  const isSomeSelected = useMemo(() => selectedUserIds.size > 0 && !isAllSelected, [selectedUserIds, isAllSelected]);
+  const isAllOnPageSelected = useMemo(() => paginatedUsers.length > 0 && paginatedUsers.every(u => selectedUserIds.has(u.id)), [selectedUserIds, paginatedUsers]);
 
   if (users.length === 0) {
     return <p className="text-muted-foreground">No users found.</p>;
@@ -119,9 +130,13 @@ export function UserList({ initialUsers }: UserListProps) {
         {selectedUserIds.size > 0 && (
             <div className="flex items-center gap-4 p-2 rounded-md bg-secondary border">
                 <p className="text-sm font-medium">{selectedUserIds.size} user(s) selected.</p>
-                <Button size="sm" onClick={handleBulkApprove}>
+                <Button size="sm" onClick={() => handleBulkAction('approve')} disabled={isPending}>
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Approve Selected
+                </Button>
+                <Button size="sm" variant="destructive" onClick={() => handleBulkAction('block')} disabled={isPending}>
+                    <Ban className="mr-2 h-4 w-4" />
+                    Block Selected
                 </Button>
             </div>
         )}
@@ -132,8 +147,8 @@ export function UserList({ initialUsers }: UserListProps) {
               <TableHead className="w-[50px]">
                 <Checkbox 
                   onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
-                  checked={isAllSelected}
-                  aria-label="Select all rows"
+                  checked={isAllOnPageSelected}
+                  aria-label="Select all rows on this page"
                 />
               </TableHead>
               <TableHead>Name</TableHead>
@@ -157,9 +172,9 @@ export function UserList({ initialUsers }: UserListProps) {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    {user.paidParticipation ? <Badge variant="secondary" className="gap-1"><Banknote className="h-3 w-3"/> Participation</Badge> : null}
-                    {user.paidDeposit ? <Badge variant="secondary" className="gap-1"><Banknote className="h-3 w-3"/> Deposit</Badge> : null}
-                    {user.paymentMethod === 'receipt' && user.receiptUrl && (
+                    {user.paidParticipation && <Badge variant="secondary" className="gap-1"><Banknote className="h-3 w-3"/> Participation</Badge>}
+                    {user.paidDeposit && <Badge variant="secondary" className="gap-1"><Banknote className="h-3 w-3"/> Deposit</Badge>}
+                    {user.paymentMethod === 'RECEIPT' && user.receiptUrl && (
                       <Button variant="ghost" size="icon" asChild className="h-6 w-6">
                         <Link href={user.receiptUrl} target="_blank" title="View Receipt">
                           <Paperclip className="h-4 w-4" />
@@ -170,21 +185,22 @@ export function UserList({ initialUsers }: UserListProps) {
                 </TableCell>
                 <TableCell>
                    <Badge variant={statusVariantMap[user.status]} className="capitalize">
-                      {user.status}
+                      {user.status.toLowerCase()}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                   <Select
                     value={user.status}
-                    onValueChange={(value: User['status']) => handleStatusChange(user.id, value)}
+                    onValueChange={(value: UserStatus) => handleStatusChange(user.id, value)}
+                    disabled={isPending}
                   >
                     <SelectTrigger className="w-[120px] ml-auto h-8">
                       <SelectValue placeholder="Change status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="pending">Pending</SelectItem>
-                      <SelectItem value="approved">Approved</SelectItem>
-                      <SelectItem value="blocked">Blocked</SelectItem>
+                      <SelectItem value="PENDING">Pending</SelectItem>
+                      <SelectItem value="APPROVED">Approved</SelectItem>
+                      <SelectItem value="BLOCKED">Blocked</SelectItem>
                     </SelectContent>
                   </Select>
                 </TableCell>
