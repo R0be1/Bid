@@ -16,8 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { KeyRound, Lock } from "lucide-react";
-import { Suspense, useTransition } from "react";
+import { KeyRound, Lock, Eye, EyeOff } from "lucide-react";
+import { Suspense, useTransition, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { forceChangePassword } from "./actions";
 
@@ -35,6 +35,8 @@ function ForceChangePasswordComponent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const userId = searchParams.get('userId');
 
@@ -96,7 +98,16 @@ function ForceChangePasswordComponent() {
                                 <FormItem>
                                 <FormLabel>New Password</FormLabel>
                                 <FormControl>
-                                    <Input type="password" {...field} className="bg-secondary/50"/>
+                                    <div className="relative">
+                                      <Input type={showNewPassword ? "text" : "password"} {...field} className="bg-secondary/50"/>
+                                      <button
+                                        type="button"
+                                        onClick={() => setShowNewPassword(!showNewPassword)}
+                                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground"
+                                      >
+                                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                      </button>
+                                    </div>
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>
@@ -109,7 +120,16 @@ function ForceChangePasswordComponent() {
                                 <FormItem>
                                 <FormLabel>Confirm New Password</FormLabel>
                                 <FormControl>
-                                    <Input type="password" {...field} className="bg-secondary/50"/>
+                                    <div className="relative">
+                                      <Input type={showConfirmPassword ? "text" : "password"} {...field} className="bg-secondary/50"/>
+                                       <button
+                                        type="button"
+                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground"
+                                      >
+                                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                      </button>
+                                    </div>
                                 </FormControl>
                                 <FormMessage />
                                 </FormItem>

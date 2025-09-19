@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { User, Lock, AlertTriangle } from "lucide-react";
+import { User, Lock, AlertTriangle, Eye, EyeOff } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState, useTransition } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -38,6 +38,9 @@ export default function ProfilePage() {
   const [user, setUser] = useState<UserProfileData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isPending, startTransition] = useTransition();
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     getUserProfile()
@@ -126,7 +129,16 @@ export default function ProfilePage() {
                                     <FormItem>
                                     <FormLabel>Current Password</FormLabel>
                                     <FormControl>
-                                        <Input type="password" {...field} className="bg-secondary/50"/>
+                                      <div className="relative">
+                                        <Input type={showCurrentPassword ? "text" : "password"} {...field} className="bg-secondary/50"/>
+                                        <button
+                                          type="button"
+                                          onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                                          className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground"
+                                        >
+                                          {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
+                                      </div>
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -139,7 +151,16 @@ export default function ProfilePage() {
                                     <FormItem>
                                     <FormLabel>New Password</FormLabel>
                                     <FormControl>
-                                        <Input type="password" {...field} className="bg-secondary/50"/>
+                                      <div className="relative">
+                                        <Input type={showNewPassword ? "text" : "password"} {...field} className="bg-secondary/50"/>
+                                        <button
+                                          type="button"
+                                          onClick={() => setShowNewPassword(!showNewPassword)}
+                                          className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground"
+                                        >
+                                          {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
+                                      </div>
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
@@ -152,7 +173,16 @@ export default function ProfilePage() {
                                     <FormItem>
                                     <FormLabel>Confirm New Password</FormLabel>
                                     <FormControl>
-                                        <Input type="password" {...field} className="bg-secondary/50"/>
+                                      <div className="relative">
+                                        <Input type={showConfirmPassword ? "text" : "password"} {...field} className="bg-secondary/50"/>
+                                        <button
+                                          type="button"
+                                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                          className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground"
+                                        >
+                                          {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
+                                      </div>
                                     </FormControl>
                                     <FormMessage />
                                     </FormItem>
