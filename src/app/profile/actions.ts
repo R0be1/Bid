@@ -1,17 +1,16 @@
+"use server";
 
-'use server';
-
-import prisma from '@/lib/prisma';
-import { getCurrentUser } from '@/lib/auth';
-import { z } from 'zod';
-import bcrypt from 'bcrypt';
-import { revalidatePath } from 'next/cache';
+import prisma from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
+import { z } from "zod";
+import bcryptjs from "bcryptjs";
+import { revalidatePath } from "next/cache";
 
 export type UserProfileData = {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
 };
 
 type ActionResult<T> = {
@@ -20,104 +19,112 @@ type ActionResult<T> = {
   data?: T;
 };
 
-
 export async function getUserProfile(): Promise<ActionResult<UserProfileData>> {
-    const user = await getCurrentUser();
-    if (!user) {
-        return { success: false, message: 'Authentication required.' };
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, message: "Authentication required." };
+  }
+
+  try {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phone: true,
+      },
+    });
+
+    if (!dbUser) {
+      return { success: false, message: "User not found." };
     }
 
-    try {
-        const dbUser = await prisma.user.findUnique({
-            where: { id: user.id },
-            select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-                email: true,
-                phone: true,
-            },
-        });
+    const profileData: UserProfileData = {
+      id: dbUser.id,
+      name:
+        user.role === "admin"
+          ? user.name
+          : `${dbUser.firstName} ${dbUser.lastName}`,
+      email: dbUser.email,
+      phone: dbUser.phone,
+    };
 
-        if (!dbUser) {
-            return { success: false, message: 'User not found.' };
-        }
-
-        const profileData: UserProfileData = {
-            id: dbUser.id,
-            name: user.role === 'admin' ? user.name : `${dbUser.firstName} ${dbUser.lastName}`,
-            email: dbUser.email,
-            phone: dbUser.phone,
-        };
-
-        return { success: true, message: 'Profile fetched.', data: profileData };
-
-    } catch (error) {
-        console.error("getUserProfile Error:", error);
-        return { success: false, message: 'Failed to fetch user profile.' };
-    }
+    return { success: true, message: "Profile fetched.", data: profileData };
+  } catch (error) {
+    console.error("getUserProfile Error:", error);
+    return { success: false, message: "Failed to fetch user profile." };
+  }
 }
 
-const passwordSchema = z.object({
+const passwordSchema = z
+  .object({
     currentPassword: z.string().min(1, "Current password is required."),
-    newPassword: z.string().min(8, "New password must be at least 8 characters."),
-    confirmPassword: z.string()
-}).refine((data) => data.newPassword === data.confirmPassword, {
+    newPassword: z
+      .string()
+      .min(8, "New password must be at least 8 characters."),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
     message: "Passwords do not match.",
     path: ["confirmPassword"],
-});
+  });
 
+export async function updateUserPassword(
+  data: unknown,
+): Promise<{ success: boolean; message: string }> {
+  const user = await getCurrentUser();
 
-export async function updateUserPassword(data: unknown): Promise<{ success: boolean; message: string; }> {
-    const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, message: "Authentication required." };
+  }
 
-    if (!user) {
-        return { success: false, message: 'Authentication required.' };
+  const validatedFields = passwordSchema.safeParse(data);
+  if (!validatedFields.success) {
+    // A bit more specific error message
+    const errorMessage =
+      validatedFields.error.errors[0]?.message || "Invalid form data.";
+    return { success: false, message: errorMessage };
+  }
+
+  const { currentPassword, newPassword } = validatedFields.data;
+
+  try {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: { auctioneerProfile: true },
+    });
+
+    if (!dbUser) {
+      return { success: false, message: "User not found." };
     }
-    
-    const validatedFields = passwordSchema.safeParse(data);
-    if (!validatedFields.success) {
-        // A bit more specific error message
-        const errorMessage = validatedFields.error.errors[0]?.message || "Invalid form data.";
-        return { success: false, message: errorMessage };
+
+    const passwordMatch = dbUser.password
+      ? await bcryptjs.compare(currentPassword, dbUser.password)
+      : false;
+
+    if (!passwordMatch) {
+      return { success: false, message: "Incorrect current password." };
     }
-    
-    const { currentPassword, newPassword } = validatedFields.data;
 
-    try {
-        const dbUser = await prisma.user.findUnique({ 
-            where: { id: user.id },
-            include: { auctioneerProfile: true }
-         });
+    const saltRounds = 10;
+    const hashedPassword = await bcryptjs.hash(newPassword, saltRounds);
 
-        if (!dbUser) {
-            return { success: false, message: 'User not found.' };
-        }
-        
-        const passwordMatch = dbUser.password ? await bcrypt.compare(currentPassword, dbUser.password) : false;
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+      },
+    });
 
-        if (!passwordMatch) {
-            return { success: false, message: 'Incorrect current password.' };
-        }
+    revalidatePath("/profile");
+    revalidatePath("/admin/profile");
+    revalidatePath("/super-admin/profile");
 
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { 
-                password: hashedPassword,
-            },
-        });
-
-        revalidatePath('/profile');
-        revalidatePath('/admin/profile');
-        revalidatePath('/super-admin/profile');
-
-        return { success: true, message: 'Password updated successfully!' };
-
-    } catch (error) {
-        console.error("Password update error:", error);
-        return { success: false, message: 'An unexpected error occurred.' };
-    }
+    return { success: true, message: "Password updated successfully!" };
+  } catch (error) {
+    console.error("Password update error:", error);
+    return { success: false, message: "An unexpected error occurred." };
+  }
 }

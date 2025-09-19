@@ -1,6 +1,5 @@
-
 import { PrismaClient, RoleName, UserStatus } from "@prisma/client";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -26,7 +25,7 @@ async function main() {
   console.log("Seeding super admin...");
   const superAdminPhone = "0912345678";
   const superAdminPassword = "Admin@123";
-  const hashedPassword = await bcrypt.hash(superAdminPassword, 10);
+  const hashedPassword = await bcryptjs.hash(superAdminPassword, 10); // works the same
 
   const existingSuperAdmin = await prisma.user.findUnique({
     where: { phone: superAdminPhone },

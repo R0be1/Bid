@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import bcrypt from "bcrypt";
+import bcryptjs from "bcryptjs";
 import type { AuthenticatedUser, UserRole, AuthResult } from "@/lib/auth";
 import { cookies } from "next/headers";
 import { UserStatus } from "@prisma/client";
@@ -23,7 +23,7 @@ export async function login(
     }
 
     const passwordMatch = user.password
-      ? await bcrypt.compare(password, user.password)
+      ? await bcryptjs.compare(password, user.password)
       : false;
     const tempPasswordMatch =
       user.auctioneerProfile?.tempPassword &&
