@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { Phone, KeyRound } from "lucide-react";
+import { Phone, KeyRound, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { login } from "../actions";
 import type { AuthResult } from "@/lib/auth";
@@ -23,6 +23,7 @@ import type { AuthResult } from "@/lib/auth";
 export function LoginForm() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -98,17 +99,25 @@ export function LoginForm() {
             <div className="grid gap-2">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <KeyRound className="h-4 w-4 text-muted-foreground" />
-                  </div>
-                  <Input 
-                    id="password" 
-                    type="password" 
-                    required 
-                    className="pl-10" 
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                </div>
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  className="pl-10 pr-10"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-muted-foreground hover:text-foreground"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
             </div>
           </CardContent>
