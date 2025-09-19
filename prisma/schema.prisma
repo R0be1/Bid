@@ -2,81 +2,83 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.1.x"]
-}
-
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("POSTGRES_PRISMA_URL")
 }
 
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+// Models
 model User {
-  id                String            @id @default(uuid())
+  id                String              @id @default(uuid())
+  phone             String              @unique
+  password          String?
   firstName         String
   lastName          String
-  email             String            @unique
-  phone             String            @unique
-  password          String?
-  status            UserStatus        @default(PENDING)
-  paidParticipation Boolean           @default(false)
-  paidDeposit       Boolean           @default(false)
+  email             String              @unique
+  status            UserStatus          @default(PENDING)
+  roles             Role[]              @relation("UserRoles")
+  auctioneerProfile AuctioneerProfile?
+  bids              Bid[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  paidParticipation Boolean             @default(false)
+  paidDeposit       Boolean             @default(false)
   paymentMethod     PaymentMethod?
   receiptUrl        String?
-  createdAt         DateTime          @default(now())
-  updatedAt         DateTime          @updatedAt
-  roles             Role[]            @relation("UserRoles")
-  auctioneerProfile AuctioneerProfile? @relation(fields: [auctioneerProfileId], references: [id])
-  auctioneerProfileId String? unique
-  bids              Bid[]
-  paidParticipationItems AuctionItem[] @relation("ParticipationPaid")
-  paidDepositItems  AuctionItem[]     @relation("DepositPaid")
+  paidParticipationFor AuctionItem[]    @relation("ParticipationPaidUsers")
+  paidDepositFor       AuctionItem[]    @relation("DepositPaidUsers")
 }
 
 model Role {
-  id    String     @id @default(uuid())
-  name  RoleName   @unique
-  users User[]     @relation("UserRoles")
+  id    String   @id @default(uuid())
+  name  RoleName @unique
+  users User[]   @relation("UserRoles")
 }
 
 model AuctioneerProfile {
-  id          String   @id @default(uuid())
-  user        User?
-  companyName String
-  address     String
+  id           String  @id @default(uuid())
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String  @unique
+  companyName  String
+  address      String
   tempPassword String?
-  auctionItems AuctionItem[]
+  items        AuctionItem[]
 }
 
 model Category {
-  id          String        @id @default(uuid())
-  name        String        @unique
-  AuctionItem AuctionItem[]
+  id    String        @id @default(uuid())
+  name  String        @unique
+  items AuctionItem[]
 }
 
 model AuctionItem {
-  id                   String          @id @default(uuid())
-  name                 String
-  description          String          @db.Text
-  startingPrice        Float
-  startDate            DateTime
-  endDate              DateTime
-  type                 AuctionItemType
-  minIncrement         Float?
-  maxAllowedValue      Float?
-  participationFee     Float?
-  securityDeposit      Float?
-  createdAt            DateTime        @default(now())
-  updatedAt            DateTime        @updatedAt
-  category             Category        @relation(fields: [categoryId], references: [id])
-  categoryId           String
-  auctioneer           AuctioneerProfile @relation(fields: [auctioneerId], references: [id])
-  auctioneerId         String
-  images               Image[]
-  bids                 Bid[]
-  paidParticipationUsers User[]          @relation("ParticipationPaid")
-  paidDepositUsers     User[]          @relation("DepositPaid")
+  id                     String          @id @default(uuid())
+  name                   String
+  description            String
+  startingPrice          Float
+  currentPrice           Float?
+  startDate              DateTime
+  endDate                DateTime
+  type                   AuctionItemType
+  minIncrement           Float?
+  maxAllowedValue        Float?
+  participationFee       Float?
+  securityDeposit        Float?
+  auctioneer             AuctioneerProfile @relation(fields: [auctioneerId], references: [id])
+  auctioneerId           String
+  category               Category        @relation(fields: [categoryId], references: [id])
+  categoryId             String
+  images                 Image[]
+  bids                   Bid[]
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+  paidParticipationUsers User[]          @relation("ParticipationPaidUsers")
+  paidDepositUsers       User[]          @relation("DepositPaidUsers")
 }
 
 model Image {
@@ -93,20 +95,21 @@ model Bid {
   createdAt     DateTime    @default(now())
   bidder        User        @relation(fields: [bidderId], references: [id])
   bidderId      String
-  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
+  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id])
   auctionItemId String
+}
+
+// Enums
+enum RoleName {
+  SUPER_ADMIN
+  AUCTIONEER
+  BIDDER
 }
 
 enum UserStatus {
   PENDING
   APPROVED
   BLOCKED
-}
-
-enum RoleName {
-  BIDDER
-  AUCTIONEER
-  SUPER_ADMIN
 }
 
 enum AuctionItemType {
