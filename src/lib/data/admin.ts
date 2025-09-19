@@ -73,10 +73,10 @@ export async function getAuctionItemsForAdmin(userId: string) {
   try {
     const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
       where: {
-        user: { id: userId }, // relation filter
+        user: { id: userId },
       },
       include: {
-        auctionItems: true, // include auction items if needed
+        auctionItems: true,
       },
     });
 
@@ -101,10 +101,10 @@ export async function getAuctionItemForEdit(itemId: string, userId: string) {
   try {
     const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
       where: {
-        user: { id: userId }, // relation filter
+        user: { id: userId },
       },
       include: {
-        auctionItems: true, // include auction items if needed
+        auctionItems: true,
       },
     });
 
