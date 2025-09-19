@@ -74,7 +74,7 @@ export default function RegisterAuctioneerPage() {
         </div>
 
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 md:px-0 pb-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 pb-8">
                 <Card>
                     <CardHeader>
                         <CardTitle>Auctioneer Details</CardTitle>
