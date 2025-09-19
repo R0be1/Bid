@@ -6,7 +6,6 @@ import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem,
 import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog, User, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { logout } from "@/lib/auth";
 import withAuth from "@/components/withAuth";
 
@@ -84,4 +83,4 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default withAuth(AdminLayout, ['admin', 'super-admin']);
+export default withAuth(AdminLayout, ['AUCTIONEER', 'SUPER_ADMIN']);

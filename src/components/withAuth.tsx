@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ComponentType } from 'react';
 import { useRouter } from 'next/navigation';
 import { getCurrentUser, UserRole } from '@/lib/auth';
 
 const withAuth = <P extends object>(
-  WrappedComponent: React.ComponentType<P>,
+  WrappedComponent: ComponentType<P>,
   allowedRoles: UserRole[]
-) => {
+): ComponentType<P> => {
   const AuthComponent = (props: P) => {
     const router = useRouter();
     const [isAuthorized, setIsAuthorized] = useState(false);

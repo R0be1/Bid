@@ -84,4 +84,4 @@ function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default withAuth(SuperAdminLayout, ['super-admin']);
+export default withAuth(SuperAdminLayout, ['SUPER_ADMIN']);
