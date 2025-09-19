@@ -1,24 +1,47 @@
 
-
-import { getAuctionItems } from "@/lib/data";
-import { getUsers } from "@/lib/users";
+import prisma from "@/lib/prisma";
+import { getCurrentUser } from "@/lib/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Gavel, Users, Clock, Calendar, CheckCircle, Banknote } from "lucide-react";
+import { redirect } from "next/navigation";
+import { UserStatus } from "@prisma/client";
+
+export default async function AdminPage() {
+  const user = getCurrentUser();
+  if (!user || user.role !== 'admin') {
+    redirect('/login');
+  }
+
+  const auctioneerUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      include: { auctioneerProfile: true }
+  });
+
+  if (!auctioneerUser || !auctioneerUser.auctioneerProfile) {
+       return <div>Auctioneer profile not found.</div>;
+  }
+
+  const auctioneerProfileId = auctioneerUser.auctioneerProfile.id;
+  const auctioneerName = auctioneerUser.auctioneerProfile.companyName;
+
+  const auctionItems = await prisma.auctionItem.findMany({
+      where: { auctioneerId: auctioneerProfileId }
+  });
+
+  const totalBidderUsers = await prisma.user.count({
+    where: {
+      status: UserStatus.APPROVED,
+      roles: {
+        some: { name: 'BIDDER' }
+      }
+    }
+  });
 
 
-// MOCK: In a real app, this would come from the logged-in user's session
-const MOCK_AUCTIONEER_NAME = "Vintage Treasures LLC";
-
-export default function AdminPage() {
-  const allAuctionItems = getAuctionItems();
-  const users = getUsers();
   const now = new Date();
   
-  // Filter items for the logged-in auctioneer
-  const auctionItems = allAuctionItems.filter(item => item.auctioneerName === MOCK_AUCTIONEER_NAME);
-
   const totalItems = auctionItems.length;
-  const activeBidders = users.filter(u => u.status === 'approved').length;
+  const activeBidders = totalBidderUsers;
   
   const activeAuctions = auctionItems.filter(item => new Date(item.startDate) <= now && new Date(item.endDate) > now).length;
   const upcomingAuctions = auctionItems.filter(item => new Date(item.startDate) > now).length;
@@ -33,7 +56,7 @@ export default function AdminPage() {
     <div className="space-y-8 p-4 md:p-8">
        <div>
           <h1 className="text-3xl font-bold font-headline text-primary">Admin Dashboard</h1>
-          <p className="text-muted-foreground">An overview of your auction activity for <span className="font-semibold">{MOCK_AUCTIONEER_NAME}</span>.</p>
+          <p className="text-muted-foreground">An overview of your auction activity for <span className="font-semibold">{auctioneerName}</span>.</p>
         </div>
       
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
