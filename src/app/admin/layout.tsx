@@ -2,19 +2,39 @@
 
 "use client";
 
+import { useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
 import { Gavel, LayoutGrid, MessageSquare, Send, Tag, Trophy, UserCog, User, LogOut } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { logout } from "@/lib/auth";
-import withAuth from "@/components/withAuth";
+import { logout, getCurrentUser } from "@/lib/auth";
 
 // MOCK: In a real app, this would come from the logged-in user's session
 const MOCK_AUCTIONEER_NAME = "Vintage Treasures LLC";
+const allowedRoles = ['AUCTIONEER', 'SUPER_ADMIN'];
 
-function AdminLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  useEffect(() => {
+    const user = getCurrentUser();
+    // Roles in the cookie might be 'admin' or 'super-admin', which maps to our db roles
+    const userRoleMapping = {
+      'admin': 'AUCTIONEER',
+      'super-admin': 'SUPER_ADMIN'
+    };
+    
+    // @ts-ignore
+    const mappedRole = user ? userRoleMapping[user.role] : undefined;
+
+    if (!user || !allowedRoles.includes(mappedRole)) {
+      router.replace('/login');
+    } else {
+      setIsAuthorized(true);
+    }
+  }, [router]);
 
   const navItems = [
     { href: "/admin", label: "Dashboard", icon: LayoutGrid },
@@ -30,6 +50,11 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
     logout();
     router.push('/login');
   };
+
+  if (!isAuthorized) {
+    // You can render a loading spinner here
+    return null;
+  }
 
   return (
       <SidebarProvider>
@@ -82,5 +107,3 @@ function AdminLayout({ children }: { children: React.ReactNode }) {
       </SidebarProvider>
   );
 }
-
-export default withAuth(AdminLayout, ['AUCTIONEER', 'SUPER_ADMIN']);

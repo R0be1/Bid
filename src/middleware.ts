@@ -1,4 +1,5 @@
 
+
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import type { AuthenticatedUser, UserRole } from './lib/auth';
@@ -13,6 +14,12 @@ const protectedRoutes: Record<UserRole, string[]> = {
 
 const authRoutes = ['/login', '/register'];
 
+const roleRedirects: Record<UserRole, string> = {
+  'user': '/dashboard',
+  'admin': '/admin',
+  'super-admin': '/super-admin',
+};
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = request.cookies.get(SESSION_KEY);
@@ -22,62 +29,28 @@ export function middleware(request: NextRequest) {
     try {
       currentUser = JSON.parse(sessionCookie.value) as AuthenticatedUser;
     } catch (e) {
-      // Invalid cookie, treat as logged out
       currentUser = null;
     }
   }
 
-  const isAuthRoute = authRoutes.includes(pathname);
+  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route));
 
   if (currentUser) {
+    const userRole = currentUser.role;
+    const defaultRedirectUrl = roleRedirects[userRole] || '/';
+    
     if (isAuthRoute) {
         // If logged in, redirect from auth routes to their respective dashboard
-        const url = request.nextUrl.clone();
-        switch (currentUser.role) {
-            case 'admin':
-                url.pathname = '/admin';
-                break;
-            case 'super-admin':
-                url.pathname = '/super-admin';
-                break;
-            case 'user':
-                url.pathname = '/dashboard';
-                break;
-            default:
-                url.pathname = '/';
-        }
-        return NextResponse.redirect(url);
+        return NextResponse.redirect(new URL(defaultRedirectUrl, request.url));
     }
     
-    // Check if user is trying to access a route they are not allowed to
-    const userRole = currentUser.role;
-    const isAuthorized = Object.entries(protectedRoutes).some(([role, routes]) => {
-        if (role === userRole) {
-            return routes.some(route => pathname.startsWith(route));
-        }
-        return false;
-    });
-
-    const isTryingToAccessProtectedRoute = Object.values(protectedRoutes).flat().some(route => pathname.startsWith(route));
-
-    if (isTryingToAccessProtectedRoute && !isAuthorized) {
-        // User is trying to access a protected route of another role
-        // Redirect to their own dashboard
-        const url = request.nextUrl.clone();
-         switch (currentUser.role) {
-            case 'admin':
-                url.pathname = '/admin';
-                break;
-            case 'super-admin':
-                url.pathname = '/super-admin';
-                break;
-            case 'user':
-                url.pathname = '/dashboard';
-                break;
-            default:
-                url.pathname = '/';
-        }
-        return NextResponse.redirect(url);
+    // Check if the user is trying to access a protected route for another role.
+    const isAccessingAllowedRoute = protectedRoutes[userRole]?.some(route => pathname.startsWith(route));
+    const isAccessingAnyProtectedRoute = Object.values(protectedRoutes).flat().some(route => pathname.startsWith(route));
+    
+    if (isAccessingAnyProtectedRoute && !isAccessingAllowedRoute) {
+        // If trying to access a protected route they don't have access to, redirect to their dashboard.
+        return NextResponse.redirect(new URL(defaultRedirectUrl, request.url));
     }
 
   } else {
@@ -85,14 +58,13 @@ export function middleware(request: NextRequest) {
     const isProtectedRoute = Object.values(protectedRoutes).flat().some(route => pathname.startsWith(route));
     if (isProtectedRoute) {
         // If not logged in and trying to access a protected route, redirect to login
-        const url = request.nextUrl.clone();
-        url.pathname = '/login';
-        url.search = `redirect=${pathname}`;
-        return NextResponse.redirect(url);
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(loginUrl);
     }
   }
   
-  return NextResponse.next()
+  return NextResponse.next();
 }
 
 export const config = {

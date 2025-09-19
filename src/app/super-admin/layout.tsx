@@ -2,17 +2,37 @@
 
 "use client";
 
+import { useEffect, useState } from 'react';
+import { usePathname, useRouter } from "next/navigation";
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
 import { Shield, LayoutGrid, Users, Settings, User, LogOut } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { logout } from "@/lib/auth";
-import withAuth from "@/components/withAuth";
+import { logout, getCurrentUser } from "@/lib/auth";
 
+const allowedRoles = ['SUPER_ADMIN'];
 
-function SuperAdminLayout({ children }: { children: React.ReactNode }) {
+export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  useEffect(() => {
+    const user = getCurrentUser();
+     // Roles in the cookie might be 'admin' or 'super-admin', which maps to our db roles
+    const userRoleMapping = {
+      'super-admin': 'SUPER_ADMIN'
+    };
+
+    // @ts-ignore
+    const mappedRole = user ? userRoleMapping[user.role] : undefined;
+
+    if (!user || !allowedRoles.includes(mappedRole)) {
+      router.replace('/login');
+    } else {
+      setIsAuthorized(true);
+    }
+  }, [router]);
+
 
   const navItems = [
     { href: "/super-admin/manage-auctioneer", label: "Manage Auctioneer", icon: Users },
@@ -23,6 +43,11 @@ function SuperAdminLayout({ children }: { children: React.ReactNode }) {
     logout();
     router.push('/login');
   };
+
+  if (!isAuthorized) {
+    // You can render a loading spinner here
+    return null;
+  }
 
   return (
       <SidebarProvider>
@@ -83,5 +108,3 @@ function SuperAdminLayout({ children }: { children: React.ReactNode }) {
       </SidebarProvider>
   );
 }
-
-export default withAuth(SuperAdminLayout, ['SUPER_ADMIN']);
