@@ -16,7 +16,7 @@ const protectedRoutesConfig = {
 const authRoutes = ['/login', '/register', '/auth/force-change-password'];
 
 const roleRedirects: Record<UserRole, string> = {
-  'user': '/dashboard',
+  'user': '/',
   'admin': '/admin',
   'super-admin': '/super-admin',
 };

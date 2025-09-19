@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, FormEvent, useTransition } from "react";
@@ -53,7 +54,7 @@ export function LoginForm() {
               router.push("/admin");
               break;
             case "user":
-              router.push("/dashboard");
+              router.push("/");
               break;
             default:
               router.push("/");
