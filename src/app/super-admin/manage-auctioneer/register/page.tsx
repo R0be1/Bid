@@ -69,13 +69,13 @@ export default function RegisterAuctioneerPage() {
 
   return (
     <div className="max-w-2xl mx-auto">
-        <div className="mb-8 pt-8 px-4 md:px-0">
+        <div className="mb-8 pt-8 md:px-0">
             <h1 className="text-3xl font-bold font-headline text-primary">Register New Auctioneer</h1>
             <p className="text-muted-foreground">Create a new portal for an auctioneer.</p>
         </div>
 
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-4 md:px-0 pb-8">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 md:px-0 pb-8">
                 <Card>
                     <CardHeader>
                         <CardTitle>Auctioneer Details</CardTitle>
