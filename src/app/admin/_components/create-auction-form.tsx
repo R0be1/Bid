@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
@@ -27,7 +26,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import type { Category } from "@prisma/client";
 import { useTransition } from "react";
@@ -35,48 +38,65 @@ import { useToast } from "@/hooks/use-toast";
 import { createAuctionItem } from "../manage-items/actions";
 import { useRouter } from "next/navigation";
 
-
 const imageSchema = z.object({
   url: z.string().url("Invalid URL").min(1, "URL is required."),
   hint: z.string().max(20, "Hint is too long").optional(),
 });
 
-const formSchema = z.object({
-  name: z.string().min(1, "Item name is required."),
-  description: z.string().min(1, "Description is required."),
-  categoryId: z.string().min(1, "Category is required."),
-  startingPrice: z.coerce.number().positive("Starting price must be positive."),
-  type: z.enum(["LIVE", "SEALED"]),
-  startDate: z.date({ required_error: "Start date is required." }),
-  endDate: z.date({ required_error: "End date is required." }),
-  participationFee: z.coerce.number().min(0).optional(),
-  securityDeposit: z.coerce.number().min(0).optional(),
-  minIncrement: z.coerce.number().optional(),
-  maxAllowedValue: z.coerce.number().optional(),
-  images: z.array(imageSchema).min(1, "At least one image is required.").max(3, "You can add a maximum of 3 images."),
-}).refine((data) => {
-    if (data.type === 'LIVE') {
+const formSchema = z
+  .object({
+    name: z.string().min(1, "Item name is required."),
+    description: z.string().min(1, "Description is required."),
+    categoryId: z.string().min(1, "Category is required."),
+    startingPrice: z.coerce
+      .number()
+      .positive("Starting price must be positive."),
+    type: z.enum(["LIVE", "SEALED"]),
+    startDate: z.date({ required_error: "Start date is required." }),
+    endDate: z.date({ required_error: "End date is required." }),
+    participationFee: z.coerce.number().min(0).optional(),
+    securityDeposit: z.coerce.number().min(0).optional(),
+    minIncrement: z.coerce.number().optional(),
+    maxAllowedValue: z.coerce.number().optional(),
+    images: z
+      .array(imageSchema)
+      .min(1, "At least one image is required.")
+      .max(3, "You can add a maximum of 3 images."),
+  })
+  .refine(
+    (data) => {
+      if (data.type === "LIVE") {
         return data.minIncrement !== undefined && data.minIncrement > 0;
-    }
-    return true;
-}, {
-    message: "Minimum increment must be a positive number for live auctions.",
-    path: ["minIncrement"],
-}).refine((data) => {
-    if (data.type === 'SEALED') {
-        return data.maxAllowedValue !== undefined && data.maxAllowedValue > data.startingPrice;
-    }
-    return true;
-}, {
-    message: "Max value must be greater than starting price for sealed bids.",
-    path: ["maxAllowedValue"],
-}).refine((data) => data.endDate > data.startDate, {
+      }
+      return true;
+    },
+    {
+      message: "Minimum increment must be a positive number for live auctions.",
+      path: ["minIncrement"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.type === "SEALED") {
+        return (
+          data.maxAllowedValue !== undefined &&
+          data.maxAllowedValue > data.startingPrice
+        );
+      }
+      return true;
+    },
+    {
+      message: "Max value must be greater than starting price for sealed bids.",
+      path: ["maxAllowedValue"],
+    },
+  )
+  .refine((data) => data.endDate > data.startDate, {
     message: "End date must be after start date.",
     path: ["endDate"],
-});
+  });
 
 interface CreateAuctionFormProps {
-    categories: Category[];
+  categories: Category[];
 }
 
 export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
@@ -95,18 +115,18 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
       participationFee: 0,
       securityDeposit: 0,
       minIncrement: 1,
-      images: [{url: '', hint: ''}],
+      images: [{ url: "", hint: "" }],
     },
   });
-  
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "images",
   });
 
   const auctionType = useWatch({
-      control: form.control,
-      name: "type"
+    control: form.control,
+    name: "type",
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -123,10 +143,10 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
         toast({
           title: "Error",
           description: result.message,
-          variant: "destructive"
-        })
+          variant: "destructive",
+        });
       }
-    })
+    });
   }
 
   return (
@@ -168,7 +188,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                 </FormItem>
               )}
             />
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormField
                 control={form.control}
@@ -176,7 +196,10 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a category" />
@@ -184,9 +207,9 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                       </FormControl>
                       <SelectContent>
                         {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                                {category.name}
-                            </SelectItem>
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -208,15 +231,18 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                 )}
               />
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-               <FormField
+              <FormField
                 control={form.control}
                 name="type"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Auction Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select an auction type" />
@@ -231,7 +257,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                   </FormItem>
                 )}
               />
-               <FormField
+              <FormField
                 control={form.control}
                 name="participationFee"
                 render={({ field }) => (
@@ -248,7 +274,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                 )}
               />
             </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormField
                 control={form.control}
                 name="startDate"
@@ -262,7 +288,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                             variant={"outline"}
                             className={cn(
                               "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
+                              !field.value && "text-muted-foreground",
                             )}
                           >
                             {field.value ? (
@@ -279,7 +305,9 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
+                          disabled={(date) =>
+                            date < new Date() || date < new Date("1900-01-01")
+                          }
                           initialFocus
                         />
                       </PopoverContent>
@@ -301,7 +329,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                             variant={"outline"}
                             className={cn(
                               "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
+                              !field.value && "text-muted-foreground",
                             )}
                           >
                             {field.value ? (
@@ -318,7 +346,9 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
+                          disabled={(date) =>
+                            date < new Date() || date < new Date("1900-01-01")
+                          }
                           initialFocus
                         />
                       </PopoverContent>
@@ -328,9 +358,9 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                 )}
               />
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-               <FormField
+              <FormField
                 control={form.control}
                 name="securityDeposit"
                 render={({ field }) => (
@@ -346,7 +376,8 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                   </FormItem>
                 )}
               />
-              {auctionType === 'LIVE' ? (
+
+              {auctionType === "LIVE" ? (
                 <FormField
                   control={form.control}
                   name="minIncrement"
@@ -364,7 +395,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                   )}
                 />
               ) : (
-                 <FormField
+                <FormField
                   control={form.control}
                   name="maxAllowedValue"
                   render={({ field }) => (
@@ -379,46 +410,63 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                       <FormMessage />
                     </FormItem>
                   )}
+                />
               )}
             </div>
-
+            
             <div>
               <FormLabel>Item Images</FormLabel>
-              <FormDescription className="text-xs">Provide public image URLs and an optional AI hint.</FormDescription>
+              <FormDescription className="text-xs">
+                Provide public image URLs and an optional AI hint.
+              </FormDescription>
               <div className="space-y-4 mt-2">
                 {fields.map((field, index) => (
-                  <div key={field.id} className="flex items-start gap-2 p-2 border rounded-md">
-                     <div className="grid gap-2 flex-grow">
-                        <FormField
-                            control={form.control}
-                            name={`images.${index}.url`}
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input placeholder="https://example.com/image.png" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                         <FormField
-                            control={form.control}
-                            name={`images.${index}.hint`}
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input placeholder="AI Hint (e.g. 'pocket watch')" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                     </div>
-                      {fields.length > 1 && (
-                        <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      )}
+                  <div
+                    key={field.id}
+                    className="flex items-start gap-2 p-2 border rounded-md"
+                  >
+                    <div className="grid gap-2 flex-grow">
+                      <FormField
+                        control={form.control}
+                        name={`images.${index}.url`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                placeholder="https://example.com/image.png"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`images.${index}.hint`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input
+                                placeholder="AI Hint (e.g. 'pocket watch')"
+                                {...field}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    {fields.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    )}
                   </div>
                 ))}
                 {fields.length < 3 && (
@@ -426,7 +474,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => append({url: '', hint: ''})}
+                    onClick={() => append({ url: "", hint: "" })}
                     className="mt-2"
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
@@ -437,9 +485,8 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
               <FormMessage>{form.formState.errors.images?.message}</FormMessage>
             </div>
 
-
             <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? 'Creating...' : 'Create Auction Item'}
+              {isPending ? "Creating..." : "Create Auction Item"}
             </Button>
           </form>
         </Form>
