@@ -45,7 +45,7 @@ export default function AuctionResultsPage() {
   const [announcements, setAnnouncements] = useState<CommunicationLog[]>([]);
 
   const [winnersPage, setWinnersPage] = useState(1);
-  const [winnersRowsPerPage, setWinnersRowsPerPage] useState(5);
+  const [winnersRowsPerPage, setWinnersRowsPerPage] = useState(5);
 
   const paginatedWinners = useMemo(() => {
     const startIndex = (winnersPage - 1) * winnersRowsPerPage;
