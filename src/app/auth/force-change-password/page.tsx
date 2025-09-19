@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useForm } from "react-hook-form";
@@ -96,7 +95,7 @@ function ForceChangePasswordComponent() {
                             name="newPassword"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>New Password</FormLabel>
+                                <FormLabel>New Password <span className="text-destructive">*</span></FormLabel>
                                 <FormControl>
                                     <div className="relative">
                                       <Input type={showNewPassword ? "text" : "password"} {...field} className="bg-secondary/50"/>
@@ -118,7 +117,7 @@ function ForceChangePasswordComponent() {
                             name="confirmPassword"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Confirm New Password</FormLabel>
+                                <FormLabel>Confirm New Password <span className="text-destructive">*</span></FormLabel>
                                 <FormControl>
                                     <div className="relative">
                                       <Input type={showConfirmPassword ? "text" : "password"} {...field} className="bg-secondary/50"/>

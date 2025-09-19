@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -70,7 +69,7 @@ export function SettingsForm({ onAddAdmin }: SettingsFormProps) {
                     name="name"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Full Name</FormLabel>
+                        <FormLabel>Full Name <span className="text-destructive">*</span></FormLabel>
                         <FormControl>
                             <Input placeholder="Jane Doe" {...field} />
                         </FormControl>
@@ -83,7 +82,7 @@ export function SettingsForm({ onAddAdmin }: SettingsFormProps) {
                     name="email"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Email Address</FormLabel>
+                        <FormLabel>Email Address <span className="text-destructive">*</span></FormLabel>
                         <FormControl>
                             <Input type="email" placeholder="jane.doe@example.com" {...field} />
                         </FormControl>
@@ -96,7 +95,7 @@ export function SettingsForm({ onAddAdmin }: SettingsFormProps) {
                     name="phone"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel>Phone Number <span className="text-destructive">*</span></FormLabel>
                         <FormControl>
                             <Input type="tel" placeholder="0911223344" {...field} />
                         </FormControl>
@@ -111,4 +110,3 @@ export function SettingsForm({ onAddAdmin }: SettingsFormProps) {
         </Form>
     );
 }
-

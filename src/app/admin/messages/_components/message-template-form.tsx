@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -71,7 +70,7 @@ export function MessageTemplateForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Template Name</FormLabel>
+              <FormLabel>Template Name <span className="text-destructive">*</span></FormLabel>
               <FormControl>
                 <Input placeholder="e.g. Winner Notification" {...field} />
               </FormControl>
@@ -84,7 +83,7 @@ export function MessageTemplateForm() {
             name="channel"
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Channel</FormLabel>
+                <FormLabel>Channel <span className="text-destructive">*</span></FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                         <SelectTrigger>
@@ -105,7 +104,7 @@ export function MessageTemplateForm() {
             name="template"
             render={({ field }) => (
             <FormItem>
-                <FormLabel>Template Content</FormLabel>
+                <FormLabel>Template Content <span className="text-destructive">*</span></FormLabel>
                 <FormControl>
                 <Textarea
                     placeholder="Congratulations {winnerName}! You won {itemName}."

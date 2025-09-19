@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -69,7 +68,7 @@ export function ChangePasswordForm({ onUpdatePassword }: ChangePasswordFormProps
                     name="currentPassword"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Current Password</FormLabel>
+                        <FormLabel>Current Password <span className="text-destructive">*</span></FormLabel>
                         <FormControl>
                             <div className="relative">
                                 <Input type={showCurrentPassword ? "text" : "password"} {...field} className="bg-secondary/50"/>
@@ -91,7 +90,7 @@ export function ChangePasswordForm({ onUpdatePassword }: ChangePasswordFormProps
                     name="newPassword"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>New Password</FormLabel>
+                        <FormLabel>New Password <span className="text-destructive">*</span></FormLabel>
                         <FormControl>
                             <div className="relative">
                                 <Input type={showNewPassword ? "text" : "password"} {...field} className="bg-secondary/50"/>
@@ -113,7 +112,7 @@ export function ChangePasswordForm({ onUpdatePassword }: ChangePasswordFormProps
                     name="confirmPassword"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Confirm New Password</FormLabel>
+                        <FormLabel>Confirm New Password <span className="text-destructive">*</span></FormLabel>
                         <FormControl>
                            <div className="relative">
                                 <Input type={showConfirmPassword ? "text" : "password"} {...field} className="bg-secondary/50"/>

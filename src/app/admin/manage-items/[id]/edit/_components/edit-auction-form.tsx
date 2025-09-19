@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
@@ -146,7 +145,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Item Name</FormLabel>
+                  <FormLabel>Item Name <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
                     <Input placeholder="e.g. Vintage Pocket Watch" {...field} />
                   </FormControl>
@@ -160,7 +159,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>Description <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Describe the item in detail."
@@ -179,7 +178,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                 name="categoryId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
+                    <FormLabel>Category <span className="text-destructive">*</span></FormLabel>
                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -203,7 +202,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                 name="startingPrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Starting Price (Birr)</FormLabel>
+                    <FormLabel>Starting Price (Birr) <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
                       <Input type="number" step="0.01" {...field} />
                     </FormControl>
@@ -219,7 +218,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Auction Type</FormLabel>
+                    <FormLabel>Auction Type <span className="text-destructive">*</span></FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -258,7 +257,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                 name="startDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Start Date</FormLabel>
+                    <FormLabel>Start Date <span className="text-destructive">*</span></FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -297,7 +296,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                 name="endDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>End Date</FormLabel>
+                    <FormLabel>End Date <span className="text-destructive">*</span></FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -356,7 +355,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                   name="minIncrement"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Minimum Increment (Birr)</FormLabel>
+                      <FormLabel>Minimum Increment (Birr) <span className="text-destructive">*</span></FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" {...field} />
                       </FormControl>
@@ -373,7 +372,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                   name="maxAllowedValue"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Max Allowed Value (Birr)</FormLabel>
+                      <FormLabel>Max Allowed Value (Birr) <span className="text-destructive">*</span></FormLabel>
                       <FormControl>
                         <Input type="number" step="0.01" {...field} />
                       </FormControl>
@@ -387,7 +386,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
             </div>
 
             <div>
-              <FormLabel>Item Images</FormLabel>
+              <FormLabel>Item Images <span className="text-destructive">*</span></FormLabel>
               <FormDescription className="text-xs">Provide public image URLs and an optional AI hint.</FormDescription>
               <div className="space-y-4 mt-2">
                 {fields.map((field, index) => (

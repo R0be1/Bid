@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, FormEvent, useTransition } from "react";
@@ -85,7 +84,7 @@ export function LoginForm() {
           </CardHeader>
           <CardContent className="grid gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="phone">Phone Number</Label>
+              <Label htmlFor="phone">Phone Number <span className="text-destructive">*</span></Label>
               <div className="relative">
                   <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <Phone className="h-4 w-4 text-muted-foreground" />
@@ -102,7 +101,7 @@ export function LoginForm() {
               </div>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">Password <span className="text-destructive">*</span></Label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <KeyRound className="h-4 w-4 text-muted-foreground" />

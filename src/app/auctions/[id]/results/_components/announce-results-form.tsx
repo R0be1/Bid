@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -99,7 +98,7 @@ export function AnnounceResultsForm({ templates, bids, item, onAnnouncementSent 
           name="templateId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Message Template</FormLabel>
+              <FormLabel>Message Template <span className="text-destructive">*</span></FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
@@ -123,7 +122,7 @@ export function AnnounceResultsForm({ templates, bids, item, onAnnouncementSent 
           name="numberOfWinners"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Top Bidders to Notify</FormLabel>
+              <FormLabel>Top Bidders to Notify <span className="text-destructive">*</span></FormLabel>
               <FormControl>
                 <Input type="number" min="1" max={bids.length} {...field} />
               </FormControl>

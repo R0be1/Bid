@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { AuctionItem } from "@/lib/types";
@@ -146,7 +145,7 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
               name="bidAmount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Your Bid Amount</FormLabel>
+                  <FormLabel>Your Bid Amount <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
                     <div className="relative">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">

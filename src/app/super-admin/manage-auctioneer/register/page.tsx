@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -87,7 +86,7 @@ export default function RegisterAuctioneerPage() {
                         name="name"
                         render={({ field }) => (
                             <FormItem>
-                            <FormLabel>Auctioneer/Company Name</FormLabel>
+                            <FormLabel>Auctioneer/Company Name <span className="text-destructive">*</span></FormLabel>
                             <FormControl>
                                 <Input placeholder="e.g. Vintage Treasures LLC" {...field} />
                             </FormControl>
@@ -100,7 +99,7 @@ export default function RegisterAuctioneerPage() {
                         name="address"
                         render={({ field }) => (
                             <FormItem>
-                            <FormLabel>Business Address</FormLabel>
+                            <FormLabel>Business Address <span className="text-destructive">*</span></FormLabel>
                             <FormControl>
                                 <Textarea placeholder="123 Main St, Anytown, USA" {...field} />
                             </FormControl>
@@ -123,7 +122,7 @@ export default function RegisterAuctioneerPage() {
                             name="firstName"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>First Name</FormLabel>
+                                <FormLabel>First Name <span className="text-destructive">*</span></FormLabel>
                                 <FormControl>
                                     <Input placeholder="John" {...field} />
                                 </FormControl>
@@ -136,7 +135,7 @@ export default function RegisterAuctioneerPage() {
                             name="lastName"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Last Name</FormLabel>
+                                <FormLabel>Last Name <span className="text-destructive">*</span></FormLabel>
                                 <FormControl>
                                     <Input placeholder="Smith" {...field} />
                                 </FormControl>
@@ -150,7 +149,7 @@ export default function RegisterAuctioneerPage() {
                             name="email"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Email Address</FormLabel>
+                                <FormLabel>Email Address <span className="text-destructive">*</span></FormLabel>
                                 <FormControl>
                                     <Input type="email" placeholder="john.smith@company.com" {...field} />
                                 </FormControl>
@@ -163,7 +162,7 @@ export default function RegisterAuctioneerPage() {
                             name="phone"
                             render={({ field }) => (
                                 <FormItem>
-                                <FormLabel>Phone Number</FormLabel>
+                                <FormLabel>Phone Number <span className="text-destructive">*</span></FormLabel>
                                 <FormControl>
                                     <Input type="tel" placeholder="0911223344" {...field} />
                                 </FormControl>
