@@ -135,7 +135,7 @@ export function HeaderNav({ navItems, className, mobile = false }: HeaderNavProp
   }
 
   return (
-    <nav className={cn(className, "hidden md:flex items-center space-x-6 text-sm font-medium")}>
+    <nav className={cn(className, "flex items-center space-x-6 text-sm font-medium")}>
       {isClient && navItems.map((item) => {
         if (!user && (item.href === '/dashboard' || item.href === '/profile')) {
             return null;
