@@ -9,119 +9,116 @@ generator client {
 }
 
 model User {
-  id                String   @id @default(uuid())
-  firstName         String
-  lastName          String
-  email             String   @unique
-  phone             String   @unique
-  password          String
-  status            String   @default("pending") // 'pending', 'approved', 'blocked'
-  role              String   @default("USER") // 'USER', 'ADMIN', 'SUPER_ADMIN'
-  paidParticipation Boolean  @default(false)
-  paidDeposit       Boolean  @default(false)
-  paymentMethod     String? // 'direct' or 'receipt'
-  receiptUrl        String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  auctioneer      Auctioneer?
-  bids            Bid[]
-  communications  CommunicationLog[]
+  id        String     @id @default(cuid())
+  phone     String     @unique
+  password  String
+  firstName String
+  lastName  String
+  email     String     @unique
+  status    UserStatus
+  roles     Role[]     @relation("UserRoles")
+  bids      Bid[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
 
   @@map("users")
 }
 
-model Auctioneer {
-  id        String   @id @default(uuid())
-  name      String
-  address   String
-  status    String   @default("active") // 'active' or 'inactive'
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id])
+model Role {
+  id    String   @id @default(cuid())
+  name  RoleName @unique
+  users User[]   @relation("UserRoles")
 
-  auctionItems AuctionItem[]
-
-  @@map("auctioneers")
-}
-
-model Category {
-  id   String @id @default(uuid())
-  name String @unique
-
-  auctionItems AuctionItem[]
-
-  @@map("categories")
+  @@map("roles")
 }
 
 model AuctionItem {
-  id                String    @id @default(uuid())
-  name              String
-  description       String
-  imageUrls         String[]
-  imageHints        String[]
-  type              String // 'live' or 'sealed'
-  startDate         DateTime
-  endDate           DateTime
-  startingPrice     Float
-  participationFee  Float?
-  securityDeposit   Float?
-  currentBid        Float?
-  highBidder        String?
-  maxAllowedValue   Float? // for sealed bids
-  minIncrement      Float? // for live auctions
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  categoryId     String
-  category       Category @relation(fields: [categoryId], references: [id])
-
-  auctioneerId   String
-  auctioneer     Auctioneer @relation(fields: [auctioneerId], references: [id])
-
-  bids            Bid[]
-  communicationLogs CommunicationLog[]
+  id               String    @id @default(cuid())
+  name             String
+  description      String
+  imageUrls        String[]
+  imageHints       String[]
+  category         Category  @relation(fields: [categoryId], references: [id])
+  categoryId       String
+  auctioneer       Auctioneer @relation(fields: [auctioneerId], references: [id])
+  auctioneerId     String
+  type             String // "live" or "sealed"
+  startDate        DateTime
+  endDate          DateTime
+  startingPrice    Float
+  participationFee Float?
+  securityDeposit  Float?
+  currentBid       Float?
+  highBidder       String?
+  maxAllowedValue  Float? // for sealed bids
+  minIncrement     Float? // for live auctions
+  bids             Bid[]
+  communications   CommunicationLog[]
 
   @@map("auction_items")
 }
 
-model Bid {
-  id        String   @id @default(uuid())
-  amount    Float
+model Category {
+  id    String @id @default(cuid())
+  name  String @unique
+  items AuctionItem[]
+
+  @@map("categories")
+}
+
+model Auctioneer {
+  id        String   @id @default(cuid())
+  name      String
+  address   String
+  status    String // "active" or "inactive"
+  userId    String   @unique
   createdAt DateTime @default(now())
+  items     AuctionItem[]
 
-  userId    String
-  bidder    User @relation(fields: [userId], references: [id])
+  @@map("auctioneers")
+}
 
-  auctionItemId String
+model Bid {
+  id            String      @id @default(cuid())
+  amount        Float
+  createdAt     DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id])
+  userId        String
   auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id])
+  auctionItemId String
 
   @@map("bids")
 }
 
 model MessageTemplate {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  channel   String // 'email' or 'sms'
+  id        String @id @default(cuid())
+  name      String @unique
+  channel   String // "email" or "sms"
   template  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@map("message_templates")
 }
 
 model CommunicationLog {
-  id              String   @id @default(uuid())
+  id              String      @id @default(cuid())
+  auctionItem     AuctionItem @relation(fields: [auctionId], references: [id])
+  auctionId       String
   templateName    String
-  channel         String // 'email' or 'sms'
+  channel         String // "email" or "sms"
   recipientsCount Int
-  sentAt          DateTime @default(now())
-
-  auctionItemId String
-  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id])
-  
-  recipients User[]
+  sentAt          DateTime    @default(now())
 
   @@map("communication_logs")
+}
+
+enum RoleName {
+  SUPER_ADMIN
+  AUCTIONEER
+  BIDDER
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  BLOCKED
 }
