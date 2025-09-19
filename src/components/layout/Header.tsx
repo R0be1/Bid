@@ -36,7 +36,9 @@ export function Header() {
         </div>
 
         <div className="flex flex-1 items-center justify-end space-x-4">
-          <HeaderAuth />
+          <div className="hidden md:flex items-center space-x-2">
+             <HeaderAuth />
+          </div>
         </div>
 
         <div className="md:hidden ml-4">
