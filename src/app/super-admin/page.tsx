@@ -1,22 +1,41 @@
 
 
-"use client"
-
-import { getAuctioneers } from "@/lib/auctioneers";
-import { getAuctionItems } from "@/lib/data";
+import prisma from "@/lib/prisma";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Users, Gavel } from "lucide-react";
 import { Pie, PieChart, Cell } from "recharts";
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { UserStatus } from "@prisma/client";
 
-export default function SuperAdminDashboard() {
-  const auctioneers = getAuctioneers();
-  const auctionItems = getAuctionItems();
+export default async function SuperAdminDashboard() {
+  const totalAuctioneers = await prisma.user.count({
+    where: {
+      roles: {
+        some: { name: 'AUCTIONEER' }
+      }
+    }
+  });
 
-  const totalAuctioneers = auctioneers.length;
-  const activeAuctioneers = auctioneers.filter(a => a.status === 'active').length;
-  const inactiveAuctioneers = auctioneers.filter(a => a.status === 'inactive').length;
-  const totalBidItems = auctionItems.length;
+  const activeAuctioneers = await prisma.user.count({
+    where: {
+      status: UserStatus.APPROVED,
+      roles: {
+        some: { name: 'AUCTIONEER' }
+      }
+    }
+  });
+  
+  const inactiveAuctioneers = await prisma.user.count({
+    where: {
+      status: { not: UserStatus.APPROVED },
+      roles: {
+        some: { name: 'AUCTIONEER' }
+      }
+    }
+  });
+
+
+  const totalBidItems = await prisma.auctionItem.count();
 
   const auctioneerStatusData = [
     { name: 'Active', count: activeAuctioneers, fill: 'hsl(var(--accent))' },
