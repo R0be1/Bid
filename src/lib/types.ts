@@ -1,5 +1,7 @@
 
 
+import type { User as PrismaUser, Role as PrismaRole, AuctioneerProfile as PrismaAuctioneerProfile, AuctionItem as PrismaAuctionItem, Bid as PrismaBid } from '@prisma/client';
+
 export type AuctionItem = {
   id: string;
   name: string;
