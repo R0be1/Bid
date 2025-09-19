@@ -1,3 +1,4 @@
+
 import { PrismaClient, RoleName, UserStatus } from "@prisma/client";
 import bcrypt from "bcrypt";
 
@@ -23,7 +24,7 @@ async function main() {
 
   // Seed Super Admin
   console.log("Seeding super admin...");
-  const superAdminPhone = "0912348714";
+  const superAdminPhone = "0912345678";
   const superAdminPassword = "Admin@123";
   const hashedPassword = await bcrypt.hash(superAdminPassword, 10);
 
