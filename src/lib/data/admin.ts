@@ -1,3 +1,4 @@
+
 "use server";
 
 import prisma from "@/lib/prisma";
@@ -72,7 +73,7 @@ export async function getAuctionItemsForAdmin(userId: string) {
 
   try {
     const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
-      where: { user: { id: userId } },
+      where: { userId: userId },
     });
 
     if (!auctioneerProfile) {
@@ -95,7 +96,7 @@ export async function getAuctionItemForEdit(itemId: string, userId: string) {
   noStore();
   try {
     const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
-      where: { user: { id: userId } },
+      where: { userId: userId },
     });
 
     if (!auctioneerProfile) {
