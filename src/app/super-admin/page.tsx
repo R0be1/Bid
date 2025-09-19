@@ -1,47 +1,62 @@
-
+"use client";
 
 import prisma from "@/lib/prisma";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Users, Gavel } from "lucide-react";
 import { Pie, PieChart, Cell } from "recharts";
-import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { UserStatus } from "@prisma/client";
 
 export default async function SuperAdminDashboard() {
   const totalAuctioneers = await prisma.user.count({
     where: {
       roles: {
-        some: { name: 'AUCTIONEER' }
-      }
-    }
+        some: { name: "AUCTIONEER" },
+      },
+    },
   });
 
   const activeAuctioneers = await prisma.user.count({
     where: {
       status: UserStatus.APPROVED,
       roles: {
-        some: { name: 'AUCTIONEER' }
-      }
-    }
+        some: { name: "AUCTIONEER" },
+      },
+    },
   });
-  
+
   const inactiveAuctioneers = await prisma.user.count({
     where: {
       status: { not: UserStatus.APPROVED },
       roles: {
-        some: { name: 'AUCTIONEER' }
-      }
-    }
+        some: { name: "AUCTIONEER" },
+      },
+    },
   });
-
 
   const totalBidItems = await prisma.auctionItem.count();
 
   const auctioneerStatusData = [
-    { name: 'Active', count: activeAuctioneers, fill: 'hsl(var(--accent))' },
-    { name: 'Inactive', count: inactiveAuctioneers, fill: 'hsl(var(--destructive))' },
+    { name: "Active", count: activeAuctioneers, fill: "hsl(var(--accent))" },
+    {
+      name: "Inactive",
+      count: inactiveAuctioneers,
+      fill: "hsl(var(--destructive))",
+    },
   ];
-  
+
   const chartConfig = {
     count: {
       label: "Count",
@@ -54,14 +69,17 @@ export default async function SuperAdminDashboard() {
       label: "Inactive",
       color: "hsl(var(--destructive))",
     },
-  }
-
+  };
 
   return (
     <div className="space-y-8 p-4 sm:p-6 lg:p-8">
       <div>
-        <h1 className="text-3xl font-bold font-headline text-primary">Super Admin Dashboard</h1>
-        <p className="text-muted-foreground">Overview of the auction platform.</p>
+        <h1 className="text-3xl font-bold font-headline text-primary">
+          Super Admin Dashboard
+        </h1>
+        <p className="text-muted-foreground">
+          Overview of the auction platform.
+        </p>
       </div>
 
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
@@ -88,35 +106,40 @@ export default async function SuperAdminDashboard() {
           </CardContent>
         </Card>
       </div>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>Auctioneer Status</CardTitle>
-          <CardDescription>A visual breakdown of active vs. inactive auctioneers.</CardDescription>
+          <CardDescription>
+            A visual breakdown of active vs. inactive auctioneers.
+          </CardDescription>
         </CardHeader>
         <CardContent className="flex items-center justify-center">
-          <ChartContainer config={chartConfig} className="min-h-[200px] w-full max-w-[300px]">
+          <ChartContainer
+            config={chartConfig}
+            className="min-h-[200px] w-full max-w-[300px]"
+          >
             <PieChart>
-               <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent indicator="dot" />}
-                />
-                <Pie 
-                    data={auctioneerStatusData} 
-                    dataKey="count" 
-                    nameKey="name" 
-                    cx="50%" 
-                    cy="50%" 
-                    outerRadius={80} 
-                >
-                    {auctioneerStatusData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                </Pie>
-                <ChartLegend
-                  content={<ChartLegendContent />}
-                  className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
-                />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="dot" />}
+              />
+              <Pie
+                data={auctioneerStatusData}
+                dataKey="count"
+                nameKey="name"
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+              >
+                {auctioneerStatusData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.fill} />
+                ))}
+              </Pie>
+              <ChartLegend
+                content={<ChartLegendContent />}
+                className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
+              />
             </PieChart>
           </ChartContainer>
         </CardContent>
