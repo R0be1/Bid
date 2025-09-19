@@ -1,11 +1,11 @@
 
+
 "use client";
 
-import { getAuctioneers } from "./auctioneers";
-import { getUsers } from "./users";
-import { getSuperAdmins } from "./super-admins";
+import prisma from './prisma';
 import { parseCookies, setCookie, destroyCookie } from 'nookies';
 import type { IncomingMessage } from 'http';
+import bcrypt from 'bcrypt';
 
 export type UserRole = 'user' | 'admin' | 'super-admin';
 
@@ -24,49 +24,49 @@ export interface AuthResult {
 
 const SESSION_KEY = 'user_session';
 
-export const login = (phone: string, password: string): AuthResult => {
-    const superAdmin = getSuperAdmins().find(sa => sa.phone === phone && sa.tempPassword === password);
-    if (superAdmin) {
-        const user: AuthenticatedUser = { id: superAdmin.id, name: superAdmin.name, role: 'super-admin' };
-        
-        setCookie(null, SESSION_KEY, JSON.stringify(user), {
-            maxAge: 30 * 24 * 60 * 60,
-            path: '/',
-        });
+export const login = async (phone: string, password: string): Promise<AuthResult> => {
+    const user = await prisma.user.findUnique({
+        where: { phone },
+        include: { roles: true, auctioneerProfile: true }
+    });
 
-        return { success: true, message: `Welcome, ${superAdmin.name}!`, role: 'super-admin' };
-    }
-
-    const auctioneer = getAuctioneers().find(
-      (a) => a.user.phone === phone && a.user.tempPassword === password
-    );
-    if (auctioneer) {
-        if (auctioneer.status !== 'active') {
-            return { success: false, message: "Your account is currently inactive. Please contact the administrator." };
-        }
-        const user: AuthenticatedUser = { id: auctioneer.id, name: auctioneer.user.firstName, role: 'admin' };
-        
-        setCookie(null, SESSION_KEY, JSON.stringify(user), {
-            maxAge: 30 * 24 * 60 * 60,
-            path: '/',
-        });
-
-        return { success: true, message: `Welcome, ${auctioneer.name}.`, role: 'admin' };
+    if (!user) {
+        return { success: false, message: "Invalid phone number or password." };
     }
     
-    const regularUser = getUsers().find(u => u.email.split('@')[0] === phone);
-    if (regularUser && password === "password") {
-       const user: AuthenticatedUser = { id: regularUser.id, name: regularUser.name, role: 'user' };
-       
-        setCookie(null, SESSION_KEY, JSON.stringify(user), {
-            maxAge: 30 * 24 * 60 * 60,
-            path: '/',
-        });
-
-       return { success: true, message: `Welcome back, ${regularUser.name}!`, role: 'user' };
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch && password !== user.tempPassword) { // Also check against temp password
+        return { success: false, message: "Invalid phone number or password." };
     }
 
-    return { success: false, message: "Please check your phone number and password." };
+    const roles = user.roles.map(r => r.name);
+    let role: UserRole = 'user';
+    let userName = `${user.firstName} ${user.lastName}`;
+
+    if (roles.includes('SUPER_ADMIN')) {
+        role = 'super-admin';
+    } else if (roles.includes('AUCTIONEER')) {
+        role = 'admin';
+        if (user.auctioneerProfile?.companyName) {
+            userName = user.auctioneerProfile.companyName;
+        }
+    } else if (roles.includes('BIDDER')) {
+        role = 'user';
+    }
+
+    if (role === 'admin' && user.status !== 'APPROVED') {
+      return { success: false, message: "Your auctioneer account is currently inactive. Please contact the administrator." };
+    }
+
+
+    const authenticatedUser: AuthenticatedUser = { id: user.id, name: userName, role: role };
+    
+    setCookie(null, SESSION_KEY, JSON.stringify(authenticatedUser), {
+        maxAge: 30 * 24 * 60 * 60,
+        path: '/',
+    });
+
+    return { success: true, message: `Welcome back, ${userName}!`, role: role };
 }
 
 export const logout = (): void => {

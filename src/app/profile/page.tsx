@@ -1,5 +1,5 @@
 
-"use client";
+'use client';
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,12 +16,12 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { getUser } from "@/lib/users";
 import { User as UserIcon, Lock } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { getCurrentUser } from "@/lib/auth";
-import { useEffect, useState } from "react";
-import type { User } from "@/lib/types";
+import { useEffect, useState, useTransition } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { getUserProfile, updateUserPassword } from "./actions";
+import type { UserProfileData } from "./actions";
 
 
 const formSchema = z.object({
@@ -36,15 +36,21 @@ const formSchema = z.object({
 
 export default function CustomerProfilePage() {
   const { toast } = useToast();
-  const [user, setUser] = useState<User | undefined>();
+  const [user, setUser] = useState<UserProfileData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    const currentUser = getCurrentUser();
-    if (currentUser?.role === 'user') {
-      const userData = getUser(currentUser.id);
-      setUser(userData);
-    }
-  }, []);
+    getUserProfile()
+      .then(result => {
+        if (result.success && result.data) {
+          setUser(result.data);
+        } else {
+          toast({ title: "Error", description: result.message, variant: "destructive" });
+        }
+      })
+      .finally(() => setIsLoading(false));
+  }, [toast]);
   
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -57,21 +63,25 @@ export default function CustomerProfilePage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // MOCK: In a real app, you'd call a server action here to verify the current password
-    // and update it in the database.
-    console.log("Password change values:", values);
-    
-    // Mocking success
-    toast({
-      title: "Password Updated",
-      description: "Your password has been changed successfully.",
+    startTransition(async () => {
+        const result = await updateUserPassword(values);
+        toast({
+            title: result.success ? "Success" : "Error",
+            description: result.message,
+            variant: result.success ? "default" : "destructive",
+        });
+        if (result.success) {
+            form.reset();
+        }
     });
-
-    form.reset();
   }
   
+  if (isLoading) {
+    return <ProfileSkeleton />;
+  }
+
   if (!user) {
-      return <div>Loading...</div>
+    return <div>Could not load profile. Please try logging in again.</div>
   }
 
   return (
@@ -94,6 +104,10 @@ export default function CustomerProfilePage() {
                     <div>
                         <Label htmlFor="email">Email Address</Label>
                         <Input id="email" value={user.email} readOnly disabled className="border-0 bg-secondary" />
+                    </div>
+                    <div>
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input id="phone" value={user.phone} readOnly disabled className="border-0 bg-secondary" />
                     </div>
                 </CardContent>
             </Card>
@@ -145,7 +159,9 @@ export default function CustomerProfilePage() {
                                     </FormItem>
                                 )}
                             />
-                            <Button type="submit">Update Password</Button>
+                            <Button type="submit" disabled={isPending}>
+                               {isPending ? "Updating..." : "Update Password"}
+                            </Button>
                         </form>
                     </Form>
                 </CardContent>
@@ -153,4 +169,51 @@ export default function CustomerProfilePage() {
         </div>
     </div>
   );
+}
+
+function ProfileSkeleton() {
+    return (
+        <div className="space-y-8 p-4 md:p-8">
+            <div>
+                <Skeleton className="h-10 w-3/4" />
+                <Skeleton className="h-4 w-1/2 mt-2" />
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <Card>
+                    <CardHeader><Skeleton className="h-8 w-1/3" /></CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="space-y-2">
+                           <Skeleton className="h-4 w-1/4" />
+                           <Skeleton className="h-10 w-full" />
+                        </div>
+                         <div className="space-y-2">
+                           <Skeleton className="h-4 w-1/4" />
+                           <Skeleton className="h-10 w-full" />
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <Skeleton className="h-8 w-1/2" />
+                        <Skeleton className="h-4 w-3/4 mt-2" />
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="space-y-2">
+                           <Skeleton className="h-4 w-1/4" />
+                           <Skeleton className="h-10 w-full" />
+                        </div>
+                         <div className="space-y-2">
+                           <Skeleton className="h-4 w-1/4" />
+                           <Skeleton className="h-10 w-full" />
+                        </div>
+                         <div className="space-y-2">
+                           <Skeleton className="h-4 w-1/4" />
+                           <Skeleton className="h-10 w-full" />
+                        </div>
+                        <Skeleton className="h-10 w-32" />
+                    </CardContent>
+                </Card>
+            </div>
+        </div>
+    )
 }
