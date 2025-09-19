@@ -35,7 +35,7 @@ export default function RootLayout({
         className={`${inter.variable} font-body antialiased flex flex-col min-h-screen bg-background text-foreground`}
       >
         {showHeader && <Header />}
-        <div className={`flex-grow ${showHeader ? 'container mx-auto px-4 sm:px-6 lg:px-8 py-8' : isPortalPage ? 'flex' : ''}`}>
+        <div className={`flex-grow ${showHeader ? 'container mx-auto px-4 sm:px-6 lg:px-8 py-8' : isPortalPage || isAuthPage ? 'flex' : ''}`}>
           {children}
         </div>
         <Toaster />

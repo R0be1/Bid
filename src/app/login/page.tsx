@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, FormEvent, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,30 +25,37 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
 
   const handleLogin = (e: FormEvent) => {
     e.preventDefault();
     startTransition(async () => {
       const authResult: AuthResult = await login(phone, password);
+      const redirectUrl = searchParams.get('redirect');
 
       if (authResult.success) {
         toast({ title: "Login Successful", description: authResult.message });
-        switch (authResult.role) {
-          case "super-admin":
-            router.push("/super-admin");
-            break;
-          case "admin":
-            router.push("/admin");
-            break;
-          case "user":
-            router.push("/dashboard");
-            break;
-          default:
-            router.push("/");
-            break;
+
+        if (redirectUrl) {
+          router.push(redirectUrl);
+        } else {
+          switch (authResult.role) {
+            case "super-admin":
+              router.push("/super-admin");
+              break;
+            case "admin":
+              router.push("/admin");
+              break;
+            case "user":
+              router.push("/dashboard");
+              break;
+            default:
+              router.push("/");
+              break;
+          }
         }
-        router.refresh(); // Refresh layout to get new user state
+        router.refresh();
       } else {
         toast({
           title: "Invalid Credentials",
@@ -61,7 +68,7 @@ export default function LoginPage() {
 
 
   return (
-    <div className="flex items-center justify-center min-h-full w-full">
+    <div className="flex items-center justify-center min-h-full w-full bg-muted/40">
       <Card className="w-full max-w-sm shadow-lg">
         <form onSubmit={handleLogin}>
           <CardHeader>

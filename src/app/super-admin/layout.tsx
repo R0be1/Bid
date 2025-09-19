@@ -2,37 +2,16 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, ReactNode } from 'react';
 import { usePathname, useRouter } from "next/navigation";
 import { Sidebar, SidebarProvider, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader, SidebarFooter, SidebarTrigger } from "@/components/ui/sidebar";
 import { Shield, LayoutGrid, Users, Settings, User, LogOut } from "lucide-react";
 import Link from "next/link";
-import { logout, getCurrentUser } from "@/lib/auth";
+import { logout } from "@/lib/auth";
 
-const allowedRoles = ['SUPER_ADMIN'];
-
-export default function SuperAdminLayout({ children }: { children: React.ReactNode }) {
+export default function SuperAdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
-
-  useEffect(() => {
-    const user = getCurrentUser();
-     // Roles in the cookie might be 'admin' or 'super-admin', which maps to our db roles
-    const userRoleMapping = {
-      'super-admin': 'SUPER_ADMIN'
-    };
-
-    // @ts-ignore
-    const mappedRole = user ? userRoleMapping[user.role] : undefined;
-
-    if (!user || !allowedRoles.includes(mappedRole)) {
-      router.replace('/login');
-    } else {
-      setIsAuthorized(true);
-    }
-  }, [router]);
-
 
   const navItems = [
     { href: "/super-admin/manage-auctioneer", label: "Manage Auctioneer", icon: Users },
@@ -42,12 +21,8 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
   const handleLogout = () => {
     logout();
     router.push('/login');
+    router.refresh();
   };
-
-  if (!isAuthorized) {
-    // You can render a loading spinner here
-    return null;
-  }
 
   return (
       <SidebarProvider>
@@ -102,7 +77,7 @@ export default function SuperAdminLayout({ children }: { children: React.ReactNo
                <SidebarTrigger />
             </SidebarFooter>
         </Sidebar>
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-muted/40">
             {children}
         </main>
       </SidebarProvider>

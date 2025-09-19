@@ -3,14 +3,12 @@
 
 import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
-import { cookies } from 'next/headers';
 import { z } from 'zod';
 import bcrypt from 'bcrypt';
 import { revalidatePath } from 'next/cache';
 
 export async function getSuperAdminProfile() {
-    const nextCookies = cookies();
-    const user = getCurrentUser({ headers: { cookie: nextCookies.toString() } });
+    const user = getCurrentUser();
 
     if (!user || user.role !== 'super-admin') {
         return null;
@@ -54,8 +52,7 @@ const passwordSchema = z.object({
 
 
 export async function updatePassword(data: unknown) {
-    const nextCookies = cookies();
-    const user = getCurrentUser({ headers: { cookie: nextCookies.toString() } });
+    const user = getCurrentUser();
 
     if (!user) {
         return { success: false, message: 'Authentication required.' };
@@ -71,7 +68,7 @@ export async function updatePassword(data: unknown) {
     try {
         const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
 
-        if (!dbUser) {
+        if (!dbUser || !dbUser.password) {
             return { success: false, message: 'User not found.' };
         }
 

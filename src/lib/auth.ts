@@ -2,7 +2,6 @@
 "use client";
 
 import { parseCookies, destroyCookie } from 'nookies';
-import type { IncomingMessage } from 'http';
 
 export type UserRole = 'user' | 'admin' | 'super-admin';
 
@@ -26,8 +25,8 @@ export const logout = (): void => {
     destroyCookie(null, SESSION_KEY, { path: '/' });
 };
 
-export const getCurrentUser = (req?: IncomingMessage): AuthenticatedUser | null => {
-    const cookies = parseCookies({ req });
+export const getCurrentUser = (): AuthenticatedUser | null => {
+    const cookies = parseCookies();
     const session = cookies[SESSION_KEY];
 
     if (!session) return null;
@@ -40,6 +39,6 @@ export const getCurrentUser = (req?: IncomingMessage): AuthenticatedUser | null 
     }
 }
 
-export const isAuthenticated = (req?: IncomingMessage): boolean => {
-    return !!getCurrentUser(req);
+export const isAuthenticated = (): boolean => {
+    return !!getCurrentUser();
 };
