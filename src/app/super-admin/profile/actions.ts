@@ -5,7 +5,7 @@ import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 
 export async function getSuperAdminProfile() {
-    const user = getCurrentUser();
+    const user = await getCurrentUser();
 
     if (!user || user.role !== 'super-admin') {
         return null;

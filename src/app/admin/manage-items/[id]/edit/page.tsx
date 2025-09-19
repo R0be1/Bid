@@ -6,7 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import { EditAuctionForm } from "./_components/edit-auction-form";
 
 export default async function EditAuctionItemPage({ params }: { params: { id: string } }) {
-  const user = getCurrentUser();
+  const user = await getCurrentUser();
   if (!user) redirect('/login');
   
   const [item, categories] = await Promise.all([

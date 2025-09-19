@@ -9,7 +9,7 @@ import { redirect } from "next/navigation";
 
 
 export default async function ManageItemsPage() {
-  const user = getCurrentUser();
+  const user = await getCurrentUser();
   if (!user) redirect('/login');
 
   const categories = await getCategoriesForAdmin();

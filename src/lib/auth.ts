@@ -1,5 +1,4 @@
 
-
 import { cookies } from 'next/headers';
 
 export type UserRole = 'user' | 'admin' | 'super-admin';
@@ -20,7 +19,7 @@ export interface AuthResult {
 
 const SESSION_KEY = 'user_session';
 
-export function getCurrentUser(): AuthenticatedUser | null {
+export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
     const sessionCookie = cookies().get(SESSION_KEY);
 
     if (!sessionCookie) return null;

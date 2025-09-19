@@ -25,7 +25,7 @@ import { getAuctionItemsForAdmin } from "@/lib/data/admin";
 import type { AuctionItem } from "@prisma/client";
 
 export default async function AdminResultsPage() {
-  const user = getCurrentUser();
+  const user = await getCurrentUser();
   if (!user) redirect('/login');
   
   const auctioneerItems = await getAuctionItemsForAdmin(user.id);

@@ -27,7 +27,7 @@ const formSchema = z.object({
 });
 
 export async function createAuctionItem(values: unknown) {
-  const user = getCurrentUser();
+  const user = await getCurrentUser();
   if (!user || user.role !== 'admin') {
     return { success: false, message: 'Unauthorized' };
   }
@@ -77,7 +77,7 @@ export async function createAuctionItem(values: unknown) {
 }
 
 export async function updateAuctionItem(itemId: string, values: unknown) {
-    const user = getCurrentUser();
+    const user = await getCurrentUser();
     if (!user || user.role !== 'admin') {
       return { success: false, message: 'Unauthorized' };
     }
@@ -142,7 +142,7 @@ export async function updateAuctionItem(itemId: string, values: unknown) {
 
 
 export async function deleteAuctionItem(itemId: string) {
-    const user = getCurrentUser();
+    const user = await getCurrentUser();
     if (!user || user.role !== 'admin') {
       return { success: false, message: 'Unauthorized' };
     }

@@ -22,7 +22,7 @@ type ActionResult<T> = {
 
 
 export async function getUserProfile(): Promise<ActionResult<UserProfileData>> {
-    const user = getCurrentUser();
+    const user = await getCurrentUser();
     if (!user) {
         return { success: false, message: 'Authentication required.' };
     }
@@ -69,7 +69,7 @@ const passwordSchema = z.object({
 
 
 export async function updateUserPassword(data: unknown): Promise<{ success: boolean; message: string; }> {
-    const user = getCurrentUser();
+    const user = await getCurrentUser();
 
     if (!user) {
         return { success: false, message: 'Authentication required.' };

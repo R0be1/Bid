@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { UserStatus } from "@prisma/client";
 
 export default async function AdminPage() {
-  const user = getCurrentUser();
+  const user = await getCurrentUser();
   if (!user || user.role !== 'admin') {
     redirect('/login');
   }

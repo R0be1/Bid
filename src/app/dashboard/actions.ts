@@ -20,7 +20,7 @@ type ActionResult<T> = {
 };
 
 export async function getDashboardData(): Promise<ActionResult<DashboardData>> {
-  const user = getCurrentUser();
+  const user = await getCurrentUser();
   if (!user || user.role !== 'user') {
     return { success: false, message: 'Authentication required.' };
   }
@@ -74,7 +74,7 @@ export async function getDashboardData(): Promise<ActionResult<DashboardData>> {
 }
 
 export async function recordPaymentAction(paymentType: PaymentType, method: 'direct' | 'receipt', receiptUrl?: string): Promise<ActionResult<User>> {
-    const user = getCurrentUser();
+    const user = await getCurrentUser();
     if (!user || user.role !== 'user') {
         return { success: false, message: 'Authentication required.' };
     }
