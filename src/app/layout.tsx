@@ -2,13 +2,10 @@
 "use client";
 
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Toaster } from "@/components/ui/toaster";
 import { usePathname } from "next/navigation";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export default function RootLayout({
   children,
@@ -32,7 +29,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} font-body antialiased flex flex-col min-h-screen bg-background text-foreground`}
+        className={`font-body antialiased flex flex-col min-h-screen bg-background text-foreground`}
       >
         {showHeader && <Header />}
         <div className={`flex-grow ${showHeader ? 'container mx-auto px-4 sm:px-6 lg:px-8 py-8' : isPortalPage || isAuthPage ? 'flex' : ''}`}>
