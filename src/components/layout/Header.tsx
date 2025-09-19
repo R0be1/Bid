@@ -1,6 +1,8 @@
 
+"use client";
+
 import Link from "next/link";
-import { Gavel, Menu, LayoutDashboard } from "lucide-react";
+import { Gavel, Menu, LayoutDashboard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -10,6 +12,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useEffect, useState } from "react";
+import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth-client";
+import { logout } from "@/app/actions";
+import { useRouter } from "next/navigation";
 
 export function Header() {
   const navItems = [
@@ -18,8 +24,19 @@ export function Header() {
     { href: "/profile", label: "Profile" },
   ];
   
-  // Mock login status
-  const isLoggedIn = false;
+  const [user, setUser] = useState<AuthenticatedUser | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    setUser(getCurrentUserClient());
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    setUser(null);
+    router.push('/login');
+    router.refresh();
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
@@ -42,7 +59,7 @@ export function Header() {
           ))}
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-4">
-          {isLoggedIn ? (
+          {user ? (
             <>
               <Button variant="ghost" asChild>
                 <Link href="/dashboard">
@@ -50,8 +67,9 @@ export function Header() {
                     Dashboard
                 </Link>
               </Button>
-               <Button variant="outline" asChild>
-                <Link href="/login">Log out</Link>
+               <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Log out
               </Button>
             </>
           ) : (
