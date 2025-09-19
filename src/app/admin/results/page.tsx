@@ -1,6 +1,4 @@
 
-
-import { getAuctionItems } from "@/lib/data";
 import {
   Card,
   CardContent,
@@ -21,14 +19,16 @@ import { Eye } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { getAuctionItemsForAdmin } from "@/lib/data/admin";
+import type { AuctionItem } from "@prisma/client";
 
-// MOCK: In a real app, this would come from the logged-in user's session
-const MOCK_AUCTIONEER_NAME = "Vintage Treasures LLC";
-
-export default function AdminResultsPage() {
-  const allItems = getAuctionItems();
-  // Filter items for the logged-in auctioneer
-  const auctioneerItems = allItems.filter(item => item.auctioneerName === MOCK_AUCTIONEER_NAME);
+export default async function AdminResultsPage() {
+  const user = getCurrentUser();
+  if (!user) redirect('/login');
+  
+  const auctioneerItems = await getAuctionItemsForAdmin(user.id);
   const completedAuctions = auctioneerItems.filter(item => new Date(item.endDate) < new Date());
 
   return (
@@ -57,10 +57,10 @@ export default function AdminResultsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {completedAuctions.map((item) => (
+                {completedAuctions.map((item: AuctionItem) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell><Badge variant={item.type === 'live' ? 'destructive' : 'secondary'} className="capitalize">{item.type}</Badge></TableCell>
+                    <TableCell><Badge variant={item.type === 'LIVE' ? 'destructive' : 'secondary'} className="capitalize">{item.type.toLowerCase()}</Badge></TableCell>
                     <TableCell>{format(new Date(item.endDate), "PPP p")}</TableCell>
                     <TableCell className="text-right">
                       <Button asChild variant="outline" size="sm">

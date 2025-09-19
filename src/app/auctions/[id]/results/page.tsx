@@ -1,10 +1,10 @@
 
 "use client";
 
-import { getAuctionItem, getAuctionBids } from "@/lib/data";
 import { notFound, useParams } from "next/navigation";
-import { useState, useEffect, useMemo } from "react";
-import type { Bid, CommunicationLog } from "@/lib/types";
+import { useState, useEffect, useMemo, useTransition } from "react";
+import type { Bid, CommunicationLog, AuctionItem } from "@/lib/types";
+import { getAuctionItemForListing, getAuctionBidsForResults } from "@/lib/data/public";
 import {
   Card,
   CardContent,
@@ -22,24 +22,23 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { Trophy, Users, BarChart2, Megaphone, Send } from "lucide-react";
+import { Trophy, Users, BarChart2, Megaphone, Send, Loader2 } from "lucide-react";
 import { AnnounceResultsForm } from "./_components/announce-results-form";
 import { AnnouncementHistory } from "./_components/announcement-history";
 import { getMessageTemplates } from "@/lib/messages";
 import { getCommunications } from "@/lib/communications";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function AuctionResultsPage() {
   const params = useParams();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
-  const item = getAuctionItem(id);
-  
-  if (!item) {
-    notFound();
-  }
-  
-  const bids = useMemo(() => getAuctionBids(id), [id]);
-  const auctionEnded = new Date() >= new Date(item.endDate);
+
+  const [item, setItem] = useState<AuctionItem | null>(null);
+  const [bids, setBids] = useState<Bid[]>([]);
+  const [isLoading, startTransition] = useTransition();
+
+  const auctionEnded = item ? new Date() >= new Date(item.endDate) : false;
   const participantCount = new Set(bids.map(b => b.bidderName)).size;
   const messageTemplates = useMemo(() => getMessageTemplates(), []);
   const [announcements, setAnnouncements] = useState<CommunicationLog[]>([]);
@@ -47,17 +46,26 @@ export default function AuctionResultsPage() {
   const [winnersPage, setWinnersPage] = useState(1);
   const [winnersRowsPerPage, setWinnersRowsPerPage] = useState(5);
 
+  useEffect(() => {
+    startTransition(async () => {
+      const [itemData, bidsData] = await Promise.all([
+        getAuctionItemForListing(id),
+        getAuctionBidsForResults(id)
+      ]);
+      setItem(itemData);
+      setBids(bidsData);
+
+      // Load initial announcements for this auction (from mock)
+      const allCommunications = getCommunications();
+      setAnnouncements(allCommunications.filter(log => log.auctionId === id));
+    });
+  }, [id]);
+
   const paginatedWinners = useMemo(() => {
     const startIndex = (winnersPage - 1) * winnersRowsPerPage;
     return bids.slice(startIndex, startIndex + winnersRowsPerPage);
   }, [bids, winnersPage, winnersRowsPerPage]);
 
-
-  useEffect(() => {
-    // Load initial announcements for this auction
-    const allCommunications = getCommunications();
-    setAnnouncements(allCommunications.filter(log => log.auctionId === id));
-  }, [id]);
 
   const handleAddAnnouncement = (announcement: CommunicationLog) => {
     setAnnouncements(prev => [announcement, ...prev]);
@@ -69,6 +77,23 @@ export default function AuctionResultsPage() {
       acc[rangeLabel] = (acc[rangeLabel] || 0) + 1;
       return acc;
   }, {} as Record<string, number>), [bids]);
+
+  if (isLoading) {
+    return (
+        <div className="max-w-4xl mx-auto py-8 space-y-8">
+            <Skeleton className="h-10 w-3/4" />
+            <Skeleton className="h-6 w-1/2" />
+
+            <Card><CardHeader><Skeleton className="h-8 w-1/4" /></CardHeader><CardContent><Skeleton className="h-24 w-full" /></CardContent></Card>
+            <Card><CardHeader><Skeleton className="h-8 w-1/4" /></CardHeader><CardContent><Skeleton className="h-32 w-full" /></CardContent></Card>
+            <Card><CardHeader><Skeleton className="h-8 w-1/4" /></CardHeader><CardContent><Skeleton className="h-48 w-full" /></CardContent></Card>
+        </div>
+    );
+  }
+
+  if (!item) {
+    notFound();
+  }
 
   if (!auctionEnded) {
     return (
@@ -214,3 +239,4 @@ export default function AuctionResultsPage() {
     </div>
   );
 }
+
