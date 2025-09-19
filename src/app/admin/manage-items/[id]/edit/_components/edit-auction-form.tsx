@@ -29,10 +29,10 @@ import {
 } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import type { Category } from "@prisma/client";
+import type { Category, AuctionItem, Image } from "@prisma/client";
 import { useTransition } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { createAuctionItem } from "../manage-items/actions";
+import { updateAuctionItem } from "../../../actions";
 import { useRouter } from "next/navigation";
 
 
@@ -75,11 +75,12 @@ const formSchema = z.object({
     path: ["endDate"],
 });
 
-interface CreateAuctionFormProps {
+interface EditAuctionFormProps {
+    item: AuctionItem & { images: Image[] };
     categories: Category[];
 }
 
-export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
+export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
@@ -87,15 +88,18 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      categoryId: "",
-      startingPrice: 0,
-      type: "LIVE",
-      participationFee: 0,
-      securityDeposit: 0,
-      minIncrement: 1,
-      images: [{url: '', hint: ''}],
+      name: item.name,
+      description: item.description,
+      categoryId: item.categoryId,
+      startingPrice: item.startingPrice,
+      type: item.type,
+      startDate: new Date(item.startDate),
+      endDate: new Date(item.endDate),
+      participationFee: item.participationFee || 0,
+      securityDeposit: item.securityDeposit || 0,
+      minIncrement: item.minIncrement || 1,
+      maxAllowedValue: item.maxAllowedValue || 0,
+      images: item.images.map(i => ({ url: i.url, hint: i.hint || '' })),
     },
   });
   
@@ -111,13 +115,13 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(async () => {
-      const result = await createAuctionItem(values);
+      const result = await updateAuctionItem(item.id, values);
       if (result.success) {
         toast({
-          title: "Auction Item Created!",
-          description: `"${values.name}" has been successfully created.`,
+          title: "Auction Item Updated!",
+          description: `"${values.name}" has been successfully updated.`,
         });
-        form.reset();
+        router.push('/admin/manage-items');
         router.refresh();
       } else {
         toast({
@@ -132,7 +136,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
   return (
     <Card className="shadow-lg">
       <CardHeader>
-        <CardTitle>Create New Auction Item</CardTitle>
+        <CardTitle>Editing "{item.name}"</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -439,7 +443,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
 
 
             <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? 'Creating...' : 'Create Auction Item'}
+              {isPending ? 'Saving...' : 'Save Changes'}
             </Button>
           </form>
         </Form>
