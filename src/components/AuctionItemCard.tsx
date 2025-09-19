@@ -1,3 +1,4 @@
+
 import type { AuctionItem } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
@@ -24,7 +25,6 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
               alt={item.name}
               width={600}
               height={400}
-              data-ai-hint={item.imageHints[0]}
               className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
             />
           </div>
