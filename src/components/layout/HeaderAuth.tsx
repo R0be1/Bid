@@ -14,11 +14,12 @@ import { Skeleton } from "../ui/skeleton";
 export function HeaderAuth() {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const pathname = usePathname();
   
   useEffect(() => {
     setIsClient(true);
     setUser(getCurrentUserClient());
-  }, []);
+  }, [pathname]);
 
   const handleLogout = async () => {
     await logout();
