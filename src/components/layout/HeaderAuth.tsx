@@ -145,4 +145,3 @@ export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
     </div>
   );
 }
-

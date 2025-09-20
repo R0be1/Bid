@@ -8,8 +8,8 @@ const SESSION_KEY = 'user_session';
 // Define which routes are protected and for which roles
 const protectedRoutesConfig = {
     '/dashboard': ['user'],
-    '/profile': ['user'],
-    '/admin': ['admin', 'super-admin'],
+    '/profile': ['user', 'admin', 'super-admin'],
+    '/admin': ['admin'],
     '/super-admin': ['super-admin'],
 };
 
@@ -23,7 +23,7 @@ const roleRedirects: Record<UserRole, string> = {
 
 // Function to determine if a route is protected and get its required roles
 function getRouteProtection(pathname: string): UserRole[] | null {
-    if (pathname.startsWith('/admin/')) return ['admin', 'super-admin'];
+    if (pathname.startsWith('/admin/')) return ['admin'];
     if (pathname.startsWith('/super-admin/')) return ['super-admin'];
     
     for (const route in protectedRoutesConfig) {
