@@ -284,6 +284,9 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                           onSelect={field.onChange}
                           disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
                           initialFocus
+                          captionLayout="dropdown-buttons"
+                          fromYear={new Date().getFullYear()}
+                          toYear={new Date().getFullYear() + 10}
                         />
                          <div className="p-3 border-t border-border">
                             <input type="time" className="w-full" onChange={(e) => {
@@ -332,6 +335,9 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                           onSelect={field.onChange}
                           disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
                           initialFocus
+                          captionLayout="dropdown-buttons"
+                          fromYear={new Date().getFullYear()}
+                          toYear={new Date().getFullYear() + 10}
                         />
                          <div className="p-3 border-t border-border">
                            <input type="time" className="w-full" onChange={(e) => {
