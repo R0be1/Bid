@@ -5,6 +5,9 @@ import { validateSealedBid, type ValidateSealedBidInput } from "@/ai/flows/seale
 import { z } from "zod";
 import { getAuctionItemForListing } from "@/lib/data/public";
 import { logout as serverLogout } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
+import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 const BidSchema = z.object({
   bidAmount: z.coerce.number().positive("Bid amount must be positive."),
@@ -17,6 +20,11 @@ export type FormState = {
 };
 
 export async function handleSealedBid(prevState: FormState, formData: FormData): Promise<FormState> {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, message: "You must be logged in to bid." };
+  }
+
   const validatedFields = BidSchema.safeParse({
     bidAmount: formData.get("bidAmount"),
     itemId: formData.get("itemId"),
@@ -32,7 +40,7 @@ export async function handleSealedBid(prevState: FormState, formData: FormData):
   const { bidAmount, itemId } = validatedFields.data;
   const item = await getAuctionItemForListing(itemId);
 
-  if (!item || item.type !== "sealed" || !item.maxAllowedValue) {
+  if (!item || item.type !== "SEALED" || !item.maxAllowedValue) {
     return {
       success: false,
       message: "Invalid item for sealed bid.",
@@ -49,8 +57,16 @@ export async function handleSealedBid(prevState: FormState, formData: FormData):
     const result = await validateSealedBid(validationInput);
 
     if (result.isValid) {
-      // In a real app, you would save the bid to the database here.
-      console.log(`Bid of ${bidAmount} for ${item.name} is valid and has been recorded.`);
+      await prisma.bid.create({
+        data: {
+          amount: bidAmount,
+          auctionItemId: itemId,
+          bidderId: user.id,
+        },
+      });
+
+      revalidatePath(`/auctions/${itemId}`);
+      
       return {
         success: true,
         message: "Your bid has been successfully submitted!",

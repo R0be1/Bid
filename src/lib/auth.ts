@@ -7,9 +7,9 @@ export interface AuthenticatedUser {
   id: string;
   name: string;
   role: UserRole;
-  status: UserStatus;
-  paidParticipation: boolean;
-  paidDeposit: boolean;
+  status?: UserStatus;
+  paidParticipation?: boolean;
+  paidDeposit?: boolean;
   paymentMethod?: PaymentMethod | null;
 }
 
