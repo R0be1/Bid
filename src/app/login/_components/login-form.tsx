@@ -55,7 +55,7 @@ export function LoginForm() {
               destination = "/admin";
               break;
             case "user":
-              destination = "/dashboard"; // Default logged-in user to dashboard
+              destination = "/"; // Default logged-in user to the main auction page
               break;
             default:
               destination = "/";
