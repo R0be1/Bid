@@ -1,4 +1,17 @@
+
 import type {NextConfig} from 'next';
+
+// Read the comma-separated list of image domains from the .env file
+const imageDomains = process.env.NEXT_PUBLIC_IMAGE_DOMAINS?.split(',').filter(Boolean) || [];
+
+// Generate remotePatterns from the list of domains
+const remotePatterns = imageDomains.map(hostname => ({
+  protocol: 'https',
+  hostname: hostname,
+  port: '',
+  pathname: '/**',
+}));
+
 
 const nextConfig: NextConfig = {
   /* config options here */
@@ -9,26 +22,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'placehold.co',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'picsum.photos',
-        port: '',
-        pathname: '/**',
-      },
-    ],
+    remotePatterns: remotePatterns,
   },
   webpack: (config, { isServer }) => {
     // Suppress warnings from handlebars library
