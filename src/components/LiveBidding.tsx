@@ -157,7 +157,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
                 <Input
                   id="bidAmount"
                   type="number"
-                  placeholder={`${(currentBid + minIncrement).toLocaleString()} or more`}
+                  placeholder="Bid Amount"
                   value={newBid}
                   onChange={(e) => setNewBid(e.target.value)}
                   className="pl-10"
@@ -185,3 +185,5 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
     </Card>
   );
 }
+
+    

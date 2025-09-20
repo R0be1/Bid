@@ -169,7 +169,7 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
                       </div>
                       <Input
                         type="number"
-                        placeholder="0.00"
+                        placeholder="Your Bid Amount"
                         step="0.01"
                         {...field}
                         className="pl-10"
@@ -189,3 +189,5 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
     </Card>
   );
 }
+
+    

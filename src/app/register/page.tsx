@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
@@ -99,25 +100,25 @@ export default function RegisterPage() {
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                  <div className="grid gap-2">
                     <Label htmlFor="firstName">First Name <span className="text-destructive">*</span></Label>
-                    <Input id="firstName" name="firstName" placeholder="John" required />
+                    <Input id="firstName" name="firstName" placeholder="First Name" required />
                   </div>
                    <div className="grid gap-2">
                     <Label htmlFor="lastName">Last Name <span className="text-destructive">*</span></Label>
-                    <Input id="lastName" name="lastName" placeholder="Smith" required />
+                    <Input id="lastName" name="lastName" placeholder="Last Name" required />
                   </div>
                </div>
                <div className="grid gap-2">
                 <Label htmlFor="email">Email <span className="text-destructive">*</span></Label>
-                <Input id="email" name="email" type="email" placeholder="m@example.com" required />
+                <Input id="email" name="email" type="email" placeholder="Email" required />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="phone">Phone Number <span className="text-destructive">*</span></Label>
-                <Input id="phone" name="phone" type="tel" placeholder="0912345678" required />
+                <Input id="phone" name="phone" type="tel" placeholder="Phone Number" required />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password <span className="text-destructive">*</span></Label>
                 <div className="relative">
-                    <Input id="password" name="password" type={showPassword ? "text" : "password"} required />
+                    <Input id="password" name="password" placeholder="Password" type={showPassword ? "text" : "password"} required />
                      <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
@@ -143,3 +144,5 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+    

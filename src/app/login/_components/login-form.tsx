@@ -95,7 +95,7 @@ export function LoginForm() {
                   <Input 
                     id="phone" 
                     type="tel" 
-                    placeholder="0912345678" 
+                    placeholder="Phone Number" 
                     required 
                     className="pl-10" 
                     value={phone}
@@ -116,6 +116,7 @@ export function LoginForm() {
                   className="pl-10 pr-10"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
                 />
                 <button
                   type="button"
@@ -145,3 +146,4 @@ export function LoginForm() {
   );
 }
 
+    

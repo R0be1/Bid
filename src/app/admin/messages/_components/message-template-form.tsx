@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -77,7 +78,7 @@ export function MessageTemplateForm() {
             <FormItem>
               <FormLabel>Template Name <span className="text-destructive">*</span></FormLabel>
               <FormControl>
-                <Input placeholder="e.g. Winner Notification" {...field} />
+                <Input placeholder="Template Name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -112,7 +113,7 @@ export function MessageTemplateForm() {
                 <FormLabel>Template Content <span className="text-destructive">*</span></FormLabel>
                 <FormControl>
                 <Textarea
-                    placeholder="Congratulations {winnerName}! You won {itemName}."
+                    placeholder="Template Content"
                     className="resize-y min-h-[120px]"
                     {...field}
                 />
@@ -128,3 +129,5 @@ export function MessageTemplateForm() {
     </Form>
   );
 }
+
+    

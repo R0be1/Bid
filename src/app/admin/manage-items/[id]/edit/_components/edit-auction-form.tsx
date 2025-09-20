@@ -152,7 +152,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                 <FormItem>
                   <FormLabel>Item Name <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Vintage Pocket Watch" {...field} />
+                    <Input placeholder="Item Name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -167,7 +167,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                   <FormLabel>Description <span className="text-destructive">*</span></FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Describe the item in detail."
+                      placeholder="Description"
                       className="resize-y"
                       {...field}
                     />
@@ -209,7 +209,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                   <FormItem>
                     <FormLabel>Starting Price (Birr) <span className="text-destructive">*</span></FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" {...field} />
+                      <Input type="number" step="0.01" placeholder="Starting Price (Birr)" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -246,7 +246,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                   <FormItem>
                     <FormLabel>Participation Fee (Birr)</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" {...field} />
+                      <Input type="number" step="0.01" placeholder="Participation Fee (Birr)" {...field} />
                     </FormControl>
                     <FormDescription>
                       Optional fee to participate in the auction.
@@ -406,7 +406,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                   <FormItem>
                     <FormLabel>Security Deposit (Birr)</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" {...field} />
+                      <Input type="number" step="0.01" placeholder="Security Deposit (Birr)" {...field} />
                     </FormControl>
                     <FormDescription>
                       Optional deposit forfeited if winner doesn't pay.
@@ -423,7 +423,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                     <FormItem>
                       <FormLabel>Minimum Increment (Birr) <span className="text-destructive">*</span></FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" {...field} />
+                        <Input type="number" step="0.01" placeholder="Minimum Increment (Birr)" {...field} />
                       </FormControl>
                       <FormDescription>
                         The smallest amount by which a bid can be increased.
@@ -440,7 +440,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                     <FormItem>
                       <FormLabel>Max Allowed Value (Birr) <span className="text-destructive">*</span></FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" {...field} />
+                        <Input type="number" step="0.01" placeholder="Max Allowed Value (Birr)" {...field} />
                       </FormControl>
                       <FormDescription>
                         (Sealed Bid) The max value for bid validation.
@@ -464,7 +464,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                             render={({ field }) => (
                             <FormItem>
                                 <FormControl>
-                                    <Input placeholder="https://example.com/image.png" {...field} />
+                                    <Input placeholder="Image URL" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>

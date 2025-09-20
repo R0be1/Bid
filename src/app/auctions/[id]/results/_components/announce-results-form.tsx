@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -125,7 +126,7 @@ export function AnnounceResultsForm({ templates, bids, item, onAnnouncementSent 
             <FormItem>
               <FormLabel>Top Bidders to Notify <span className="text-destructive">*</span></FormLabel>
               <FormControl>
-                <Input type="number" min="1" max={bids.length} {...field} />
+                <Input type="number" min="1" max={bids.length} placeholder="Top Bidders to Notify" {...field} />
               </FormControl>
               <FormDescription>
                 Notify the top N bidders.
@@ -141,3 +142,5 @@ export function AnnounceResultsForm({ templates, bids, item, onAnnouncementSent 
     </Form>
   );
 }
+
+    

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -67,7 +68,7 @@ export function CategoryForm() {
             <FormItem className="flex-grow">
               <FormLabel>Category Name <span className="text-destructive">*</span></FormLabel>
               <FormControl>
-                <Input placeholder="e.g. Electronics" {...field} />
+                <Input placeholder="Category Name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -80,3 +81,5 @@ export function CategoryForm() {
     </Form>
   );
 }
+
+    
