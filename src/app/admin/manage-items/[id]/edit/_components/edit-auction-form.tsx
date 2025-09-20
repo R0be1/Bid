@@ -282,20 +282,25 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
+                          disabled={(date) => date < new Date("1900-01-01")}
                           initialFocus
                           captionLayout="dropdown-buttons"
-                          fromYear={new Date().getFullYear()}
+                          fromYear={new Date().getFullYear() -1}
                           toYear={new Date().getFullYear() + 10}
                         />
                          <div className="p-3 border-t border-border">
-                            <input type="time" className="w-full" onChange={(e) => {
-                                if (!field.value) return;
-                                const newDate = new Date(field.value);
-                                const [hours, minutes] = e.target.value.split(':');
-                                newDate.setHours(parseInt(hours), parseInt(minutes));
-                                field.onChange(newDate);
-                            }} />
+                            <input
+                              type="time"
+                              className="w-full border-input bg-background p-2 rounded-md text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                              defaultValue={format(field.value || new Date(), 'HH:mm')}
+                              onChange={(e) => {
+                                  if (!field.value) return;
+                                  const newDate = new Date(field.value);
+                                  const [hours, minutes] = e.target.value.split(':');
+                                  newDate.setHours(parseInt(hours), parseInt(minutes));
+                                  field.onChange(newDate);
+                              }}
+                            />
                         </div>
                       </PopoverContent>
                     </Popover>
@@ -340,13 +345,18 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                           toYear={new Date().getFullYear() + 10}
                         />
                          <div className="p-3 border-t border-border">
-                           <input type="time" className="w-full" onChange={(e) => {
-                                if (!field.value) return;
-                                const newDate = new Date(field.value);
-                                const [hours, minutes] = e.target.value.split(':');
-                                newDate.setHours(parseInt(hours), parseInt(minutes));
-                                field.onChange(newDate);
-                            }} />
+                           <input
+                              type="time"
+                              className="w-full border-input bg-background p-2 rounded-md text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                              defaultValue={format(field.value || new Date(), 'HH:mm')}
+                              onChange={(e) => {
+                                  if (!field.value) return;
+                                  const newDate = new Date(field.value);
+                                  const [hours, minutes] = e.target.value.split(':');
+                                  newDate.setHours(parseInt(hours), parseInt(minutes));
+                                  field.onChange(newDate);
+                              }}
+                            />
                         </div>
                       </PopoverContent>
                     </Popover>
