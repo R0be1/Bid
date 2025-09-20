@@ -10,8 +10,24 @@ import type { CommunicationLog } from "../types";
 
 export async function getCategoriesForAdmin() {
   noStore();
+  const user = await getCurrentUser();
+  if (!user) {
+    throw new Error("User not authenticated");
+  }
+
+  const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
+    where: { userId: user.id },
+  });
+
+  if (!auctioneerProfile) {
+    return [];
+  }
+  
   try {
     const categories = await prisma.category.findMany({
+      where: {
+        auctioneerId: auctioneerProfile.id,
+      },
       orderBy: { name: "asc" },
     });
     return categories;

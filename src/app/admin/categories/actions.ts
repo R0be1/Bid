@@ -1,6 +1,7 @@
 'use server';
 
 import prisma from '@/lib/prisma';
+import { getCurrentUser } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
@@ -9,6 +10,19 @@ const CategorySchema = z.object({
 });
 
 export async function addCategory(formData: FormData) {
+    const user = await getCurrentUser();
+    if (!user) {
+        return { success: false, message: 'Unauthorized' };
+    }
+
+    const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
+        where: { userId: user.id }
+    });
+
+    if (!auctioneerProfile) {
+        return { success: false, message: 'Auctioneer profile not found.' };
+    }
+
     const validatedFields = CategorySchema.safeParse({
         name: formData.get('name'),
     });
@@ -21,7 +35,10 @@ export async function addCategory(formData: FormData) {
 
     try {
         const existingCategory = await prisma.category.findFirst({
-            where: { name: { equals: name, mode: 'insensitive' } },
+            where: { 
+                name: { equals: name, mode: 'insensitive' },
+                auctioneerId: auctioneerProfile.id
+            },
         });
 
         if (existingCategory) {
@@ -29,7 +46,10 @@ export async function addCategory(formData: FormData) {
         }
 
         await prisma.category.create({
-            data: { name },
+            data: { 
+                name,
+                auctioneerId: auctioneerProfile.id
+            },
         });
 
         revalidatePath('/admin/categories');
@@ -40,6 +60,19 @@ export async function addCategory(formData: FormData) {
 }
 
 export async function updateCategory(id: string, name: string) {
+    const user = await getCurrentUser();
+    if (!user) {
+        return { success: false, message: 'Unauthorized' };
+    }
+
+    const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
+        where: { userId: user.id }
+    });
+
+    if (!auctioneerProfile) {
+        return { success: false, message: 'Auctioneer profile not found.' };
+    }
+    
     const validatedFields = CategorySchema.safeParse({ name });
 
     if (!validatedFields.success) {
@@ -47,10 +80,19 @@ export async function updateCategory(id: string, name: string) {
     }
 
     try {
+        const categoryToUpdate = await prisma.category.findFirst({
+            where: { id, auctioneerId: auctioneerProfile.id }
+        });
+
+        if (!categoryToUpdate) {
+            return { success: false, message: 'Category not found or you do not have permission to edit it.' };
+        }
+
         const existingCategory = await prisma.category.findFirst({
             where: { 
                 name: { equals: name, mode: 'insensitive' },
                 id: { not: id },
+                auctioneerId: auctioneerProfile.id
             },
         });
 
@@ -71,7 +113,28 @@ export async function updateCategory(id: string, name: string) {
 }
 
 export async function deleteCategory(id: string) {
+    const user = await getCurrentUser();
+    if (!user) {
+        return { success: false, message: 'Unauthorized' };
+    }
+
+    const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
+        where: { userId: user.id }
+    });
+
+    if (!auctioneerProfile) {
+        return { success: false, message: 'Auctioneer profile not found.' };
+    }
+
     try {
+        const categoryToDelete = await prisma.category.findFirst({
+            where: { id, auctioneerId: auctioneerProfile.id }
+        });
+
+        if (!categoryToDelete) {
+            return { success: false, message: 'Category not found or you do not have permission to delete it.' };
+        }
+
         // First check if any auction items are using this category
         const itemsInCategory = await prisma.auctionItem.count({
             where: { categoryId: id },
