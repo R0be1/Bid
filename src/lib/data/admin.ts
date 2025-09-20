@@ -135,6 +135,9 @@ export async function getAuctionItemsForAdmin(userId: string) {
     const items = await prisma.auctionItem.findMany({
       where: { auctioneerId: auctioneerProfile.id },
       orderBy: { createdAt: "desc" },
+      include: {
+        category: true
+      }
     });
 
     return items;
