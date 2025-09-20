@@ -4,7 +4,7 @@
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
+import { format, getHours, getMinutes, setHours, setMinutes } from "date-fns";
 import { CalendarIcon, PlusCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -288,19 +288,32 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                           fromYear={new Date().getFullYear() -1}
                           toYear={new Date().getFullYear() + 10}
                         />
-                         <div className="p-3 border-t border-border">
-                            <input
-                              type="time"
-                              className="w-full border-input bg-background p-2 rounded-md text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                              defaultValue={format(field.value || new Date(), 'HH:mm')}
-                              onChange={(e) => {
-                                  if (!field.value) return;
-                                  const newDate = new Date(field.value);
-                                  const [hours, minutes] = e.target.value.split(':');
-                                  newDate.setHours(parseInt(hours), parseInt(minutes));
-                                  field.onChange(newDate);
-                              }}
-                            />
+                         <div className="p-3 border-t border-border flex items-center justify-center gap-2">
+                             <Select
+                                value={String(getHours(field.value || new Date()))}
+                                onValueChange={(value) => {
+                                    if (!field.value) return;
+                                    field.onChange(setHours(field.value, parseInt(value)));
+                                }}
+                            >
+                                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {Array.from({length: 24}, (_, i) => String(i).padStart(2, '0')).map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                            :
+                            <Select
+                                value={String(getMinutes(field.value || new Date())).padStart(2, '0')}
+                                onValueChange={(value) => {
+                                    if (!field.value) return;
+                                    field.onChange(setMinutes(field.value, parseInt(value)));
+                                }}
+                            >
+                                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {Array.from({length: 60}, (_, i) => String(i).padStart(2, '0')).map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
                         </div>
                       </PopoverContent>
                     </Popover>
@@ -344,19 +357,32 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                           fromYear={new Date().getFullYear()}
                           toYear={new Date().getFullYear() + 10}
                         />
-                         <div className="p-3 border-t border-border">
-                           <input
-                              type="time"
-                              className="w-full border-input bg-background p-2 rounded-md text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                              defaultValue={format(field.value || new Date(), 'HH:mm')}
-                              onChange={(e) => {
-                                  if (!field.value) return;
-                                  const newDate = new Date(field.value);
-                                  const [hours, minutes] = e.target.value.split(':');
-                                  newDate.setHours(parseInt(hours), parseInt(minutes));
-                                  field.onChange(newDate);
-                              }}
-                            />
+                         <div className="p-3 border-t border-border flex items-center justify-center gap-2">
+                             <Select
+                                value={String(getHours(field.value || new Date()))}
+                                onValueChange={(value) => {
+                                    if (!field.value) return;
+                                    field.onChange(setHours(field.value, parseInt(value)));
+                                }}
+                            >
+                                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {Array.from({length: 24}, (_, i) => String(i).padStart(2, '0')).map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
+                            :
+                            <Select
+                                value={String(getMinutes(field.value || new Date())).padStart(2, '0')}
+                                onValueChange={(value) => {
+                                    if (!field.value) return;
+                                    field.onChange(setMinutes(field.value, parseInt(value)));
+                                }}
+                            >
+                                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
+                                <SelectContent>
+                                    {Array.from({length: 60}, (_, i) => String(i).padStart(2, '0')).map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                                </SelectContent>
+                            </Select>
                         </div>
                       </PopoverContent>
                     </Popover>
