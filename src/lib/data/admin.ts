@@ -1,4 +1,5 @@
 
+
 "use server";
 
 import prisma from "@/lib/prisma";
@@ -163,7 +164,7 @@ export async function getCommunicationsForAdmin(auctionId?: string): Promise<Com
     if (!user) throw new Error("Unauthorized");
 
     const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
-        where: { userId: user.id },
+        where: { user: { id: user.id } },
         select: { id: true }
     });
 
