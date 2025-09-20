@@ -110,6 +110,11 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
       name: "type"
   });
 
+  const startDate = useWatch({
+    control: form.control,
+    name: "startDate"
+  });
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(async () => {
       const result = await createAuctionItem(values);
@@ -334,6 +339,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                               "w-full pl-3 text-left font-normal",
                               !field.value && "text-muted-foreground"
                             )}
+                            disabled={!startDate}
                           >
                             {field.value ? (
                               format(field.value, "PPP p")
@@ -349,7 +355,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
+                          disabled={(date) => date < startDate || date < new Date("1900-01-01")}
                           initialFocus
                           captionLayout="dropdown-buttons"
                           fromYear={new Date().getFullYear()}
