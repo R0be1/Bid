@@ -52,8 +52,8 @@ export async function getUsersForAdmin(
   noStore();
   try {
     // 1. Find the auctioneer's profile ID
-    const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
-      where: { user: { id: auctioneerUserId } },
+    const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
+      where: { userId: auctioneerUserId },
       select: { id: true },
     });
 
@@ -122,9 +122,9 @@ export async function getAuctionItemsForAdmin(userId: string) {
   noStore();
 
   try {
-    const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
+    const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
       where: {
-        user: { id: userId },
+        userId: userId,
       },
     });
 
@@ -147,9 +147,9 @@ export async function getAuctionItemsForAdmin(userId: string) {
 export async function getAuctionItemForEdit(itemId: string, userId: string) {
   noStore();
   try {
-    const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
+    const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
       where: {
-        user: { id: userId },
+        userId: userId,
       },
     });
 
