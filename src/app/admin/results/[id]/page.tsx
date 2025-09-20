@@ -27,7 +27,7 @@ import { Trophy, Users, BarChart2, Megaphone, Send } from "lucide-react";
 import { AnnounceResultsForm } from "@/app/auctions/[id]/results/_components/announce-results-form";
 import { AnnouncementHistory } from "@/app/auctions/[id]/results/_components/announcement-history";
 import { getMessageTemplates } from "@/lib/messages";
-import { getCommunications } from "@/lib/communications";
+import { getCommunicationsForAdmin } from "@/lib/data/admin";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -37,7 +37,8 @@ export default function AuctionResultsPage() {
 
   const [item, setItem] = useState<PublicAuctionItem | null>(null);
   const [bids, setBids] = useState<Bid[]>([]);
-  const [isLoading, startTransition] = useTransition();
+  const [isLoading, startLoading] = useTransition();
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
   const auctionEnded = item ? new Date() >= new Date(item.endDate) : false;
   const participantCount = new Set(bids.map(b => b.bidderName)).size;
@@ -48,16 +49,17 @@ export default function AuctionResultsPage() {
   const [winnersRowsPerPage, setWinnersRowsPerPage] = useState(5);
 
   useEffect(() => {
-    startTransition(async () => {
-      const [itemData, bidsData] = await Promise.all([
+    setIsDataLoading(true);
+    startLoading(async () => {
+      const [itemData, bidsData, commsData] = await Promise.all([
         getAuctionItemForListing(id),
-        getAuctionBidsForResults(id)
+        getAuctionBidsForResults(id),
+        getCommunicationsForAdmin(id)
       ]);
       setItem(itemData);
       setBids(bidsData);
-
-      const allCommunications = getCommunications();
-      setAnnouncements(allCommunications.filter(log => log.auctionId === id));
+      setAnnouncements(commsData);
+      setIsDataLoading(false);
     });
   }, [id]);
 
@@ -78,7 +80,7 @@ export default function AuctionResultsPage() {
       return acc;
   }, {} as Record<string, number>), [bids]);
 
-  if (isLoading) {
+  if (isDataLoading) {
     return (
         <div className="space-y-8">
             <Skeleton className="h-10 w-3/4" />

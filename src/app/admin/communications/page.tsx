@@ -1,10 +1,9 @@
 
-
 "use client";
 
-import { useState, useMemo } from "react";
-import { getCommunications } from "@/lib/communications";
-import { getAuctionItems } from "@/lib/data";
+import { useState, useEffect, useMemo, useTransition } from "react";
+import { getCommunicationsForAdmin } from "@/lib/data/admin";
+import type { CommunicationLog } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -25,16 +24,19 @@ import { format } from "date-fns";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// MOCK: In a real app, this would come from the logged-in user's session
-const MOCK_AUCTIONEER_NAME = "Vintage Treasures LLC";
 
 export default function CommunicationsPage() {
-  const allCommunications = getCommunications();
-  const allItems = getAuctionItems();
-  const auctioneerItemIds = new Set(allItems.filter(item => item.auctioneerName === MOCK_AUCTIONEER_NAME).map(item => item.id));
-
-  const communications = allCommunications.filter(log => auctioneerItemIds.has(log.auctionId));
+  const [communications, setCommunications] = useState<CommunicationLog[]>([]);
+  const [isLoading, startTransition] = useTransition();
+  
+  useEffect(() => {
+    startTransition(async () => {
+        const comms = await getCommunicationsForAdmin();
+        setCommunications(comms);
+    });
+  }, []);
 
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -43,6 +45,10 @@ export default function CommunicationsPage() {
     const startIndex = (page - 1) * rowsPerPage;
     return communications.slice(startIndex, startIndex + rowsPerPage);
   }, [communications, page, rowsPerPage]);
+  
+  if (isLoading) {
+    return <CommunicationsPageSkeleton />;
+  }
 
   return (
     <div className="space-y-8 p-4 md:p-8">
@@ -74,10 +80,10 @@ export default function CommunicationsPage() {
               <TableBody>
                 {paginatedCommunications.map((log) => (
                   <TableRow key={log.id}>
-                     <TableCell>{format(log.sentAt, "PPP p")}</TableCell>
+                     <TableCell>{format(new Date(log.sentAt), "PPP p")}</TableCell>
                     <TableCell>
                       <Button variant="link" asChild className="p-0 h-auto">
-                        <Link href={`/auctions/${log.auctionId}/results`}>
+                        <Link href={`/admin/results/${log.auctionId}`}>
                            {log.auctionName}
                         </Link>
                       </Button>
@@ -110,4 +116,29 @@ export default function CommunicationsPage() {
       </Card>
     </div>
   );
+}
+
+
+function CommunicationsPageSkeleton() {
+    return (
+        <div className="space-y-8 p-4 md:p-8">
+            <div>
+                <Skeleton className="h-10 w-3/4" />
+                <Skeleton className="h-4 w-1/2 mt-2" />
+            </div>
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/4" />
+                    <Skeleton className="h-4 w-2/3 mt-2" />
+                </CardHeader>
+                <CardContent>
+                    <div className="space-y-4">
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                        <Skeleton className="h-10 w-full" />
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+    )
 }

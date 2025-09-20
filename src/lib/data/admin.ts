@@ -1,8 +1,11 @@
+
 "use server";
 
 import prisma from "@/lib/prisma";
 import { unstable_noStore as noStore } from "next/cache";
 import type { User, UserStatus } from "@prisma/client";
+import { getCurrentUser } from "../auth";
+import type { CommunicationLog } from "../types";
 
 export async function getCategoriesForAdmin() {
   noStore();
@@ -26,14 +29,45 @@ export type UserForAdminTable = Pick<
   paidDeposit: boolean;
 };
 
-export async function getUsersForAdmin(): Promise<UserForAdminTable[]> {
+export async function getUsersForAdmin(
+  auctioneerUserId: string,
+): Promise<UserForAdminTable[]> {
   noStore();
   try {
+    // 1. Find the auctioneer's profile ID
+    const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
+      where: { userId: auctioneerUserId },
+      select: { id: true },
+    });
+
+    if (!auctioneerProfile) {
+      return [];
+    }
+
+    // 2. Find all auction items belonging to this auctioneer
+    const auctioneerItems = await prisma.auctionItem.findMany({
+      where: { auctioneerId: auctioneerProfile.id },
+      select: { id: true },
+    });
+    const itemIds = auctioneerItems.map((item) => item.id);
+
+    // 3. Find all bids placed on those items
+    const bids = await prisma.bid.findMany({
+      where: { auctionItemId: { in: itemIds } },
+      select: { bidderId: true },
+    });
+
+    // 4. Get unique bidder IDs
+    const bidderIds = [...new Set(bids.map((bid) => bid.bidderId))];
+    
+    if (bidderIds.length === 0) {
+        return [];
+    }
+
+    // 5. Fetch the user details for those bidders
     const users = await prisma.user.findMany({
       where: {
-        roles: {
-          some: { name: "BIDDER" },
-        },
+        id: { in: bidderIds },
       },
       select: {
         id: true,
@@ -75,9 +109,6 @@ export async function getAuctionItemsForAdmin(userId: string) {
       where: {
         user: { id: userId },
       },
-      include: {
-        auctionItems: true,
-      },
     });
 
     if (!auctioneerProfile) {
@@ -103,9 +134,6 @@ export async function getAuctionItemForEdit(itemId: string, userId: string) {
       where: {
         user: { id: userId },
       },
-      include: {
-        auctionItems: true,
-      },
     });
 
     if (!auctioneerProfile) {
@@ -127,4 +155,41 @@ export async function getAuctionItemForEdit(itemId: string, userId: string) {
     console.error("Database Error:", error);
     throw new Error("Failed to fetch auction item for editing.");
   }
+}
+
+export async function getCommunicationsForAdmin(auctionId?: string): Promise<CommunicationLog[]> {
+    noStore();
+    const user = await getCurrentUser();
+    if (!user) throw new Error("Unauthorized");
+
+    const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
+        where: { userId: user.id },
+        select: { id: true }
+    });
+
+    if (!auctioneerProfile) return [];
+
+    try {
+        const logs = await prisma.communicationLog.findMany({
+            where: {
+                auctioneerId: auctioneerProfile.id,
+                ...(auctionId && { auctionId: auctionId })
+            },
+            orderBy: {
+                sentAt: 'desc'
+            }
+        });
+        return logs.map(c => ({
+            id: c.id,
+            auctionId: c.auctionId,
+            auctionName: c.auctionName,
+            templateName: c.templateName,
+            channel: c.channel,
+            recipientsCount: c.recipientsCount,
+            sentAt: c.sentAt,
+        }));
+    } catch (error) {
+        console.error("Database Error:", error);
+        throw new Error("Failed to fetch communication logs.");
+    }
 }

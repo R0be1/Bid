@@ -1,12 +1,16 @@
 
-
 import { getUsersForAdmin } from "@/lib/data/admin";
 import { UserList } from "./_components/user-list";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserCog } from "lucide-react";
+import { getCurrentUser } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export default async function UsersPage() {
-  const users = await getUsersForAdmin();
+  const currentUser = await getCurrentUser();
+  if (!currentUser) redirect('/login');
+
+  const users = await getUsersForAdmin(currentUser.id);
 
   return (
     <div className="space-y-8 p-4 md:p-8">
@@ -15,13 +19,13 @@ export default async function UsersPage() {
                 <UserCog />
                 Manage Bidders
             </h1>
-            <p className="text-muted-foreground">Approve, block, and manage registered bidders and their payment statuses.</p>
+            <p className="text-muted-foreground">Approve, block, and manage registered bidders for your auctions.</p>
         </div>
 
         <Card>
             <CardHeader>
-                <CardTitle>Registered Bidders</CardTitle>
-                <CardDescription>View all bidders, their approval status, and any payments made for auction entry.</CardDescription>
+                <CardTitle>Bidders in Your Auctions</CardTitle>
+                <CardDescription>View all bidders who have participated in your auctions, their approval status, and any payments made for auction entry.</CardDescription>
             </CardHeader>
             <CardContent>
                 <UserList initialUsers={users} />

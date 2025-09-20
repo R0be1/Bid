@@ -27,21 +27,26 @@ export default async function AdminPage() {
   const auctionItems = await prisma.auctionItem.findMany({
       where: { auctioneerId: auctioneerProfileId }
   });
+  
+  const auctionItemIds = auctionItems.map(item => item.id);
 
-  const totalBidderUsers = await prisma.user.count({
-    where: {
-      status: UserStatus.APPROVED,
-      roles: {
-        some: { name: 'BIDDER' }
+  const bidsOnAuctioneerItems = await prisma.bid.findMany({
+      where: {
+          auctionItemId: {
+              in: auctionItemIds
+          }
+      },
+      select: {
+          bidderId: true
       }
-    }
   });
 
+  const distinctBidderIds = [...new Set(bidsOnAuctioneerItems.map(bid => bid.bidderId))];
+  const activeBiddersCount = distinctBidderIds.length;
 
   const now = new Date();
   
   const totalItems = auctionItems.length;
-  const activeBidders = totalBidderUsers;
   
   const activeAuctions = auctionItems.filter(item => new Date(item.startDate) <= now && new Date(item.endDate) > now).length;
   const upcomingAuctions = auctionItems.filter(item => new Date(item.startDate) > now).length;
@@ -77,14 +82,14 @@ export default async function AdminPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Active Bidders
+              Your Active Bidders
             </CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{activeBidders}</div>
+            <div className="text-2xl font-bold">{activeBiddersCount}</div>
              <p className="text-xs text-muted-foreground">
-              platform-wide approved users
+              bidders in your auctions
             </p>
           </CardContent>
         </Card>

@@ -1,6 +1,6 @@
 
 
-import type { User as PrismaUser, Role as PrismaRole, AuctioneerProfile as PrismaAuctioneerProfile, AuctionItem as PrismaAuctionItem, Bid as PrismaBid, UserStatus, PaymentMethod, AuctionItemType, Category as PrismaCategory } from '@prisma/client';
+import type { User as PrismaUser, Role as PrismaRole, AuctioneerProfile as PrismaAuctioneerProfile, AuctionItem as PrismaAuctionItem, Bid as PrismaBid, UserStatus, PaymentMethod, AuctionItemType, Category as PrismaCategory, CommunicationChannel } from '@prisma/client';
 
 export type AuctionItem = {
   id: string;
@@ -48,7 +48,7 @@ export type Bid = {
 export type MessageTemplate = {
   id: string;
   name: string;
-  channel: 'email' | 'sms';
+  channel: CommunicationChannel;
   template: string;
 };
 
@@ -57,7 +57,7 @@ export type CommunicationLog = {
   auctionId: string;
   auctionName: string;
   templateName: string;
-  channel: 'email' | 'sms';
+  channel: CommunicationChannel;
   recipientsCount: number;
   sentAt: Date;
 }
@@ -84,5 +84,3 @@ export type SuperAdmin = {
   phone: string;
   tempPassword?: string;
 };
-
-    
