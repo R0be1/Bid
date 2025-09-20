@@ -21,19 +21,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { addMessageTemplate } from "@/lib/messages";
+import { addMessageTemplateAction } from "@/app/admin/messages/actions";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
+import { CommunicationChannel } from "@prisma/client";
 
 const formSchema = z.object({
   name: z.string().min(1, "Template name is required."),
-  channel: z.enum(["email", "sms"], { required_error: "Channel is required." }),
+  channel: z.enum([CommunicationChannel.email, CommunicationChannel.sms], { required_error: "Channel is required." }),
   template: z.string().min(1, "Template content is required."),
 });
 
 export function MessageTemplateForm() {
   const { toast } = useToast();
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -45,21 +48,23 @@ export function MessageTemplateForm() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-        addMessageTemplate(values.name, values.channel, values.template);
+    startTransition(async () => {
+      const result = await addMessageTemplateAction(values);
+       if (result.success) {
         toast({
             title: "Template Added",
-            description: `The "${values.name}" template has been saved.`,
+            description: result.message,
         });
         form.reset();
         router.refresh();
-    } catch (error: any) {
+      } else {
          toast({
             title: "Error",
-            description: error.message || "Failed to add template.",
+            description: result.message,
             variant: "destructive"
         });
-    }
+      }
+    });
   }
 
   return (
@@ -116,7 +121,9 @@ export function MessageTemplateForm() {
             </FormItem>
             )}
         />
-        <Button type="submit" className="w-full">Add Template</Button>
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? 'Adding...' : 'Add Template'}
+        </Button>
       </form>
     </Form>
   );

@@ -1,4 +1,10 @@
 
+
+// This file is no longer used for data manipulation and can be considered deprecated.
+// All template management logic has been moved to server actions in 
+// src/app/admin/messages/actions.ts
+// and data fetching is done in src/lib/data/admin.ts
+
 import type { MessageTemplate } from "./types";
 
 // In a real application, this would be a database.

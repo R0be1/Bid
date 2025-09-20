@@ -26,10 +26,11 @@ import { format } from "date-fns";
 import { Trophy, Users, BarChart2, Megaphone, Send } from "lucide-react";
 import { AnnounceResultsForm } from "@/app/auctions/[id]/results/_components/announce-results-form";
 import { AnnouncementHistory } from "@/app/auctions/[id]/results/_components/announcement-history";
-import { getMessageTemplates } from "@/lib/messages";
+import { getMessageTemplatesForAdmin } from "@/lib/data/admin";
 import { getCommunicationsForAdmin } from "@/lib/data/admin";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { MessageTemplate } from "@prisma/client";
 
 export default function AuctionResultsPage() {
   const params = useParams();
@@ -42,7 +43,7 @@ export default function AuctionResultsPage() {
 
   const auctionEnded = item ? new Date() >= new Date(item.endDate) : false;
   const participantCount = new Set(bids.map(b => b.bidderName)).size;
-  const messageTemplates = useMemo(() => getMessageTemplates(), []);
+  const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>([]);
   const [announcements, setAnnouncements] = useState<CommunicationLog[]>([]);
 
   const [winnersPage, setWinnersPage] = useState(1);
@@ -51,14 +52,16 @@ export default function AuctionResultsPage() {
   useEffect(() => {
     setIsDataLoading(true);
     startLoading(async () => {
-      const [itemData, bidsData, commsData] = await Promise.all([
+      const [itemData, bidsData, commsData, templateData] = await Promise.all([
         getAuctionItemForListing(id),
         getAuctionBidsForResults(id),
-        getCommunicationsForAdmin(id)
+        getCommunicationsForAdmin(id),
+        getMessageTemplatesForAdmin()
       ]);
       setItem(itemData);
       setBids(bidsData);
       setAnnouncements(commsData);
+      setMessageTemplates(templateData);
       setIsDataLoading(false);
     });
   }, [id]);

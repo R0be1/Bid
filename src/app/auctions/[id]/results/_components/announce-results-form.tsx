@@ -3,7 +3,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import type { MessageTemplate, Bid, AuctionItem, CommunicationLog } from "@/lib/types";
+import type { Bid, AuctionItem, CommunicationLog } from "@/lib/types";
+import type { MessageTemplate } from "@prisma/client";
 import {
   Form,
   FormControl,
@@ -50,7 +51,7 @@ export function AnnounceResultsForm({ templates, bids, item, onAnnouncementSent 
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     const template = templates.find(t => t.id === values.templateId);
     if (!template) {
         toast({ title: "Error", description: "Selected template not found.", variant: "destructive" });
@@ -59,7 +60,7 @@ export function AnnounceResultsForm({ templates, bids, item, onAnnouncementSent 
     
     // In a real application, this would trigger a server action to send emails/SMS.
     // For now, we just log it.
-    const newLog = addCommunicationLog({
+    const newLog = await addCommunicationLog({
       auctionId: item.id,
       auctionName: item.name,
       templateName: template.name,

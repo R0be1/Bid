@@ -2,8 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-3.0.x"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -15,7 +14,6 @@ model User {
   id                String              @id @default(uuid())
   phone             String              @unique
   password          String
-  tempPassword      String?
   firstName         String
   lastName          String
   email             String              @unique
@@ -24,8 +22,7 @@ model User {
   createdAt         DateTime            @default(now())
   updatedAt         DateTime            @updatedAt
   bids              Bid[]
-  auctioneerProfile AuctioneerProfile?  @relation(fields: [auctioneerProfileId], references: [id])
-  auctioneerProfileId String?            @unique
+  auctioneerProfile AuctioneerProfile?
   paidParticipation Boolean             @default(false)
   paidDeposit       Boolean             @default(false)
   paymentMethod     PaymentMethod?
@@ -39,58 +36,84 @@ model Role {
 }
 
 model AuctioneerProfile {
-  id          String        @id @default(uuid())
-  companyName String
-  address     String
-  user        User?
-  auctionItems AuctionItem[]
-  tempPassword String?
+  id             String            @id @default(uuid())
+  userId         String            @unique
+  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName    String
+  address        String
+  tempPassword   String?
+  auctionItems   AuctionItem[]
+  messageTemplates MessageTemplate[]
+  communicationLogs CommunicationLog[]
 }
 
 model Category {
-  id          String        @id @default(uuid())
-  name        String        @unique
+  id           String        @id @default(uuid())
+  name         String        @unique
   auctionItems AuctionItem[]
 }
 
 model AuctionItem {
-  id                String          @id @default(uuid())
-  name              String
-  description       String
-  startingPrice     Float
-  startDate         DateTime
-  endDate           DateTime
-  type              AuctionItemType
-  minIncrement      Float?
-  maxAllowedValue   Float?
-  participationFee  Float?
-  securityDeposit   Float?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  category          Category        @relation(fields: [categoryId], references: [id])
-  categoryId        String
-  auctioneer        AuctioneerProfile @relation(fields: [auctioneerId], references: [id])
-  auctioneerId      String
-  images            Image[]
-  bids              Bid[]
+  id               String            @id @default(uuid())
+  name             String
+  description      String            @db.Text
+  startingPrice    Float
+  startDate        DateTime
+  endDate          DateTime
+  type             AuctionItemType
+  minIncrement     Float?
+  maxAllowedValue  Float?
+  participationFee Float?
+  securityDeposit  Float?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  categoryId       String
+  category         Category          @relation(fields: [categoryId], references: [id])
+  auctioneerId     String
+  auctioneer       AuctioneerProfile @relation(fields: [auctioneerId], references: [id])
+  bids             Bid[]
+  images           Image[]
 }
 
 model Image {
   id            String      @id @default(uuid())
   url           String
   hint          String?
-  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
   auctionItemId String
+  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
 }
 
 model Bid {
   id            String      @id @default(uuid())
   amount        Float
   createdAt     DateTime    @default(now())
-  bidder        User        @relation(fields: [bidderId], references: [id])
-  bidderId      String
-  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
   auctionItemId String
+  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
+  bidderId      String
+  bidder        User        @relation(fields: [bidderId], references: [id])
+}
+
+model CommunicationLog {
+  id String @id @default(uuid())
+  auctionId String
+  auctionName String
+  templateName String
+  channel CommunicationChannel
+  recipientsCount Int
+  sentAt DateTime @default(now())
+  auctioneerId String
+  auctioneer AuctioneerProfile @relation(fields: [auctioneerId], references: [id])
+}
+
+model MessageTemplate {
+  id String @id @default(uuid())
+  name String
+  channel CommunicationChannel
+  template String @db.Text
+  auctioneerId String
+  auctioneer AuctioneerProfile @relation(fields: [auctioneerId], references: [id])
+
+  @@unique([name, auctioneerId])
 }
 
 enum RoleName {
@@ -113,4 +136,9 @@ enum AuctionItemType {
 enum PaymentMethod {
   DIRECT
   RECEIPT
+}
+
+enum CommunicationChannel {
+  email
+  sms
 }

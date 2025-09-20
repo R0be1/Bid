@@ -25,10 +25,11 @@ import { format } from "date-fns";
 import { Trophy, Users, BarChart2, Megaphone, Send, Loader2 } from "lucide-react";
 import { AnnounceResultsForm } from "./_components/announce-results-form";
 import { AnnouncementHistory } from "./_components/announcement-history";
-import { getMessageTemplates } from "@/lib/messages";
+import { getMessageTemplatesForAdmin } from "@/lib/data/admin";
 import { getCommunications } from "@/lib/communications";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { MessageTemplate } from "@prisma/client";
 
 export default function AuctionResultsPage() {
   const params = useParams();
@@ -37,10 +38,10 @@ export default function AuctionResultsPage() {
   const [item, setItem] = useState<AuctionItem | null>(null);
   const [bids, setBids] = useState<Bid[]>([]);
   const [isLoading, startTransition] = useTransition();
+  const [messageTemplates, setMessageTemplates] = useState<MessageTemplate[]>([]);
 
   const auctionEnded = item ? new Date() >= new Date(item.endDate) : false;
   const participantCount = new Set(bids.map(b => b.bidderName)).size;
-  const messageTemplates = useMemo(() => getMessageTemplates(), []);
   const [announcements, setAnnouncements] = useState<CommunicationLog[]>([]);
 
   const [winnersPage, setWinnersPage] = useState(1);
@@ -48,12 +49,14 @@ export default function AuctionResultsPage() {
 
   useEffect(() => {
     startTransition(async () => {
-      const [itemData, bidsData] = await Promise.all([
+      const [itemData, bidsData, templateData] = await Promise.all([
         getAuctionItemForListing(id),
-        getAuctionBidsForResults(id)
+        getAuctionBidsForResults(id),
+        getMessageTemplatesForAdmin()
       ]);
       setItem(itemData);
       setBids(bidsData);
+      setMessageTemplates(templateData);
 
       // Load initial announcements for this auction (from mock)
       const allCommunications = getCommunications();
@@ -239,4 +242,3 @@ export default function AuctionResultsPage() {
     </div>
   );
 }
-

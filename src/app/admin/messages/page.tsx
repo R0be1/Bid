@@ -1,6 +1,6 @@
 
 
-import { getMessageTemplates } from "@/lib/messages";
+import { getMessageTemplatesForAdmin } from "@/lib/data/admin";
 import { MessageTemplateList } from "./_components/message-template-list";
 import { MessageTemplateForm } from "./_components/message-template-form";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -13,7 +13,9 @@ import {
 import { List } from "lucide-react";
 
 
-export default function MessagesPage() {
+export default async function MessagesPage() {
+  const templates = await getMessageTemplatesForAdmin();
+
   const availablePlaceholders = [
     { placeholder: "{itemName}", description: "The name of the auction item." },
     { placeholder: "{winnerName}", description: "The name of the winning bidder." },
@@ -73,7 +75,7 @@ export default function MessagesPage() {
                         <CardDescription>View, edit, or delete your saved templates.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <MessageTemplateList />
+                        <MessageTemplateList initialTemplates={templates} />
                     </CardContent>
                 </Card>
             </div>

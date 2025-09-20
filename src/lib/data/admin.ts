@@ -3,7 +3,7 @@
 
 import prisma from "@/lib/prisma";
 import { unstable_noStore as noStore } from "next/cache";
-import type { User, UserStatus } from "@prisma/client";
+import type { User, UserStatus, MessageTemplate } from "@prisma/client";
 import { getCurrentUser } from "../auth";
 import type { CommunicationLog } from "../types";
 
@@ -191,5 +191,37 @@ export async function getCommunicationsForAdmin(auctionId?: string): Promise<Com
     } catch (error) {
         console.error("Database Error:", error);
         throw new Error("Failed to fetch communication logs.");
+    }
+}
+
+
+export async function getMessageTemplatesForAdmin(): Promise<MessageTemplate[]> {
+    noStore();
+    const user = await getCurrentUser();
+    if (!user) {
+        throw new Error("User not authenticated");
+    }
+
+    const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
+        where: { userId: user.id }
+    });
+
+    if (!auctioneerProfile) {
+        return [];
+    }
+
+    try {
+        const templates = await prisma.messageTemplate.findMany({
+            where: {
+                auctioneerId: auctioneerProfile.id
+            },
+            orderBy: {
+                name: 'asc'
+            }
+        });
+        return templates;
+    } catch (error) {
+        console.error("Database error:", error);
+        throw new Error("Failed to fetch message templates.");
     }
 }
