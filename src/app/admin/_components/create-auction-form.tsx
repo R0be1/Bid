@@ -123,7 +123,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
           title: "Auction Item Created!",
           description: `"${values.name}" has been successfully created.`,
         });
-        form.reset();
+        router.push("/admin/manage-items");
         router.refresh();
       } else {
         toast({
@@ -503,7 +503,3 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
     </Card>
   );
 }
-
-    
-
-    

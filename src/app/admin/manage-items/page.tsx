@@ -1,28 +1,34 @@
 
-import { CreateAuctionForm } from "../_components/create-auction-form";
 import { ExistingItemsList } from "./_components/existing-items-list";
-import { getCategoriesForAdmin } from "@/lib/data/admin";
 import { getAuctionItemsForAdmin } from "@/lib/data/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/auth";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { PlusCircle } from "lucide-react";
 
 
 export default async function ManageItemsPage() {
   const user = await getCurrentUser();
   if (!user) redirect('/login');
 
-  const categories = await getCategoriesForAdmin();
   const auctioneerItems = await getAuctionItemsForAdmin(user.id);
 
   return (
     <div className="space-y-8 p-4 md:p-8">
-       <div>
-          <h1 className="text-3xl font-bold font-headline text-primary">Manage Auction Items</h1>
-          <p className="text-muted-foreground">Create and manage your auction items from here.</p>
+       <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold font-headline text-primary">Manage Auction Items</h1>
+            <p className="text-muted-foreground">Create and manage your auction items from here.</p>
+          </div>
+           <Button asChild>
+                <Link href="/admin/manage-items/new">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Create Auction Item
+                </Link>
+            </Button>
         </div>
-      
-      <CreateAuctionForm categories={categories} />
 
       <Card>
         <CardHeader>
