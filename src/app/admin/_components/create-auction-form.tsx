@@ -266,7 +266,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "PPP p")
                             ) : (
                               <span>Pick a date</span>
                             )}
@@ -282,6 +282,14 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                           disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
                           initialFocus
                         />
+                         <div className="p-3 border-t border-border">
+                            <input type="time" className="w-full" onChange={(e) => {
+                                const newDate = new Date(field.value);
+                                const [hours, minutes] = e.target.value.split(':');
+                                newDate.setHours(parseInt(hours), parseInt(minutes));
+                                field.onChange(newDate);
+                            }} />
+                        </div>
                       </PopoverContent>
                     </Popover>
                     <FormMessage />
@@ -305,7 +313,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                             )}
                           >
                             {field.value ? (
-                              format(field.value, "PPP")
+                              format(field.value, "PPP p")
                             ) : (
                               <span>Pick a date</span>
                             )}
@@ -321,6 +329,14 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                           disabled={(date) => date < new Date() || date < new Date("1900-01-01")}
                           initialFocus
                         />
+                        <div className="p-3 border-t border-border">
+                           <input type="time" className="w-full" onChange={(e) => {
+                                const newDate = new Date(field.value);
+                                const [hours, minutes] = e.target.value.split(':');
+                                newDate.setHours(parseInt(hours), parseInt(minutes));
+                                field.onChange(newDate);
+                            }} />
+                        </div>
                       </PopoverContent>
                     </Popover>
                     <FormMessage />
@@ -448,5 +464,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
     </Card>
   );
 }
+
+    
 
     
