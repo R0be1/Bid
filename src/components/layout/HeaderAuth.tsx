@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, LogOut, User as UserIcon } from "lucide-react";
+import { LayoutDashboard, LogOut, User as UserIcon, Gavel } from "lucide-react";
 import {
   getCurrentUserClient,
   type AuthenticatedUser,
@@ -23,9 +23,15 @@ export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const currentUser = await getCurrentUserClient();
-      setUser(currentUser);
-      setLoading(false);
+      try {
+        const currentUser = await getCurrentUserClient();
+        console.log("Current User:", currentUser); // Debug
+        setUser(currentUser);
+      } catch (err) {
+        console.error("Failed to fetch user", err);
+      } finally {
+        setLoading(false);
+      }
     };
     fetchUser();
   }, [pathname]);
@@ -66,6 +72,12 @@ export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
       return (
         <>
           <Link
+            href="/auction"
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Auction
+          </Link>
+          <Link
             href={dashboardUrl}
             className="text-muted-foreground hover:text-foreground"
           >
@@ -89,6 +101,12 @@ export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
 
     return (
       <div className="flex items-center space-x-2">
+        <Button variant="ghost" asChild>
+          <Link href="/auction">
+            <Gavel className="mr-2 h-4 w-4" />
+            Auction
+          </Link>
+        </Button>
         <Button variant="ghost" asChild>
           <Link href={dashboardUrl}>
             <LayoutDashboard className="mr-2 h-4 w-4" />
