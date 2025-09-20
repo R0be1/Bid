@@ -3,46 +3,78 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, LogOut } from "lucide-react";
+import { LayoutDashboard, LogOut, User as UserIcon } from "lucide-react";
 import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth-client";
 import { logout } from "@/app/actions";
-import { cn } from "@/lib/utils";
 import { Skeleton } from "../ui/skeleton";
 
-export function HeaderAuth() {
+interface HeaderAuthProps {
+  mobile?: boolean;
+}
+
+export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
-  const [isClient, setIsClient] = useState(false);
-  const pathname = usePathname();
-  
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
-    setIsClient(true);
+    // This effect runs only on the client
     setUser(getCurrentUserClient());
-  }, [pathname]);
+    setLoading(false);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
-    setUser(null);
-    window.location.href = '/login';
+    window.location.href = '/login'; // Force a full page reload to clear state
   };
-  
-  if (!isClient) {
+
+  if (loading) {
+    if (mobile) {
+      return (
+         <div className="grid gap-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+        </div>
+      )
+    }
     return (
-      <div className="flex items-center gap-2">
-          <Skeleton className="h-10 w-24" />
-          <Skeleton className="h-10 w-24" />
+      <div className="flex items-center space-x-2">
+        <Skeleton className="h-10 w-24" />
+        <Skeleton className="h-10 w-24" />
       </div>
     );
   }
 
   if (user) {
+    const dashboardUrl = user.role === 'admin' ? '/admin' : user.role === 'super-admin' ? '/super-admin' : '/dashboard';
+    
+    if (mobile) {
+        return (
+            <>
+                <Link href={dashboardUrl} className="text-muted-foreground hover:text-foreground">Dashboard</Link>
+                <Link href="/profile" className="text-muted-foreground hover:text-foreground">Profile</Link>
+                <div className="pt-6">
+                    <Button onClick={handleLogout} variant="outline" className="w-full">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Log out
+                    </Button>
+                </div>
+            </>
+        )
+    }
+
     return (
       <div className="flex items-center space-x-2">
         <Button variant="ghost" asChild>
-          <Link href={user.role === 'admin' ? '/admin' : user.role === 'super-admin' ? '/super-admin' : '/dashboard'}>
+          <Link href={dashboardUrl}>
             <LayoutDashboard className="mr-2 h-4 w-4" />
             Dashboard
+          </Link>
+        </Button>
+         <Button variant="ghost" asChild>
+          <Link href="/profile">
+            <UserIcon className="mr-2 h-4 w-4" />
+            Profile
           </Link>
         </Button>
         <Button variant="outline" onClick={handleLogout}>
@@ -51,6 +83,19 @@ export function HeaderAuth() {
         </Button>
       </div>
     );
+  }
+
+  if (mobile) {
+      return (
+         <div className="pt-6 grid gap-4">
+            <Button asChild className="w-full">
+                <Link href="/login">Log In</Link>
+            </Button>
+            <Button asChild variant="secondary" className="w-full">
+                <Link href="/register">Sign Up</Link>
+            </Button>
+         </div>
+      )
   }
 
   return (
@@ -62,100 +107,5 @@ export function HeaderAuth() {
         <Link href="/register">Sign up</Link>
       </Button>
     </div>
-  );
-}
-
-
-type NavItem = {
-    href: string;
-    label: string;
-}
-interface HeaderNavProps {
-    navItems: NavItem[];
-    className?: string;
-    mobile?: boolean;
-}
-
-export function HeaderNav({ navItems, className, mobile = false }: HeaderNavProps) {
-  const [user, setUser] = useState<AuthenticatedUser | null>(null);
-  const [isClient, setIsClient] = useState(false);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    setIsClient(true);
-    setUser(getCurrentUserClient());
-  }, [pathname]);
-
-  const handleLogout = async () => {
-    await logout();
-    setUser(null);
-    window.location.href = '/login';
-  };
-  
-  if (mobile) {
-      if (!isClient) return null;
-      return (
-          <nav className={className}>
-              {navItems.map((item) => {
-                 if (!user && (item.href === '/dashboard' || item.href === '/profile')) {
-                    return null;
-                 }
-                 return (
-                    <Link
-                      key={item.label}
-                      href={item.href}
-                      className="text-muted-foreground hover:text-foreground"
-                    >
-                      {item.label}
-                    </Link>
-                 )
-              })}
-                <div className="pt-6">
-                 {user ? (
-                   <div className="grid gap-4">
-                     <Button asChild className="w-full" variant="secondary">
-                          <Link href={user.role === 'admin' ? '/admin' : user.role === 'super-admin' ? '/super-admin' : '/dashboard'}>
-                            <LayoutDashboard className="mr-2 h-4 w-4" />
-                            Dashboard
-                          </Link>
-                      </Button>
-                      <Button className="w-full" variant="outline" onClick={handleLogout}>
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Log out
-                      </Button>
-                   </div>
-                  ) : (
-                    <div className="grid gap-4">
-                      <Button asChild className="w-full">
-                        <Link href="/login">Log In</Link>
-                      </Button>
-                      <Button asChild className="w-full" variant="secondary">
-                        <Link href="/register">Sign Up</Link>
-                      </Button>
-                    </div>
-                  )}
-                </div>
-          </nav>
-      )
-  }
-
-  return (
-    <nav className={cn(className, "flex items-center space-x-6 text-sm font-medium")}>
-      {isClient && navItems.map((item) => {
-        if (!user && (item.href === '/dashboard' || item.href === '/profile')) {
-            return null;
-        }
-        return (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="text-foreground/60 transition-colors hover:text-foreground/80"
-            >
-              {item.label}
-            </Link>
-        );
-       })}
-       {!isClient && <Skeleton className="h-4 w-[200px]" />}
-    </nav>
   );
 }

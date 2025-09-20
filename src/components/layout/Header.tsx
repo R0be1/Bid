@@ -7,20 +7,11 @@ import { Button } from "@/components/ui/button";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { HeaderAuth, HeaderNav } from "./HeaderAuth";
+import { HeaderAuth } from "./HeaderAuth";
 
 export function Header() {
-  const navItems = [
-    { href: "/", label: "Auctions" },
-    { href: "/dashboard", label: "Dashboard" },
-    { href: "/profile", label: "Profile" },
-  ];
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-card shadow-sm">
       <div className="container flex h-16 items-center px-4 sm:px-6 lg:px-8">
@@ -31,12 +22,8 @@ export function Header() {
           </span>
         </Link>
         
-        <div className="hidden md:flex items-center space-x-6 text-sm font-medium">
-            <HeaderNav navItems={navItems} />
-        </div>
-
-        <div className="flex flex-1 items-center justify-end space-x-4">
-          <div className="hidden md:flex items-center space-x-2">
+        <div className="flex flex-1 items-center justify-end">
+          <div className="hidden md:flex">
              <HeaderAuth />
           </div>
         </div>
@@ -50,13 +37,10 @@ export function Header() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right">
-              <SheetHeader>
-                  <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                  <SheetDescription className="sr-only">
-                    A list of links to navigate the site.
-                  </SheetDescription>
-              </SheetHeader>
-               <HeaderNav navItems={navItems} className="grid gap-6 text-lg font-medium mt-8" mobile={true}/>
+               <div className="grid gap-6 text-lg font-medium mt-8">
+                 <Link href="/" className="text-muted-foreground hover:text-foreground">Auctions</Link>
+                 <HeaderAuth mobile={true} />
+               </div>
             </SheetContent>
           </Sheet>
         </div>

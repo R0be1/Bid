@@ -55,7 +55,7 @@ export function LoginForm() {
               destination = "/admin";
               break;
             case "user":
-              destination = "/";
+              destination = "/dashboard"; // Default logged-in user to dashboard
               break;
             default:
               destination = "/";
