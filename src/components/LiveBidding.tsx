@@ -12,12 +12,12 @@ import { Info, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth-client";
+import prisma from "@/lib/prisma";
+import { revalidatePath } from "next/cache";
 
 interface LiveBiddingProps {
   item: AuctionItem;
 }
-
-const bidders = ["BidMaster123", "ArtLover88", "CollectorPro", "AuctionHunter"];
 
 export default function LiveBidding({ item }: LiveBiddingProps) {
   const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null | undefined>(undefined);
@@ -34,23 +34,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
   const requiresFees = (item.participationFee && item.participationFee > 0) || (item.securityDeposit && item.securityDeposit > 0);
   const hasPaid = (item.participationFee && item.participationFee > 0 ? currentUser?.paidParticipation : true) && (item.securityDeposit && item.securityDeposit > 0 ? currentUser?.paidDeposit : true);
 
-  useEffect(() => {
-    // In a real app with a real-time database like Firestore,
-    // you wouldn't need to simulate bids like this.
-    const simulateBids = setInterval(() => {
-      if (new Date() > new Date(item.endDate)) {
-        clearInterval(simulateBids);
-        return;
-      }
-      const bidIncrease = minIncrement + Math.floor(Math.random() * 10) * minIncrement;
-      setCurrentBid((prev) => prev + bidIncrease);
-      setHighBidder(bidders[Math.floor(Math.random() * bidders.length)]);
-    }, 5000 + Math.random() * 5000);
-
-    return () => clearInterval(simulateBids);
-  }, [minIncrement, item.endDate]);
-
-  const handleBidSubmit = (e: React.FormEvent) => {
+  const handleBidSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!currentUser) {
@@ -77,13 +61,16 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
       });
       return;
     }
+    
+    // In a real app, this would be a server action
     setCurrentBid(bidAmount);
     setHighBidder("You");
-    setNewBid("");
+
     toast({
       title: "Bid Placed!",
       description: `You are now the highest bidder with ${bidAmount.toLocaleString()} Birr.`,
     });
+    setNewBid("");
   };
   
   if (currentUser === undefined) {

@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import prisma from '@/lib/prisma';
@@ -94,7 +95,7 @@ export async function getAuctionItemForListing(id: string): Promise<AuctionItem 
       startingPrice: item.startingPrice,
       participationFee: item.participationFee ?? undefined,
       securityDeposit: item.securityDeposit ?? undefined,
-      currentBid: item.bids.length > 0 ? item.bids[0].amount : undefined,
+      currentBid: item.bids.length > 0 ? item.bids[0].amount : item.startingPrice,
       highBidder: item.bids.length > 0 ? 'A Bidder' : undefined,
       maxAllowedValue: item.maxAllowedValue ?? undefined,
       minIncrement: item.minIncrement ?? undefined,
