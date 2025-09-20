@@ -26,7 +26,7 @@ import { Trophy, Users, BarChart2, Megaphone, Send, Loader2 } from "lucide-react
 import { AnnounceResultsForm } from "./_components/announce-results-form";
 import { AnnouncementHistory } from "./_components/announcement-history";
 import { getMessageTemplatesForAdmin } from "@/lib/data/admin";
-import { getCommunications } from "@/lib/communications";
+import { getCommunicationsForAdmin } from "@/lib/data/admin";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { MessageTemplate } from "@prisma/client";
@@ -49,18 +49,16 @@ export default function AuctionResultsPage() {
 
   useEffect(() => {
     startTransition(async () => {
-      const [itemData, bidsData, templateData] = await Promise.all([
+      const [itemData, bidsData, templateData, commsData] = await Promise.all([
         getAuctionItemForListing(id),
         getAuctionBidsForResults(id),
-        getMessageTemplatesForAdmin()
+        getMessageTemplatesForAdmin(),
+        getCommunicationsForAdmin(id)
       ]);
       setItem(itemData);
       setBids(bidsData);
       setMessageTemplates(templateData);
-
-      // Load initial announcements for this auction (from mock)
-      const allCommunications = getCommunications();
-      setAnnouncements(allCommunications.filter(log => log.auctionId === id));
+      setAnnouncements(commsData);
     });
   }, [id]);
 

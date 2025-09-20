@@ -163,8 +163,8 @@ export async function getCommunicationsForAdmin(auctionId?: string): Promise<Com
     const user = await getCurrentUser();
     if (!user) throw new Error("Unauthorized");
 
-    const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
-        where: { user: { id: user.id } },
+    const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
+        where: { userId: user.id },
         select: { id: true }
     });
 

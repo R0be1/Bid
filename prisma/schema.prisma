@@ -18,15 +18,15 @@ model User {
   lastName          String
   email             String              @unique
   status            UserStatus          @default(PENDING)
-  roles             Role[]              @relation("UserRoles")
-  createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @updatedAt
-  bids              Bid[]
-  auctioneerProfile AuctioneerProfile?
   paidParticipation Boolean             @default(false)
   paidDeposit       Boolean             @default(false)
   paymentMethod     PaymentMethod?
   receiptUrl        String?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  roles             Role[]              @relation("UserRoles")
+  bids              Bid[]
+  auctioneerProfile AuctioneerProfile?
 }
 
 model Role {
@@ -36,14 +36,14 @@ model Role {
 }
 
 model AuctioneerProfile {
-  id             String            @id @default(uuid())
-  userId         String            @unique
-  user           User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  companyName    String
-  address        String
-  tempPassword   String?
-  auctionItems   AuctionItem[]
-  messageTemplates MessageTemplate[]
+  id                String              @id @default(uuid())
+  companyName       String
+  address           String
+  tempPassword      String?
+  user              User                @relation(fields: [userId], references: [id])
+  userId            String              @unique
+  auctionItems      AuctionItem[]
+  messageTemplates  MessageTemplate[]
   communicationLogs CommunicationLog[]
 }
 
@@ -54,66 +54,64 @@ model Category {
 }
 
 model AuctionItem {
-  id               String            @id @default(uuid())
-  name             String
-  description      String            @db.Text
-  startingPrice    Float
-  startDate        DateTime
-  endDate          DateTime
-  type             AuctionItemType
-  minIncrement     Float?
-  maxAllowedValue  Float?
-  participationFee Float?
-  securityDeposit  Float?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
-  categoryId       String
-  category         Category          @relation(fields: [categoryId], references: [id])
-  auctioneerId     String
-  auctioneer       AuctioneerProfile @relation(fields: [auctioneerId], references: [id])
-  bids             Bid[]
-  images           Image[]
+  id                String          @id @default(uuid())
+  name              String
+  description       String          @db.Text
+  startingPrice     Float
+  startDate         DateTime
+  endDate           DateTime
+  type              AuctionItemType
+  minIncrement      Float?
+  maxAllowedValue   Float?
+  participationFee  Float?
+  securityDeposit   Float?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  category          Category        @relation(fields: [categoryId], references: [id])
+  categoryId        String
+  auctioneer        AuctioneerProfile @relation(fields: [auctioneerId], references: [id], onDelete: Cascade)
+  auctioneerId      String
+  bids              Bid[]
+  images            Image[]
 }
 
 model Image {
   id            String      @id @default(uuid())
   url           String
-  hint          String?
-  auctionItemId String
+  hint          String
   auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
+  auctionItemId String
 }
 
 model Bid {
   id            String      @id @default(uuid())
   amount        Float
   createdAt     DateTime    @default(now())
-  auctionItemId String
-  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
+  bidder        User        @relation(fields: [bidderId], references: [id], onDelete: Cascade)
   bidderId      String
-  bidder        User        @relation(fields: [bidderId], references: [id])
-}
-
-model CommunicationLog {
-  id String @id @default(uuid())
-  auctionId String
-  auctionName String
-  templateName String
-  channel CommunicationChannel
-  recipientsCount Int
-  sentAt DateTime @default(now())
-  auctioneerId String
-  auctioneer AuctioneerProfile @relation(fields: [auctioneerId], references: [id])
+  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
+  auctionItemId String
 }
 
 model MessageTemplate {
-  id String @id @default(uuid())
-  name String
-  channel CommunicationChannel
-  template String @db.Text
+  id           String               @id @default(uuid())
+  name         String
+  channel      CommunicationChannel
+  template     String               @db.Text
+  auctioneer   AuctioneerProfile    @relation(fields: [auctioneerId], references: [id], onDelete: Cascade)
   auctioneerId String
-  auctioneer AuctioneerProfile @relation(fields: [auctioneerId], references: [id])
+}
 
-  @@unique([name, auctioneerId])
+model CommunicationLog {
+  id              String               @id @default(uuid())
+  auctionId       String
+  auctionName     String
+  templateName    String
+  channel         CommunicationChannel
+  recipientsCount Int
+  sentAt          DateTime             @default(now())
+  auctioneer      AuctioneerProfile    @relation(fields: [auctioneerId], references: [id], onDelete: Cascade)
+  auctioneerId    String
 }
 
 enum RoleName {
@@ -128,14 +126,14 @@ enum UserStatus {
   BLOCKED
 }
 
-enum AuctionItemType {
-  LIVE
-  SEALED
-}
-
 enum PaymentMethod {
   DIRECT
   RECEIPT
+}
+
+enum AuctionItemType {
+  LIVE
+  SEALED
 }
 
 enum CommunicationChannel {

@@ -25,7 +25,7 @@ export async function addCommunicationLog(log: Omit<CommunicationLog, 'id' | 'au
     const user = await getCurrentUser();
     if (!user) throw new Error("Unauthorized");
 
-    const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
+    const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
         where: { userId: user.id }
     });
     if (!auctioneerProfile) throw new Error("Auctioneer profile not found");
