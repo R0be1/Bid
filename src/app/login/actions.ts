@@ -72,7 +72,7 @@ export async function login(
       role: role,
     };
 
-    cookies().set(SESSION_KEY, JSON.stringify(authenticatedUser), {
+    (await cookies()).set(SESSION_KEY, JSON.stringify(authenticatedUser), {
       maxAge: 30 * 24 * 60 * 60, // 30 days
       path: "/",
       httpOnly: true,

@@ -1,18 +1,11 @@
-import { parseCookies } from "nookies";
 import type { AuthenticatedUser } from "./auth";
 
-const SESSION_KEY = "user_session";
-
-export function getCurrentUserClient(): AuthenticatedUser | null {
-  const clientCookies = parseCookies();
-  const session = clientCookies[SESSION_KEY];
-
-  if (!session) return null;
-
+export async function getCurrentUserClient(): Promise<AuthenticatedUser | null> {
   try {
-    const user: AuthenticatedUser = JSON.parse(session);
-    return user;
-  } catch (e) {
+    const res = await fetch("/api/auth/me", { cache: "no-store" });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
     return null;
   }
 }
