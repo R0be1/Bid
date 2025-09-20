@@ -8,9 +8,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { User, Banknote, Info } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth-client";
 
 interface LiveBiddingProps {
   item: AuctionItem;
@@ -18,20 +19,20 @@ interface LiveBiddingProps {
 
 const bidders = ["BidMaster123", "ArtLover88", "CollectorPro", "AuctionHunter"];
 
-// This is a mock value. In a real app, this would come from an authentication context.
-const MOCK_IS_LOGGED_IN = false;
-const MOCK_USER_STATUS = 'pending'; // or 'approved' or 'blocked'
-const MOCK_USER_HAS_PAID = false;
-
-
 export default function LiveBidding({ item }: LiveBiddingProps) {
+  const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null | undefined>(undefined);
   const [currentBid, setCurrentBid] = useState(item.currentBid ?? item.startingPrice);
   const [highBidder, setHighBidder] = useState(item.highBidder ?? "None");
   const [newBid, setNewBid] = useState("");
   const { toast } = useToast();
   const minIncrement = item.minIncrement ?? 1;
+
+  useEffect(() => {
+    getCurrentUserClient().then(setCurrentUser);
+  }, []);
   
   const requiresFees = (item.participationFee && item.participationFee > 0) || (item.securityDeposit && item.securityDeposit > 0);
+  const hasPaid = (item.participationFee && item.participationFee > 0 ? currentUser?.paidParticipation : true) && (item.securityDeposit && item.securityDeposit > 0 ? currentUser?.paidDeposit : true);
 
   useEffect(() => {
     // In a real app with a real-time database like Firestore,
@@ -52,16 +53,16 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
   const handleBidSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!MOCK_IS_LOGGED_IN) {
+    if (!currentUser) {
         toast({ title: "Login Required", description: "You must be logged in to place a bid.", variant: "destructive"});
         return;
     }
-    if (requiresFees && !MOCK_USER_HAS_PAID) {
+    if (requiresFees && !hasPaid) {
       toast({ title: "Payment Required", description: "Please complete the required payments from your dashboard to participate.", variant: "destructive"});
       return;
     }
-    if (MOCK_USER_STATUS !== 'approved') {
-        toast({ title: "Account Not Approved", description: `Your account status is "${MOCK_USER_STATUS}". Admin approval is required to bid.`, variant: "destructive"});
+    if (currentUser.status !== 'APPROVED') {
+        toast({ title: "Account Not Approved", description: `Your account status is "${currentUser.status}". Admin approval is required to bid.`, variant: "destructive"});
         return;
     }
 
@@ -84,8 +85,21 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
       description: `You are now the highest bidder with ${bidAmount.toLocaleString()} Birr.`,
     });
   };
+  
+  if (currentUser === undefined) {
+    return (
+        <Card className="shadow-lg">
+            <CardHeader>
+                <CardTitle>Live Bidding</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center py-10">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </CardContent>
+        </Card>
+    );
+  }
 
-  if (!MOCK_IS_LOGGED_IN) {
+  if (!currentUser) {
      return (
       <Card className="shadow-lg">
         <CardHeader>
@@ -107,7 +121,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
     );
   }
   
-  if (requiresFees && !MOCK_USER_HAS_PAID) {
+  if (requiresFees && !hasPaid) {
     return (
       <Card className="shadow-lg">
         <CardHeader>
@@ -163,15 +177,15 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
                   className="pl-10"
                   required
                   step={minIncrement}
-                  disabled={MOCK_USER_STATUS !== 'approved'}
+                  disabled={currentUser.status !== 'APPROVED'}
                 />
               </div>
             </div>
-            <Button type="submit" className="w-full font-bold" disabled={MOCK_USER_STATUS !== 'approved'}>
+            <Button type="submit" className="w-full font-bold" disabled={currentUser.status !== 'APPROVED'}>
               Place Bid
             </Button>
           </form>
-           {MOCK_USER_STATUS !== 'approved' ? (
+           {currentUser.status !== 'APPROVED' ? (
              <p className="text-xs text-center text-red-600">
                 Your account is not approved to bid. Please contact an administrator.
             </p>

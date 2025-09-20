@@ -1,19 +1,21 @@
+
 "use client";
 
 import type { AuctionItem } from "@/lib/types";
 import { useFormState, useFormStatus } from "react-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { handleSealedBid, type FormState } from "@/app/actions";
 import { useToast } from "@/hooks/use-toast";
+import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth-client";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Banknote, Info } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import Link from "next/link";
 
@@ -25,15 +27,10 @@ const formSchema = z.object({
   bidAmount: z.coerce.number().min(0.01, "Bid must be greater than zero."),
 });
 
-// This is a mock value. In a real app, this would come from an authentication context.
-const MOCK_IS_LOGGED_IN = false;
-const MOCK_USER_STATUS = 'pending'; // or 'approved' or 'blocked'
-const MOCK_USER_HAS_PAID = false;
-
-function SubmitButton() {
+function SubmitButton({ currentUser }: { currentUser: AuthenticatedUser | null }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="w-full font-bold" disabled={pending || MOCK_USER_STATUS !== 'approved'}>
+    <Button type="submit" className="w-full font-bold" disabled={pending || currentUser?.status !== 'APPROVED'}>
       {pending ? "Submitting..." : "Submit Sealed Bid"}
     </Button>
   );
@@ -41,11 +38,17 @@ function SubmitButton() {
 
 export default function SealedBidForm({ item }: SealedBidFormProps) {
   const { toast } = useToast();
+  const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null | undefined>(undefined);
   
+  useEffect(() => {
+    getCurrentUserClient().then(setCurrentUser);
+  }, []);
+
   const initialState: FormState = { success: false, message: "" };
   const [state, formAction] = useFormState(handleSealedBid, initialState);
 
   const requiresFees = (item.participationFee && item.participationFee > 0) || (item.securityDeposit && item.securityDeposit > 0);
+  const hasPaid = (item.participationFee && item.participationFee > 0 ? currentUser?.paidParticipation : true) && (item.securityDeposit && item.securityDeposit > 0 ? currentUser?.paidDeposit : true);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -68,22 +71,35 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
   }, [state, toast, form]);
 
   const handleFormAction = (formData: FormData) => {
-    if (!MOCK_IS_LOGGED_IN) {
+    if (!currentUser) {
         toast({ title: "Login Required", description: "You must be logged in to place a bid.", variant: "destructive"});
         return;
     }
-    if (requiresFees && !MOCK_USER_HAS_PAID) {
+    if (requiresFees && !hasPaid) {
       toast({ title: "Payment Required", description: "Please complete the required payments from your dashboard to participate.", variant: "destructive"});
       return;
     }
-    if (MOCK_USER_STATUS !== 'approved') {
-        toast({ title: "Account Not Approved", description: `Your account status is "${MOCK_USER_STATUS}". Admin approval is required to bid.`, variant: "destructive"});
+    if (currentUser.status !== 'APPROVED') {
+        toast({ title: "Account Not Approved", description: `Your account status is "${currentUser.status}". Admin approval is required to bid.`, variant: "destructive"});
         return;
     }
     formAction(formData);
   }
+  
+  if (currentUser === undefined) {
+    return (
+        <Card className="shadow-lg">
+            <CardHeader>
+                <CardTitle>Submit a Sealed Bid</CardTitle>
+            </CardHeader>
+            <CardContent className="flex items-center justify-center py-10">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </CardContent>
+        </Card>
+    );
+  }
 
-  if (!MOCK_IS_LOGGED_IN) {
+  if (!currentUser) {
      return (
       <Card className="shadow-lg">
         <CardHeader>
@@ -105,7 +121,7 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
     );
   }
 
-  if (requiresFees && !MOCK_USER_HAS_PAID) {
+  if (requiresFees && !hasPaid) {
     return (
       <Card className="shadow-lg">
         <CardHeader>
@@ -157,7 +173,7 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
                         step="0.01"
                         {...field}
                         className="pl-10"
-                        disabled={MOCK_USER_STATUS !== 'approved'}
+                        disabled={currentUser.status !== 'APPROVED'}
                       />
                     </div>
                   </FormControl>
@@ -165,8 +181,8 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
                 </FormItem>
               )}
             />
-            <SubmitButton />
-             {MOCK_USER_STATUS !== 'approved' && <p className="text-xs text-center text-red-600">Your account is not approved to submit a bid. Please contact an administrator.</p>}
+            <SubmitButton currentUser={currentUser} />
+             {currentUser.status !== 'APPROVED' && <p className="text-xs text-center text-red-600">Your account is not approved to submit a bid. Please contact an administrator.</p>}
           </form>
         </Form>
       </CardContent>

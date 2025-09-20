@@ -70,6 +70,10 @@ export async function login(
       id: user.id,
       name: userName,
       role: role,
+      status: user.status,
+      paidParticipation: user.paidParticipation,
+      paidDeposit: user.paidDeposit,
+      paymentMethod: user.paymentMethod,
     };
 
     (await cookies()).set(SESSION_KEY, JSON.stringify(authenticatedUser), {
