@@ -82,9 +82,13 @@ export default async function AuctionDetailPage({ params }: { params: { id: stri
                   <CardHeader>
                       <CardTitle>Auction starts soon</CardTitle>
                       <CardDescription>
-                          This auction has not started yet. Bidding will open on {format(new Date(item.startDate), "PPP p")}.
+                          Bidding will open on {format(new Date(item.startDate), "PPP p")}.
                       </CardDescription>
                   </CardHeader>
+                   <CardContent className="flex items-center justify-center space-x-2 text-lg">
+                        <Clock className="h-5 w-5 text-accent" />
+                        <CountdownTimer date={item.startDate} prefix="Starts In:" endedText="Auction Started" />
+                    </CardContent>
               </Card>
           )}
           
@@ -119,8 +123,7 @@ export default async function AuctionDetailPage({ params }: { params: { id: stri
               </div>
               <div className="flex items-center space-x-3">
                 <Clock className="h-5 w-5 text-accent" />
-                <span className="font-medium">Ends In:</span>
-                <CountdownTimer endDate={item.endDate} />
+                <CountdownTimer date={item.endDate} />
               </div>
               <div className="flex items-center space-x-3">
                  <Hammer className="h-5 w-5 text-accent" />

@@ -14,6 +14,7 @@ interface AuctionItemCardProps {
 
 export default function AuctionItemCard({ item }: AuctionItemCardProps) {
   const currentPrice = item.currentBid ?? item.startingPrice;
+  const isUpcoming = new Date(item.startDate) > new Date();
 
   return (
     <Card className="group relative flex flex-col overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
@@ -47,7 +48,11 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
           </div>
           <div className="mt-2 flex items-center text-sm text-foreground/80">
             <Clock className="mr-2 h-4 w-4" />
-            <CountdownTimer endDate={item.endDate} />
+            {isUpcoming ? (
+              <CountdownTimer date={item.startDate} prefix="Starts In:" endedText="Started" />
+            ) : (
+              <CountdownTimer date={item.endDate} />
+            )}
           </div>
         </CardContent>
       </Link>
@@ -61,5 +66,3 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
     </Card>
   );
 }
-
-    

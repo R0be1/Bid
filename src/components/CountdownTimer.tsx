@@ -1,22 +1,25 @@
+
 "use client";
 
 import { useState, useEffect } from "react";
 import { intervalToDuration, isPast } from "date-fns";
 
 interface CountdownTimerProps {
-  endDate: string;
+  date: string;
+  prefix?: string;
+  endedText?: string;
 }
 
-export default function CountdownTimer({ endDate }: CountdownTimerProps) {
+export default function CountdownTimer({ date, prefix = "Ends In:", endedText = "Auction Ended" }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState("");
   const [hasEnded, setHasEnded] = useState(false);
 
   useEffect(() => {
-    const targetDate = new Date(endDate);
+    const targetDate = new Date(date);
 
     if (isPast(targetDate)) {
       setHasEnded(true);
-      setTimeLeft("Auction Ended");
+      setTimeLeft(endedText);
       return;
     }
 
@@ -25,7 +28,7 @@ export default function CountdownTimer({ endDate }: CountdownTimerProps) {
       if (now > targetDate) {
         clearInterval(timer);
         setHasEnded(true);
-        setTimeLeft("Auction Ended");
+        setTimeLeft(endedText);
         return;
       }
 
@@ -43,11 +46,22 @@ export default function CountdownTimer({ endDate }: CountdownTimerProps) {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [endDate]);
+  }, [date, endedText]);
+  
+  if (hasEnded) {
+      return (
+        <span className="text-destructive font-medium">
+          {timeLeft}
+        </span>
+      );
+  }
 
   return (
-    <span className={hasEnded ? "text-destructive font-medium" : "text-foreground/90 font-medium"}>
-      {timeLeft}
-    </span>
+    <>
+      {prefix && <span className="font-medium">{prefix}</span>}
+      <span className="text-foreground/90 font-medium ml-1">
+        {timeLeft}
+      </span>
+    </>
   );
 }
