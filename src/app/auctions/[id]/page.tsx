@@ -11,6 +11,7 @@ import { Clock, Hammer, Tag, Banknote, ShieldCheck, Calendar, Trophy, Gavel } fr
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
+import { DescriptionWithReadMore } from "@/components/DescriptionWithReadMore";
 
 export default async function AuctionDetailPage({ params }: { params: { id: string } }) {
   const item = await getAuctionItemForListing(params.id);
@@ -62,7 +63,7 @@ export default async function AuctionDetailPage({ params }: { params: { id: stri
                 ))}
             </div>
             )}
-             <p className="text-lg text-muted-foreground mt-4 pt-4 border-t">{item.description}</p>
+            <DescriptionWithReadMore text={item.description} />
         </div>
         <div className="flex flex-col space-y-6">
           
@@ -152,5 +153,3 @@ export default async function AuctionDetailPage({ params }: { params: { id: stri
     </div>
   );
 }
-
-    
