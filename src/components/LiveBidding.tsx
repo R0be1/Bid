@@ -12,8 +12,6 @@ import { Info, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth-client";
-import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
 
 interface LiveBiddingProps {
   item: AuctionItem;
@@ -63,6 +61,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
     }
     
     // In a real app, this would be a server action
+    // For now, this just updates the client state.
     setCurrentBid(bidAmount);
     setHighBidder("You");
 
