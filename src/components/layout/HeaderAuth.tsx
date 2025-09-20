@@ -8,6 +8,7 @@ import { LayoutDashboard, LogOut, User as UserIcon } from "lucide-react";
 import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth-client";
 import { logout } from "@/app/actions";
 import { Skeleton } from "../ui/skeleton";
+import { usePathname } from "next/navigation";
 
 interface HeaderAuthProps {
   mobile?: boolean;
@@ -16,12 +17,13 @@ interface HeaderAuthProps {
 export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const pathname = usePathname();
 
   useEffect(() => {
     // This effect runs only on the client
     setUser(getCurrentUserClient());
     setLoading(false);
-  }, []);
+  }, [pathname]); // Re-check user on every navigation change
 
   const handleLogout = async () => {
     await logout();
@@ -109,3 +111,4 @@ export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
     </div>
   );
 }
+
