@@ -41,7 +41,6 @@ export async function getAuctionItemsForListing(): Promise<AuctionItem[]> {
       name: item.name,
       description: item.description,
       imageUrls: item.images.map(img => img.url),
-      imageHints: item.images.map(img => img.hint ?? ''),
       categoryName: item.category.name,
       auctioneerName: item.auctioneer.companyName,
       type: item.type,
@@ -87,7 +86,6 @@ export async function getAuctionItemForListing(id: string): Promise<AuctionItem 
       name: item.name,
       description: item.description,
       imageUrls: item.images.map(img => img.url),
-      imageHints: item.images.map(img => img.hint ?? ''),
       categoryName: item.category.name,
       auctioneerName: item.auctioneer.companyName,
       type: item.type,
@@ -172,3 +170,5 @@ export async function getAuctioneersForListing() {
         throw new Error('Failed to fetch auctioneers.');
     }
 }
+
+    

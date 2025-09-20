@@ -1,3 +1,4 @@
+
 "use server";
 
 import { z } from "zod";
@@ -7,7 +8,6 @@ import { revalidatePath } from "next/cache";
 
 const imageSchema = z.object({
   url: z.string().url(),
-  hint: z.string().optional(),
 });
 
 const formSchema = z.object({
@@ -64,7 +64,7 @@ export async function createAuctionItem(values: unknown) {
         images: {
           create: data.images.map((img) => ({
             url: img.url,
-            hint: img.hint || "",
+            hint: "",
           })),
         },
       },
@@ -136,7 +136,7 @@ export async function updateAuctionItem(itemId: string, values: unknown) {
           deleteMany: {}, // Delete old images
           create: data.images.map((img) => ({
             url: img.url,
-            hint: img.hint || "",
+            hint: "",
           })),
         },
       },
@@ -198,3 +198,5 @@ export async function deleteAuctionItem(itemId: string) {
     };
   }
 }
+
+    

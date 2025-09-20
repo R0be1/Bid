@@ -38,7 +38,6 @@ import { useRouter } from "next/navigation";
 
 const imageSchema = z.object({
   url: z.string().url("Invalid URL").min(1, "URL is required."),
-  hint: z.string().max(20, "Hint is too long").optional(),
 });
 
 const formSchema = z.object({
@@ -99,7 +98,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
       securityDeposit: item.securityDeposit || 0,
       minIncrement: item.minIncrement || 1,
       maxAllowedValue: item.maxAllowedValue || 0,
-      images: item.images.map(i => ({ url: i.url, hint: i.hint || '' })),
+      images: item.images.map(i => ({ url: i.url })),
     },
   });
   
@@ -404,7 +403,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
 
             <div>
               <FormLabel>Item Images <span className="text-destructive">*</span></FormLabel>
-              <FormDescription className="text-xs">Provide public image URLs and an optional AI hint.</FormDescription>
+              <FormDescription className="text-xs">Provide public image URLs.</FormDescription>
               <div className="space-y-4 mt-2">
                 {fields.map((field, index) => (
                   <div key={field.id} className="flex items-start gap-2 p-2 border rounded-md">
@@ -416,18 +415,6 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                             <FormItem>
                                 <FormControl>
                                     <Input placeholder="https://example.com/image.png" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                         <FormField
-                            control={form.control}
-                            name={`images.${index}.hint`}
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input placeholder="AI Hint (e.g. 'pocket watch')" {...field} />
                                 </FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -446,7 +433,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => append({url: '', hint: ''})}
+                    onClick={() => append({url: ''})}
                     className="mt-2"
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
@@ -467,7 +454,5 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
     </Card>
   );
 }
-
-    
 
     

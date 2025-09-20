@@ -20,14 +20,9 @@ const items: AuctionItem[] = [
         "https://picsum.photos/seed/1a/200/200",
         "https://picsum.photos/seed/1b/200/200"
     ],
-    imageHints: [
-        PlaceHolderImages.find(p => p.id === '1')?.imageHint || '',
-        'watch detail',
-        'watch mechanism'
-    ],
-    category: categories[0]?.name || "Antiques",
+    categoryName: categories[0]?.name || "Antiques",
     auctioneerName: auctioneers[0]?.name || "Vintage Treasures LLC",
-    type: "live",
+    type: "LIVE",
     startDate: now.toISOString(),
     endDate: addDays(now, 2).toISOString(),
     startingPrice: 500,
@@ -42,10 +37,9 @@ const items: AuctionItem[] = [
     name: "Abstract Oil Painting",
     description: "A vibrant, large-scale abstract painting by a renowned contemporary artist. A statement piece for any modern home or office.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '2')?.imageUrl || ''],
-    imageHints: [PlaceHolderImages.find(p => p.id === '2')?.imageHint || ''],
-    category: categories[1]?.name || "Art",
+    categoryName: categories[1]?.name || "Art",
     auctioneerName: auctioneers[1]?.name || "Modern Art Auctions",
-    type: "live",
+    type: "LIVE",
     startDate: now.toISOString(),
     endDate: addDays(now, 1).toISOString(),
     startingPrice: 1200,
@@ -58,10 +52,9 @@ const items: AuctionItem[] = [
     name: "Antique Wooden Chair",
     description: "A hand-carved mahogany chair with original upholstery. Dates back to the Victorian era. Perfect as a decorative accent.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '3')?.imageUrl || ''],
-    imageHints: [PlaceHolderImages.find(p => p.id === '3')?.imageHint || ''],
-    category: categories[2]?.name || "Furniture",
+    categoryName: categories[2]?.name || "Furniture",
     auctioneerName: auctioneers[0]?.name || "Vintage Treasures LLC",
-    type: "live",
+    type: "LIVE",
     startDate: subDays(now, 4).toISOString(),
     endDate: subDays(now, 1).toISOString(),
     startingPrice: 250,
@@ -74,10 +67,9 @@ const items: AuctionItem[] = [
     name: "Rare Stamp Collection",
     description: "A curated collection of rare stamps from around the world, including several sought-after misprints. Housed in a professional album.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '4')?.imageUrl || ''],
-    imageHints: [PlaceHolderImages.find(p => p.id === '4')?.imageHint || ''],
-    category: categories[3]?.name || "Collectibles",
+    categoryName: categories[3]?.name || "Collectibles",
     auctioneerName: auctioneers[0]?.name || "Vintage Treasures LLC",
-    type: "sealed",
+    type: "SEALED",
     startDate: now.toISOString(),
     endDate: addDays(now, 7).toISOString(),
     startingPrice: 2000,
@@ -90,10 +82,9 @@ const items: AuctionItem[] = [
     name: "Signed Baseball",
     description: "A baseball autographed by a legendary Hall of Fame player. Comes with a certificate of authenticity. A must-have for any sports memorabilia collector.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '5')?.imageUrl || ''],
-    imageHints: [PlaceHolderImages.find(p => p.id === '5')?.imageHint || ''],
-    category: categories[4]?.name || "Sports Memorabilia",
+    categoryName: categories[4]?.name || "Sports Memorabilia",
     auctioneerName: auctioneers[2]?.name || "Sports Memorabilia Kings",
-    type: "sealed",
+    type: "SEALED",
     startDate: subDays(now, 10).toISOString(),
     endDate: subDays(now, 2).toISOString(),
     startingPrice: 300,
@@ -104,10 +95,9 @@ const items: AuctionItem[] = [
     name: "First Edition Novel",
     description: "A rare, first edition printing of a classic 20th-century novel. In excellent condition with original dust jacket.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '6')?.imageUrl || ''],
-    imageHints: [PlaceHolderImages.find(p => p.id === '6')?.imageHint || ''],
-    category: categories[5]?.name || "Books",
+    categoryName: categories[5]?.name || "Books",
     auctioneerName: auctioneers[0]?.name || "Vintage Treasures LLC",
-    type: "live",
+    type: "LIVE",
     startDate: now.toISOString(),
     endDate: addDays(now, 4).toISOString(),
     startingPrice: 800,
@@ -120,10 +110,9 @@ const items: AuctionItem[] = [
     name: "Designer Handbag",
     description: "An iconic, limited-edition leather handbag from a world-famous luxury brand. Barely used and in pristine condition.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '7')?.imageUrl || ''],
-    imageHints: [PlaceHolderImages.find(p => p.id === '7')?.imageHint || ''],
-    category: categories[6]?.name || "Fashion",
+    categoryName: categories[6]?.name || "Fashion",
     auctioneerName: auctioneers[1]?.name || "Modern Art Auctions",
-    type: "sealed",
+    type: "SEALED",
     startDate: now.toISOString(),
     endDate: addDays(now, 6).toISOString(),
     startingPrice: 1500,
@@ -136,10 +125,9 @@ const items: AuctionItem[] = [
     name: "Classic Electric Guitar",
     description: "A vintage model electric guitar known for its legendary tone. All original parts, with a beautifully aged sunburst finish.",
     imageUrls: [PlaceHolderImages.find(p => p.id === '8')?.imageUrl || ''],
-    imageHints: [PlaceHolderImages.find(p => p.id === '8')?.imageHint || ''],
-    category: categories[7]?.name || "Musical Instruments",
+    categoryName: categories[7]?.name || "Musical Instruments",
     auctioneerName: auctioneers[2]?.name || "Sports Memorabilia Kings",
-    type: "live",
+    type: "LIVE",
     startDate: now.toISOString(),
     endDate: addDays(now, 10).toISOString(),
     startingPrice: 2500,
@@ -178,13 +166,17 @@ const mockBids: { [itemId: string]: Bid[] } = {
 };
 
 export function getAuctionItems(): AuctionItem[] {
+  // @ts-ignore
   return items;
 }
 
 export function getAuctionItem(id: string): AuctionItem | undefined {
+  // @ts-ignore
   return items.find((item) => item.id === id);
 }
 
 export function getAuctionBids(id: string): Bid[] {
     return mockBids[id]?.sort((a, b) => b.amount - a.amount) || [];
 }
+
+    

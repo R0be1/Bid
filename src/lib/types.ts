@@ -7,7 +7,6 @@ export type AuctionItem = {
   name: string;
   description: string;
   imageUrls: string[];
-  imageHints: string[];
   categoryName: string;
   auctioneerName: string;
   type: AuctionItemType;
@@ -85,3 +84,5 @@ export type SuperAdmin = {
   phone: string;
   tempPassword?: string;
 };
+
+    

@@ -44,7 +44,6 @@ export default async function AuctionDetailPage({ params }: { params: { id: stri
                 alt={item.name}
                 width={600}
                 height={400}
-                data-ai-hint={item.imageHints[0]}
                 className="rounded-lg object-cover w-full h-full shadow-lg"
             />
             </div>
@@ -57,7 +56,6 @@ export default async function AuctionDetailPage({ params }: { params: { id: stri
                     alt={`${item.name} image ${index + 2}`}
                     width={200}
                     height={200}
-                    data-ai-hint={item.imageHints[index+1]}
                     className="rounded-md object-cover w-full h-full shadow-md"
                     />
                 </div>
@@ -154,3 +152,5 @@ export default async function AuctionDetailPage({ params }: { params: { id: stri
     </div>
   );
 }
+
+    
