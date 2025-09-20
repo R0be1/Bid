@@ -45,22 +45,24 @@ export function SuperAdminList({ initialAdmins }: SuperAdminListProps) {
                         {initialAdmins.map((admin) => (
                             <TableRow key={admin.id}>
                                 <TableCell className="font-medium">
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <div className="flex items-center gap-2 cursor-help">
-                                            <span>{admin.name}</span>
-                                            <Info className="h-4 w-4 text-muted-foreground"/>
-                                            </div>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <div className="flex items-center gap-2">
-                                                <p>Temp Password: <span className="font-bold">{admin.tempPassword}</span></p>
-                                                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopyPassword(admin.tempPassword)}>
-                                                    <Copy className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </TooltipContent>
-                                    </Tooltip>
+                                    <div className="flex items-center gap-2">
+                                        <span>{admin.name}</span>
+                                        {admin.tempPassword && (
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <Info className="h-4 w-4 text-muted-foreground cursor-help"/>
+                                                </TooltipTrigger>
+                                                <TooltipContent>
+                                                    <div className="flex items-center gap-2">
+                                                        <p>Temp Password: <span className="font-bold">{admin.tempPassword}</span></p>
+                                                        <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => handleCopyPassword(admin.tempPassword)}>
+                                                            <Copy className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        )}
+                                    </div>
                                 </TableCell>
                                 <TableCell>{admin.email}</TableCell>
                             </TableRow>
@@ -71,4 +73,3 @@ export function SuperAdminList({ initialAdmins }: SuperAdminListProps) {
         </TooltipProvider>
     );
 }
-
