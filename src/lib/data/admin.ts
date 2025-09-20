@@ -36,7 +36,7 @@ export async function getUsersForAdmin(
   try {
     // 1. Find the auctioneer's profile ID
     const auctioneerProfile = await prisma.auctioneerProfile.findFirst({
-      where: { userId: auctioneerUserId },
+      where: { user: { id: auctioneerUserId } },
       select: { id: true },
     });
 
