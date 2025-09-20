@@ -83,7 +83,7 @@ export default function Home() {
           Welcome to NIBtera ጨረታ
         </h1>
         <p className="mt-4 text-lg leading-8 text-foreground/80 max-w-2xl mx-auto">
-          Discover unique treasures and compete in exciting live and sealed-bid auctions. Your next great find is just a bid away.
+          Compete in exciting live and sealed-bid auctions.
         </p>
       </div>
 
