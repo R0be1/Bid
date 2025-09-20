@@ -505,3 +505,5 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
 }
 
     
+
+    
