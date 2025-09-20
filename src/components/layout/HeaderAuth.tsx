@@ -4,7 +4,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { LayoutDashboard, LogOut, User as UserIcon, Gavel } from "lucide-react";
+import {
+  LayoutDashboard,
+  LogOut,
+  User as UserIcon,
+  Gavel,
+} from "lucide-react";
 import {
   getCurrentUserClient,
   type AuthenticatedUser,
@@ -38,7 +43,7 @@ export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
 
   const handleLogout = async () => {
     await logout();
-    window.location.href = "/login"; // Force reload to clear state
+    window.location.href = "/login";
   };
 
   // ---------------- Loading state ----------------
@@ -68,27 +73,25 @@ export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
         ? "/super-admin"
         : "/dashboard";
 
+    const navLinks = [
+        { href: "/", label: "Auctions", icon: Gavel },
+        { href: dashboardUrl, label: "Dashboard", icon: LayoutDashboard },
+        { href: "/profile", label: "Profile", icon: UserIcon },
+    ];
+
+
     if (mobile) {
       return (
         <>
-          <Link
-            href="/"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            Auction
-          </Link>
-          <Link
-            href={dashboardUrl}
-            className="text-muted-foreground hover:text-foreground"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/profile"
-            className="text-muted-foreground hover:text-foreground"
-          >
-            Profile
-          </Link>
+          {navLinks.map(link => (
+             <Link
+                key={link.href}
+                href={link.href}
+                className={`text-muted-foreground hover:text-foreground ${pathname === link.href ? 'font-semibold text-primary' : ''}`}
+            >
+                {link.label}
+            </Link>
+          ))}
           <div className="pt-6">
             <Button onClick={handleLogout} variant="outline" className="w-full">
               <LogOut className="mr-2 h-4 w-4" />
@@ -100,27 +103,17 @@ export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
     }
 
     return (
-      <div className="flex items-center space-x-2">
-        <Button variant="ghost" asChild>
-          <Link href="/">
-            <Gavel className="mr-2 h-4 w-4" />
-            Auction
-          </Link>
-        </Button>
-        <Button variant="ghost" asChild>
-          <Link href={dashboardUrl}>
-            <LayoutDashboard className="mr-2 h-4 w-4" />
-            Dashboard
-          </Link>
-        </Button>
-        <Button variant="ghost" asChild>
-          <Link href="/profile">
-            <UserIcon className="mr-2 h-4 w-4" />
-            Profile
-          </Link>
-        </Button>
-        <Button variant="outline" onClick={handleLogout}>
-          <LogOut className="mr-2 h-4 w-4" />
+      <div className="flex items-center space-x-1">
+        {navLinks.map(link => (
+             <Button key={link.href} variant={pathname === link.href ? 'secondary' : 'ghost'} asChild>
+                <Link href={link.href}>
+                    <link.icon className="mr-2" />
+                    {link.label}
+                </Link>
+            </Button>
+        ))}
+        <Button variant="ghost" onClick={handleLogout} className="text-muted-foreground hover:text-destructive">
+          <LogOut className="mr-2" />
           Log out
         </Button>
       </div>
@@ -134,7 +127,7 @@ export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
         <Button asChild className="w-full">
           <Link href="/login">Log In</Link>
         </Button>
-        <Button asChild variant="secondary" className="w-full">
+        <Button asChild variant="accent" className="w-full">
           <Link href="/register">Sign Up</Link>
         </Button>
       </div>
@@ -146,9 +139,10 @@ export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
       <Button variant="ghost" asChild>
         <Link href="/login">Log in</Link>
       </Button>
-      <Button asChild>
+      <Button asChild variant="accent">
         <Link href="/register">Sign up</Link>
       </Button>
     </div>
   );
 }
+
