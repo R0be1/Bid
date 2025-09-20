@@ -287,6 +287,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                         />
                          <div className="p-3 border-t border-border">
                             <input type="time" className="w-full" onChange={(e) => {
+                                if (!field.value) return;
                                 const newDate = new Date(field.value);
                                 const [hours, minutes] = e.target.value.split(':');
                                 newDate.setHours(parseInt(hours), parseInt(minutes));
@@ -334,6 +335,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                         />
                          <div className="p-3 border-t border-border">
                            <input type="time" className="w-full" onChange={(e) => {
+                                if (!field.value) return;
                                 const newDate = new Date(field.value);
                                 const [hours, minutes] = e.target.value.split(':');
                                 newDate.setHours(parseInt(hours), parseInt(minutes));

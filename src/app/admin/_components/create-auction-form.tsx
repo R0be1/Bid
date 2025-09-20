@@ -4,7 +4,7 @@
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 import { CalendarIcon, PlusCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -91,6 +91,8 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
       categoryId: "",
       startingPrice: 0,
       type: "LIVE",
+      startDate: new Date(),
+      endDate: addDays(new Date(), 3),
       participationFee: 0,
       securityDeposit: 0,
       minIncrement: 1,
@@ -283,6 +285,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                         />
                          <div className="p-3 border-t border-border">
                             <input type="time" className="w-full" onChange={(e) => {
+                                if (!field.value) return;
                                 const newDate = new Date(field.value);
                                 const [hours, minutes] = e.target.value.split(':');
                                 newDate.setHours(parseInt(hours), parseInt(minutes));
@@ -330,6 +333,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                         />
                         <div className="p-3 border-t border-border">
                            <input type="time" className="w-full" onChange={(e) => {
+                                if (!field.value) return;
                                 const newDate = new Date(field.value);
                                 const [hours, minutes] = e.target.value.split(':');
                                 newDate.setHours(parseInt(hours), parseInt(minutes));
