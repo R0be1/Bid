@@ -38,14 +38,14 @@ export default async function AuctionDetailPage({ params }: { params: { id: stri
         <p className="text-md text-muted-foreground flex items-center gap-2 mt-2"><Gavel className="h-4 w-4" /> Sold by {item.auctioneerName}</p>
       </div>
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-        <div className="space-y-4">
-            <div className="aspect-w-16 aspect-h-9">
+        <div className="space-y-4 group">
+            <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-lg">
             <Image
                 src={item.imageUrls[0]}
                 alt={item.name}
                 width={600}
                 height={400}
-                className="rounded-lg object-cover w-full h-full shadow-lg"
+                className="rounded-lg object-cover w-full h-full shadow-lg transform transition-transform duration-300 group-hover:scale-105"
             />
             </div>
             {item.imageUrls.length > 1 && (
