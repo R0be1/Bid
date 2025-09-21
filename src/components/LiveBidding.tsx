@@ -36,7 +36,7 @@ function PaymentPrompt({ item, onPaymentSuccess }: { item: AuctionItem, onPaymen
     const fees = {
         participation: item.participationFee,
         deposit: item.securityDeposit
-    }
+    };
 
     const handlePayment = (paymentType: PaymentType, method: 'direct' | 'receipt') => {
         startTransition(async () => {
