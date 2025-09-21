@@ -143,11 +143,17 @@ export function ExistingItemsList({ items: initialItems }: ExistingItemsListProp
                   </TableCell>
                   <TableCell>{format(endDate, "PPP")}</TableCell>
                   <TableCell className="text-right">
-                    <Button asChild variant="ghost" size="icon" disabled={!isEditable} title={!isEditable ? "Cannot edit an active or ended auction" : "Edit Item"}>
-                        <Link href={isEditable ? `/admin/manage-items/${item.id}/edit` : '#'}>
+                    {isEditable ? (
+                      <Button asChild variant="ghost" size="icon" title="Edit Item">
+                        <Link href={`/admin/manage-items/${item.id}/edit`}>
                           <Edit className="h-4 w-4" />
                         </Link>
-                    </Button>
+                      </Button>
+                    ) : (
+                      <Button variant="ghost" size="icon" disabled title="Cannot edit an active or ended auction">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteClick(item)} disabled={!isEditable} title={!isEditable ? "Cannot delete an active or ended auction" : "Delete Item"}>
                         <Trash2 className="h-4 w-4" />
                     </Button>
