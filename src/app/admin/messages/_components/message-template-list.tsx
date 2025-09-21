@@ -125,9 +125,6 @@ export function MessageTemplateList({ initialTemplates }: MessageTemplateListPro
                           {template.template}
                       </p>
                   </CardContent>
-                  <CardFooter>
-                      <p className="text-xs text-muted-foreground">ID: {template.id}</p>
-                  </CardFooter>
               </Card>
           ))}
           <DataTablePagination
