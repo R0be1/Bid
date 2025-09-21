@@ -27,7 +27,8 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Info } from "lucide-react";
-import { addCommunicationLog } from "@/lib/communications";
+import { announceResultsAction } from "@/app/admin/results/[id]/actions";
+import { useTransition } from "react";
 
 interface AnnounceResultsFormProps {
   templates: MessageTemplate[];
@@ -43,6 +44,7 @@ const formSchema = z.object({
 
 export function AnnounceResultsForm({ templates, bids, item, onAnnouncementSent }: AnnounceResultsFormProps) {
   const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,32 +54,39 @@ export function AnnounceResultsForm({ templates, bids, item, onAnnouncementSent 
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const template = templates.find(t => t.id === values.templateId);
-    if (!template) {
-        toast({ title: "Error", description: "Selected template not found.", variant: "destructive" });
-        return;
-    }
-    
-    // In a real application, this would trigger a server action to send emails/SMS.
-    // For now, we just log it.
-    const newLog = await addCommunicationLog({
-      auctionId: item.id,
-      auctionName: item.name,
-      templateName: template.name,
-      channel: template.channel,
-      recipientsCount: values.numberOfWinners,
-      sentAt: new Date(),
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    startTransition(async () => {
+      const template = templates.find(t => t.id === values.templateId);
+      if (!template) {
+          toast({ title: "Error", description: "Selected template not found.", variant: "destructive" });
+          return;
+      }
+      
+      try {
+        const newLog = await announceResultsAction({
+          auctionId: item.id,
+          auctionName: item.name,
+          templateName: template.name,
+          channel: template.channel,
+          recipientsCount: values.numberOfWinners,
+          sentAt: new Date(),
+        });
+        
+        onAnnouncementSent(newLog);
+
+        toast({
+            title: "Announcements Sent!",
+            description: `Notifications have been queued for the top ${values.numberOfWinners} bidder(s) using the "${template.name}" template.`,
+        });
+        form.reset();
+      } catch (error) {
+        toast({
+            title: "Error",
+            description: "Failed to send announcement. You may not be authorized.",
+            variant: "destructive",
+        });
+      }
     });
-
-
-    onAnnouncementSent(newLog);
-
-    toast({
-        title: "Announcements Sent!",
-        description: `Notifications have been queued for the top ${values.numberOfWinners} bidder(s) using the "${template.name}" template.`,
-    });
-    form.reset();
   }
   
   if (bids.length === 0) {
@@ -135,12 +144,10 @@ export function AnnounceResultsForm({ templates, bids, item, onAnnouncementSent 
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          Announce to Top Bidders
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? 'Sending...' : 'Announce to Top Bidders'}
         </Button>
       </form>
     </Form>
   );
 }
-
-    

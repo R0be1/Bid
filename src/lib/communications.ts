@@ -1,6 +1,5 @@
 
 import type { CommunicationLog } from "./types";
-import { getCurrentUser } from "./data/server-only";
 import prisma from "./prisma";
 
 export async function getCommunications(): Promise<CommunicationLog[]> {
@@ -21,15 +20,7 @@ export async function getCommunications(): Promise<CommunicationLog[]> {
     }));
 }
 
-export async function addCommunicationLog(log: Omit<CommunicationLog, 'id' | 'auctioneerId'>): Promise<CommunicationLog> {
-    const user = await getCurrentUser();
-    if (!user) throw new Error("Unauthorized");
-
-    const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
-        where: { userId: user.id }
-    });
-    if (!auctioneerProfile) throw new Error("Auctioneer profile not found");
-
+export async function addCommunicationLog(log: Omit<CommunicationLog, 'id'> & { auctioneerId: string }): Promise<CommunicationLog> {
     const newLog = await prisma.communicationLog.create({
         data: {
             auctionId: log.auctionId,
@@ -38,7 +29,7 @@ export async function addCommunicationLog(log: Omit<CommunicationLog, 'id' | 'au
             channel: log.channel,
             recipientsCount: log.recipientsCount,
             sentAt: log.sentAt,
-            auctioneerId: auctioneerProfile.id,
+            auctioneerId: log.auctioneerId,
         }
     });
 
