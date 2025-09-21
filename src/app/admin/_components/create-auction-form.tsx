@@ -289,12 +289,12 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                             disabled={(date) => date < new Date()}
                             initialFocus
                             captionLayout="dropdown-buttons"
-                            fromYear={new Date().getFullYear() - 5}
+                            fromYear={new Date().getFullYear()}
                             toYear={new Date().getFullYear() + 10}
                             />
                             <div className="p-3 border-l border-border flex flex-col items-center justify-center gap-2">
                                 <Select
-                                    value={String(getHours(field.value || new Date()))}
+                                    value={String(getHours(field.value || new Date())).padStart(2, '0')}
                                     onValueChange={(value) => {
                                         const newDate = setHours(field.value || new Date(), parseInt(value));
                                         field.onChange(newDate);
@@ -358,7 +358,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) => date < startDate}
+                            disabled={(date) => date < (startDate || new Date())}
                             initialFocus
                             captionLayout="dropdown-buttons"
                             fromYear={new Date().getFullYear()}
@@ -366,7 +366,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                             />
                             <div className="p-3 border-l border-border flex flex-col items-center justify-center gap-2">
                                 <Select
-                                    value={String(getHours(field.value || new Date()))}
+                                    value={String(getHours(field.value || new Date())).padStart(2, '0')}
                                     onValueChange={(value) => {
                                         if (!field.value) return;
                                         const newDate = setHours(field.value, parseInt(value));
