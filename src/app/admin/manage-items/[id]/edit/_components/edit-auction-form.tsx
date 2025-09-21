@@ -290,7 +290,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                           disabled={(date) => date < new Date("1900-01-01")}
                           initialFocus
                           captionLayout="dropdown-buttons"
-                          fromYear={new Date().getFullYear() -1}
+                          fromYear={new Date().getFullYear()}
                           toYear={new Date().getFullYear() + 10}
                         />
                          <div className="p-3 border-t border-border flex items-center justify-center gap-2">
