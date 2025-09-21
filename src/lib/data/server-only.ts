@@ -5,7 +5,7 @@ import type { AuthenticatedUser } from "@/lib/auth";
 const SESSION_KEY = "user_session";
 
 export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
-  const sessionCookie = (await cookies()).get(SESSION_KEY);
+  const sessionCookie = cookies().get(SESSION_KEY);
 
   if (!sessionCookie) return null;
 
@@ -15,8 +15,4 @@ export async function getCurrentUser(): Promise<AuthenticatedUser | null> {
   } catch (e) {
     return null;
   }
-}
-
-export async function logout() {
-  (await cookies()).delete(SESSION_KEY);
 }
