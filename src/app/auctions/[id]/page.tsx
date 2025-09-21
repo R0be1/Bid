@@ -158,11 +158,12 @@ export default function AuctionDetailPage() {
             </CardContent>
           </Card>
           
-          <Card>
+          {auctionEnded && (
+            <Card>
               <CardHeader>
-                  <CardTitle>Auction Status</CardTitle>
+                  <CardTitle>Auction Ended</CardTitle>
                   <CardDescription>
-                      {auctionEnded ? `This auction ended on ${format(new Date(item.endDate), "PPP p")}.` : auctionActive ? "This auction is currently active." : `This auction will start on ${format(new Date(item.startDate), "PPP p")}.`}
+                      This auction ended on {format(new Date(item.endDate), "PPP p")}.
                   </CardDescription>
               </CardHeader>
               <CardContent>
@@ -172,9 +173,9 @@ export default function AuctionDetailPage() {
                         View Results
                     </Link>
                 </Button>
-                {!auctionEnded && <p className="text-xs text-center text-muted-foreground mt-2">Results will be available after the auction ends.</p>}
               </CardContent>
-          </Card>
+            </Card>
+          )}
 
         </div>
       </div>
