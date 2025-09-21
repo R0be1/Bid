@@ -4,27 +4,15 @@
 import { useState, useEffect, useTransition } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Clock, CreditCard, Banknote, UserCheck, Upload } from "lucide-react";
+import { CheckCircle, Clock, CreditCard, UserCheck, Paperclip, Ban } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import Link from "next/link";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { getDashboardData, recordPaymentAction } from './actions';
+import { getDashboardData } from './actions';
 import { Skeleton } from "@/components/ui/skeleton";
 import type { DashboardData } from './actions';
-import type { AuctionItemFee, PaymentType } from "@/lib/types";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { PaymentMethod } from "@prisma/client";
 
 const statusVariantMap = {
   APPROVED: 'default' as const,
@@ -32,11 +20,17 @@ const statusVariantMap = {
   BLOCKED: 'destructive' as const,
 };
 
+const paymentStatusText = {
+    paid: {
+        [PaymentMethod.DIRECT]: "Paid",
+        [PaymentMethod.RECEIPT]: "Paid (Receipt Approved)",
+    },
+    pending: "Pending (Receipt Submitted)",
+}
+
 export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -51,53 +45,29 @@ export default function DashboardPage() {
       .finally(() => setIsLoading(false));
   }, [toast]);
 
-  const handlePayment = (paymentType: PaymentType, method: 'direct' | 'receipt') => {
-    startTransition(async () => {
-      // In a real app, receipt would be a file upload.
-      const receiptFile = method === 'receipt' ? '/receipt-placeholder.pdf' : undefined;
-      const result = await recordPaymentAction(paymentType, method, receiptFile);
-
-      toast({
-        title: result.success ? "Success" : "Error",
-        description: result.message,
-        variant: result.success ? "default" : "destructive",
-      });
-
-      if (result.success && result.data) {
-        setData(d => d ? ({ ...d, user: result.data! }) : null);
-      }
-      setIsDialogOpen(false);
-    });
-  };
-
-  const getPendingPayments = (item: AuctionItemFee) => {
-      if (!data?.user) return [];
-      const payments = [];
-      if (item.participationFee && !data.user.paidParticipation) {
-          payments.push({ type: 'participation' as const, amount: item.participationFee });
-      }
-      if (item.securityDeposit && !data.user.paidDeposit) {
-          payments.push({ type: 'deposit' as const, amount: item.securityDeposit });
-      }
-      return payments;
-  }
-
   if (isLoading) {
     return <DashboardSkeleton />;
   }
 
   if (!data || !data.user) {
     return (
-      <div className="text-center">
-        <p>Could not load user data. Please try again.</p>
-        <Button onClick={() => window.location.reload()} className="mt-4">
-          Reload
-        </Button>
+      <div className="text-center p-8">
+        <Card>
+            <CardHeader>
+                <CardTitle>Error</CardTitle>
+                <CardDescription>Could not load user data. Please try again.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Button onClick={() => window.location.reload()} className="mt-4">
+                Reload
+                </Button>
+            </CardContent>
+        </Card>
       </div>
     );
   }
 
-  const { user, feeItems } = data;
+  const { user } = data;
   
   return (
     <div className="space-y-8">
@@ -123,8 +93,9 @@ export default function DashboardPage() {
               <Clock className="h-4 w-4" />
               <AlertTitle>Approval Pending</AlertTitle>
               <AlertDescription>
-                Your account is currently pending administrator approval. For auctions with fees, you can make a payment to be approved automatically or upload a receipt for review.
+                Your account is currently pending administrator approval.
                 {user.paymentMethod === 'RECEIPT' && " Your uploaded receipt is awaiting review."}
+                 {!user.paymentMethod && ' You can participate in auctions that require fees by paying directly or uploading a receipt on the auction page.'}
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -132,7 +103,7 @@ export default function DashboardPage() {
         {user.status === 'BLOCKED' && (
           <CardContent>
             <Alert variant="destructive">
-              <Clock className="h-4 w-4" />
+              <Ban className="h-4 w-4" />
               <AlertTitle>Account Blocked</AlertTitle>
               <AlertDescription>
                 Your account has been blocked. Please contact support for assistance.
@@ -146,80 +117,53 @@ export default function DashboardPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <CreditCard />
-            Pending Payments for Auctions
+            Fee Payment Status
           </CardTitle>
           <CardDescription>
-            Some auctions require a participation fee or a security deposit. Pay them here to be eligible to bid.
+            This section shows the status of any required participation or security deposit fees.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {feeItems.map(item => {
-            const pendingPayments = getPendingPayments(item);
-            if (pendingPayments.length === 0) return null;
-
-            return (
-              <div key={item.id} className="p-4 border rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <CardContent className="space-y-4">
+             <div className="p-4 border rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex-1">
-                  <h3 className="font-semibold">
-                    <Link href={`/auctions/${item.id}`} className="hover:underline text-primary">
-                      {item.name}
-                    </Link>
-                  </h3>
-                  <p className="text-sm text-muted-foreground">Requires payment to participate.</p>
+                    <h3 className="font-semibold text-base">Participation Fee</h3>
+                    <p className="text-sm text-muted-foreground">Required for some auctions to join bidding.</p>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full md:w-auto shrink-0">
-                  {pendingPayments.map(p => (
-                    <div key={p.type} className="space-y-2">
-                      <p className="text-sm font-medium text-center capitalize">{p.type} Fee: {p.amount} Birr</p>
-                      <div className="flex flex-col gap-2">
-                        <Button onClick={() => handlePayment(p.type, 'direct')} disabled={user.status === 'BLOCKED' || isPending}>
-                          <Banknote className="mr-2 h-4 w-4" />
-                          {isPending ? 'Processing...' : 'Pay Now'}
-                        </Button>
-                        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                          <DialogTrigger asChild>
-                            <Button variant="secondary" disabled={user.status === 'BLOCKED'}>
-                              <Upload className="mr-2 h-4 w-4" />
-                              Upload Receipt
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Upload Payment Receipt</DialogTitle>
-                              <DialogDescription>
-                                Upload a screenshot or document of your payment for the {p.type} fee of {p.amount} Birr. An admin will review it.
-                              </DialogDescription>
-                            </DialogHeader>
-                            <div className="grid gap-4 py-4">
-                              <div className="grid w-full max-w-sm items-center gap-1.5">
-                                <Label htmlFor="receipt">Receipt File</Label>
-                                <Input id="receipt" type="file" />
-                              </div>
-                            </div>
-                            <DialogFooter>
-                              <DialogClose asChild>
-                                <Button type="button" variant="outline">Cancel</Button>
-                              </DialogClose>
-                              <Button type="button" onClick={() => handlePayment(p.type, 'receipt')} disabled={isPending}>
-                               {isPending ? 'Submitting...' : 'Submit for Review'}
-                              </Button>
-                            </DialogFooter>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </div>
-                  ))}
+                <div>
+                   {user.paidParticipation ? (
+                       <Badge variant="default" className="text-sm gap-2"><CheckCircle /> {user.status === 'APPROVED' ? paymentStatusText.paid[user.paymentMethod || 'DIRECT'] : paymentStatusText.pending}</Badge>
+                   ) : (
+                       <Badge variant="secondary" className="text-sm">Not Paid</Badge>
+                   )}
                 </div>
-              </div>
-            )
-          })}
-          {feeItems.every(item => getPendingPayments(item).length === 0) && (
-            <div className="text-center text-muted-foreground py-8">
-              <CheckCircle className="h-12 w-12 mx-auto text-green-500 mb-4" />
-              <p className="font-semibold">You have no pending payments.</p>
-              <p>You're all set to bid on any auction!</p>
-            </div>
-          )}
+             </div>
+             <div className="p-4 border rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className="flex-1">
+                    <h3 className="font-semibold text-base">Security Deposit</h3>
+                    <p className="text-sm text-muted-foreground">A refundable deposit required for certain high-value auctions.</p>
+                </div>
+                 <div>
+                   {user.paidDeposit ? (
+                       <Badge variant="default" className="text-sm gap-2"><CheckCircle /> {user.status === 'APPROVED' ? paymentStatusText.paid[user.paymentMethod || 'DIRECT'] : paymentStatusText.pending}</Badge>
+                   ) : (
+                       <Badge variant="secondary" className="text-sm">Not Paid</Badge>
+                   )}
+                </div>
+             </div>
+             { (user.paidParticipation || user.paidDeposit) && user.paymentMethod === 'RECEIPT' && user.receiptUrl && (
+                <div className="p-4 border rounded-lg bg-secondary/50">
+                    <h3 className="font-semibold text-base mb-2">Submitted Receipt</h3>
+                    <Button asChild variant="outline">
+                        <Link href={user.receiptUrl} target="_blank" rel="noopener noreferrer">
+                            <Paperclip className="mr-2 h-4 w-4" />
+                            View Your Submitted Receipt
+                        </Link>
+                    </Button>
+                     {user.status === 'PENDING' && (
+                        <p className="text-xs text-muted-foreground mt-2">Your receipt is awaiting review by an administrator. Your status will be updated to 'Approved' upon verification.</p>
+                     )}
+                </div>
+             )}
         </CardContent>
       </Card>
     </div>
@@ -252,20 +196,14 @@ function DashboardSkeleton() {
                       <Skeleton className="h-5 w-1/2" />
                       <Skeleton className="h-4 w-1/3" />
                   </div>
-                  <div className="space-y-2">
-                     <Skeleton className="h-9 w-24" />
-                     <Skeleton className="h-9 w-24" />
-                  </div>
+                  <Skeleton className="h-9 w-24" />
               </div>
                <div className="p-4 border rounded-lg flex justify-between items-center gap-4">
                   <div className="flex-1 space-y-2">
                       <Skeleton className="h-5 w-2/3" />
                       <Skeleton className="h-4 w-1/4" />
                   </div>
-                   <div className="space-y-2">
-                     <Skeleton className="h-9 w-24" />
-                     <Skeleton className="h-9 w-24" />
-                  </div>
+                   <Skeleton className="h-9 w-24" />
               </div>
             </CardContent>
         </Card>

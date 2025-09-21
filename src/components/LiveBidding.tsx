@@ -1,17 +1,131 @@
 
 "use client";
 
-import type { AuctionItem } from "@/lib/types";
-import { useState, useEffect } from "react";
+import type { AuctionItem, PaymentType } from "@/lib/types";
+import { useState, useEffect, useTransition } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { Info, Loader2 } from "lucide-react";
+import { Info, Loader2, Banknote, Upload, CreditCard } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { getCurrentUserClient, type AuthenticatedUser } from "@/lib/auth-client";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
+import { recordPaymentAction } from "@/app/dashboard/actions";
+
+
+function PaymentPrompt({ item, onPaymentSuccess }: { item: AuctionItem, onPaymentSuccess: (user: AuthenticatedUser) => void }) {
+    const [isPending, startTransition] = useTransition();
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const { toast } = useToast();
+
+    const fees = {
+        participation: item.participationFee,
+        deposit: item.securityDeposit
+    }
+
+    const handlePayment = (paymentType: PaymentType, method: 'direct' | 'receipt') => {
+        startTransition(async () => {
+            // In a real app, receipt would be a file upload.
+            const receiptFile = method === 'receipt' ? '/receipt-placeholder.pdf' : undefined;
+            const result = await recordPaymentAction(paymentType, method, receiptFile);
+
+            toast({
+                title: result.success ? "Success" : "Error",
+                description: result.message,
+                variant: result.success ? "default" : "destructive",
+            });
+
+            if (result.success && result.data) {
+                onPaymentSuccess(result.data);
+            }
+            setIsDialogOpen(false);
+        });
+    };
+
+    return (
+        <Card className="shadow-lg">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><CreditCard /> Payment Required</CardTitle>
+                <CardDescription>This auction requires one or more fees to participate.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 {fees.participation && fees.participation > 0 && (
+                     <div className="p-4 border rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div className="flex-1">
+                        <h3 className="font-semibold">Participation Fee: {fees.participation.toLocaleString()} Birr</h3>
+                        <p className="text-sm text-muted-foreground">A one-time fee to enter this auction.</p>
+                        </div>
+                        <div className="flex flex-col gap-2 shrink-0">
+                            <Button onClick={() => handlePayment('participation', 'direct')} disabled={isPending}>
+                                <Banknote className="mr-2 h-4 w-4" />
+                                {isPending ? 'Processing...' : 'Pay Now'}
+                            </Button>
+                            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                <DialogTrigger asChild>
+                                    <Button variant="secondary"><Upload className="mr-2 h-4 w-4" /> Upload Receipt</Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                    <DialogTitle>Upload Payment Receipt</DialogTitle>
+                                    <DialogDescription>Upload proof of payment for the participation fee.</DialogDescription>
+                                    </DialogHeader>
+                                    <div className="py-4"><Input id="receipt" type="file" /></div>
+                                    <DialogFooter>
+                                    <DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose>
+                                    <Button type="button" onClick={() => handlePayment('participation', 'receipt')} disabled={isPending}>{isPending ? 'Submitting...' : 'Submit for Review'}</Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
+                    </div>
+                )}
+                 {fees.deposit && fees.deposit > 0 && (
+                     <div className="p-4 border rounded-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                        <div className="flex-1">
+                        <h3 className="font-semibold">Security Deposit: {fees.deposit.toLocaleString()} Birr</h3>
+                        <p className="text-sm text-muted-foreground">A refundable deposit to ensure bid integrity.</p>
+                        </div>
+                        <div className="flex flex-col gap-2 shrink-0">
+                           <Button onClick={() => handlePayment('deposit', 'direct')} disabled={isPending}>
+                                <Banknote className="mr-2 h-4 w-4" />
+                                {isPending ? 'Processing...' : 'Pay Now'}
+                            </Button>
+                            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                <DialogTrigger asChild>
+                                     <Button variant="secondary"><Upload className="mr-2 h-4 w-4" /> Upload Receipt</Button>
+                                </DialogTrigger>
+                                <DialogContent>
+                                    <DialogHeader>
+                                    <DialogTitle>Upload Payment Receipt</DialogTitle>
+                                    <DialogDescription>Upload proof of payment for the security deposit.</DialogDescription>
+                                    </DialogHeader>
+                                    <div className="py-4"><Input id="receipt" type="file" /></div>
+                                    <DialogFooter>
+                                    <DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose>
+                                    <Button type="button" onClick={() => handlePayment('deposit', 'receipt')} disabled={isPending}>{isPending ? 'Submitting...' : 'Submit for Review'}</Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
+                        </div>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    );
+}
+
 
 interface LiveBiddingProps {
   item: AuctionItem;
@@ -29,8 +143,8 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
     getCurrentUserClient().then(setCurrentUser);
   }, []);
   
-  const requiresFees = (item.participationFee && item.participationFee > 0) || (item.securityDeposit && item.securityDeposit > 0);
-  const hasPaid = (item.participationFee && item.participationFee > 0 ? currentUser?.paidParticipation : true) && (item.securityDeposit && item.securityDeposit > 0 ? currentUser?.paidDeposit : true);
+  const requiresFees = (item.participationFee && item.participationFee > 0 && !currentUser?.paidParticipation) || 
+                       (item.securityDeposit && item.securityDeposit > 0 && !currentUser?.paidDeposit);
 
   const handleBidSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,8 +153,8 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
         toast({ title: "Login Required", description: "You must be logged in to place a bid.", variant: "destructive"});
         return;
     }
-    if (requiresFees && !hasPaid) {
-      toast({ title: "Payment Required", description: "Please complete the required payments from your dashboard to participate.", variant: "destructive"});
+    if (requiresFees) {
+      toast({ title: "Payment Required", description: "Please complete the required payments to participate.", variant: "destructive"});
       return;
     }
     if (currentUser.status !== 'APPROVED') {
@@ -107,26 +221,8 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
     );
   }
   
-  if (requiresFees && !hasPaid) {
-    return (
-      <Card className="shadow-lg">
-        <CardHeader>
-            <CardTitle>Special Auction Requirements</CardTitle>
-        </CardHeader>
-        <CardContent>
-            <Alert>
-                <Info className="h-4 w-4" />
-                <AlertTitle>Payment Required</AlertTitle>
-                <AlertDescription>
-                    This auction requires payment of fees. Please visit your dashboard to complete the payment.
-                    <Button asChild className="w-full mt-4">
-                        <Link href="/dashboard">Go to Dashboard</Link>
-                    </Button>
-                </AlertDescription>
-            </Alert>
-        </CardContent>
-      </Card>
-    );
+  if (requiresFees) {
+    return <PaymentPrompt item={item} onPaymentSuccess={setCurrentUser} />;
   }
 
   return (
@@ -149,7 +245,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
           </div>
           <form onSubmit={handleBidSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="bidAmount" className="sr-only">Bid Amount</Label>
+              <Label htmlFor="bidAmount" className="sr-only">Your Bid Amount</Label>
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
                   <span className="text-muted-foreground">Birr</span>
@@ -157,7 +253,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
                 <Input
                   id="bidAmount"
                   type="number"
-                  placeholder="Bid Amount"
+                  placeholder="Your Bid Amount"
                   value={newBid}
                   onChange={(e) => setNewBid(e.target.value)}
                   className="pl-10"
@@ -185,5 +281,3 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
     </Card>
   );
 }
-
-    
