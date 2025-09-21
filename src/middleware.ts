@@ -8,6 +8,7 @@ const SESSION_KEY = 'user_session';
 // Define which routes are protected and for which roles
 const protectedRoutesConfig: Record<string, UserRole[]> = {
     '/dashboard': ['user'],
+    '/history': ['user'],
     '/profile': ['user', 'admin', 'super-admin'],
     '/admin': ['admin'],
     '/super-admin': ['super-admin'],

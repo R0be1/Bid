@@ -9,6 +9,7 @@ import {
   LogOut,
   User as UserIcon,
   Gavel,
+  History,
 } from "lucide-react";
 import {
   getCurrentUserClient,
@@ -74,10 +75,11 @@ export function HeaderAuth({ mobile = false }: HeaderAuthProps) {
         : "/dashboard";
 
     const navLinks = [
-        { href: "/", label: "Auctions", icon: Gavel },
-        { href: dashboardUrl, label: "Dashboard", icon: LayoutDashboard },
-        { href: "/profile", label: "Profile", icon: UserIcon },
-    ];
+        { href: "/", label: "Auctions", icon: Gavel, role: ['user', 'admin', 'super-admin'] },
+        { href: dashboardUrl, label: "Dashboard", icon: LayoutDashboard, role: ['user', 'admin', 'super-admin'] },
+        { href: "/history", label: "Bidding History", icon: History, role: ['user'] },
+        { href: "/profile", label: "Profile", icon: UserIcon, role: ['user', 'admin', 'super-admin'] },
+    ].filter(link => link.role.includes(user.role));
 
 
     if (mobile) {
