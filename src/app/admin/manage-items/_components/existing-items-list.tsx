@@ -143,7 +143,7 @@ export function ExistingItemsList({ items: initialItems }: ExistingItemsListProp
                   </TableCell>
                   <TableCell>{format(endDate, "PPP")}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" asChild disabled={!isEditable} title={!isEditable ? "Cannot edit an active or ended auction" : "Edit Item"}>
+                    <Button asChild variant="ghost" size="icon" disabled={!isEditable} title={!isEditable ? "Cannot edit an active or ended auction" : "Edit Item"}>
                         <Link href={isEditable ? `/admin/manage-items/${item.id}/edit` : '#'}>
                           <Edit className="h-4 w-4" />
                         </Link>
