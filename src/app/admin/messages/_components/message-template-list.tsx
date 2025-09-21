@@ -6,11 +6,10 @@ import { useState, useMemo, useTransition } from "react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { deleteMessageTemplateAction } from "@/app/admin/messages/actions";
+import { updateMessageTemplateAction, deleteMessageTemplateAction } from "@/app/admin/messages/actions";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { Edit, Trash2 } from "lucide-react";
-import Link from "next/link";
+import { Edit, Trash2, Check, X } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +21,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CommunicationChannel } from "@prisma/client";
 
 interface MessageTemplateListProps {
   initialTemplates: MessageTemplate[];
@@ -29,6 +32,9 @@ interface MessageTemplateListProps {
 
 export function MessageTemplateList({ initialTemplates }: MessageTemplateListProps) {
   const [templates, setTemplates] = useState<MessageTemplate[]>(initialTemplates);
+  const [editingTemplateId, setEditingTemplateId] = useState<string | null>(null);
+  const [editingValues, setEditingValues] = useState<{name: string, channel: CommunicationChannel, template: string} | null>(null);
+
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
@@ -47,6 +53,37 @@ export function MessageTemplateList({ initialTemplates }: MessageTemplateListPro
     setTemplates(initialTemplates);
   }, [initialTemplates]);
 
+  const handleEditClick = (template: MessageTemplate) => {
+    setEditingTemplateId(template.id);
+    setEditingValues({ name: template.name, channel: template.channel, template: template.template });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingTemplateId(null);
+    setEditingValues(null);
+  };
+
+  const handleSaveEdit = (templateId: string) => {
+    if (!editingValues) return;
+    startTransition(async () => {
+      const result = await updateMessageTemplateAction(templateId, editingValues);
+      if (result.success && result.template) {
+        setTemplates(prev => prev.map(t => t.id === templateId ? result.template! : t));
+        handleCancelEdit();
+        toast({
+          title: "Template Updated",
+          description: "Your message template has been updated.",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to update template.",
+          variant: "destructive",
+        });
+      }
+    });
+  };
+
   const handleDeleteClick = (template: MessageTemplate) => {
     setItemToDelete(template);
     setDialogOpen(true);
@@ -54,10 +91,9 @@ export function MessageTemplateList({ initialTemplates }: MessageTemplateListPro
 
   const confirmDelete = () => {
     if (!itemToDelete) return;
-
     startTransition(async () => {
       const result = await deleteMessageTemplateAction(itemToDelete.id);
-       if (result.success) {
+      if (result.success) {
         setTemplates(prev => prev.filter(t => t.id !== itemToDelete.id));
         toast({
           title: "Template Deleted",
@@ -81,7 +117,7 @@ export function MessageTemplateList({ initialTemplates }: MessageTemplateListPro
 
   return (
     <>
-       <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
@@ -99,44 +135,92 @@ export function MessageTemplateList({ initialTemplates }: MessageTemplateListPro
       </AlertDialog>
 
       <div className="space-y-4">
-          {paginatedTemplates.map((template) => (
-              <Card key={template.id} className="shadow-sm">
-                  <CardHeader>
-                      <div className="flex justify-between items-start">
-                          <div>
-                              <CardTitle className="text-lg">{template.name}</CardTitle>
-                              <CardDescription>
-                                  <Badge variant={template.channel === 'email' ? 'secondary' : 'default'} className="capitalize mt-1">{template.channel}</Badge>
-                              </CardDescription>
-                          </div>
-                          <div className="flex items-center gap-1">
-                              <Button variant="ghost" size="icon" asChild>
-                                  <Link href={`/admin/messages/${template.id}/edit`}>
-                                    <Edit className="h-4 w-4" />
-                                    <span className="sr-only">Edit Template</span>
-                                  </Link>
-                              </Button>
-                              <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(template)} disabled={isPending}>
-                                  <Trash2 className="h-4 w-4 text-destructive" />
-                                  <span className="sr-only">Delete Template</span>
-                              </Button>
-                          </div>
-                      </div>
-                  </CardHeader>
-                  <CardContent>
-                      <p className="text-sm text-muted-foreground bg-secondary/30 p-3 rounded-md border">
-                          {template.template}
-                      </p>
-                  </CardContent>
-              </Card>
-          ))}
-          <DataTablePagination
-              page={page}
-              setPage={setPage}
-              rowsPerPage={rowsPerPage}
-              setRowsPerPage={setRowsPerPage}
-              totalRows={templates.length}
-          />
+        {paginatedTemplates.map((template) => (
+          <Card key={template.id} className="shadow-sm">
+            {editingTemplateId === template.id ? (
+              <>
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div className="grid gap-2 w-full">
+                       <Input
+                          value={editingValues?.name || ''}
+                          onChange={(e) => setEditingValues(v => v ? {...v, name: e.target.value} : null)}
+                          className="text-lg font-semibold"
+                          disabled={isPending}
+                        />
+                         <Select 
+                            value={editingValues?.channel} 
+                            onValueChange={(value: CommunicationChannel) => setEditingValues(v => v ? {...v, channel: value} : null)}
+                            disabled={isPending}
+                         >
+                            <SelectTrigger className="w-32">
+                                <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="email">Email</SelectItem>
+                                <SelectItem value="sms">SMS</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => handleSaveEdit(template.id)} disabled={isPending}>
+                        <Check className="h-4 w-4 text-green-600" />
+                        <span className="sr-only">Save</span>
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={handleCancelEdit} disabled={isPending}>
+                        <X className="h-4 w-4 text-destructive" />
+                        <span className="sr-only">Cancel</span>
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <Textarea
+                    value={editingValues?.template || ''}
+                    onChange={(e) => setEditingValues(v => v ? {...v, template: e.target.value} : null)}
+                    className="text-sm text-muted-foreground bg-secondary/30 p-3 rounded-md border min-h-[100px]"
+                    disabled={isPending}
+                  />
+                </CardContent>
+              </>
+            ) : (
+              <>
+                <CardHeader>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle className="text-lg">{template.name}</CardTitle>
+                      <CardDescription>
+                        <Badge variant={template.channel === 'email' ? 'secondary' : 'default'} className="capitalize mt-1">{template.channel}</Badge>
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => handleEditClick(template)} disabled={isPending}>
+                        <Edit className="h-4 w-4" />
+                        <span className="sr-only">Edit Template</span>
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(template)} disabled={isPending}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                        <span className="sr-only">Delete Template</span>
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground bg-secondary/30 p-3 rounded-md border whitespace-pre-wrap">
+                    {template.template}
+                  </p>
+                </CardContent>
+              </>
+            )}
+          </Card>
+        ))}
+        <DataTablePagination
+          page={page}
+          setPage={setPage}
+          rowsPerPage={rowsPerPage}
+          setRowsPerPage={setRowsPerPage}
+          totalRows={templates.length}
+        />
       </div>
     </>
   );

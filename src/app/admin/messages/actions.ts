@@ -114,7 +114,7 @@ export async function updateMessageTemplateAction(id: string, values: unknown) {
     }
 
 
-    await prisma.messageTemplate.update({
+    const updatedTemplate = await prisma.messageTemplate.update({
       where: { id },
       data: {
         name,
@@ -124,8 +124,7 @@ export async function updateMessageTemplateAction(id: string, values: unknown) {
     });
 
     revalidatePath("/admin/messages");
-    revalidatePath(`/admin/messages/${id}/edit`);
-    return { success: true, message: "Template updated successfully." };
+    return { success: true, message: "Template updated successfully.", template: updatedTemplate };
   } catch (error) {
     console.error("Database error: ", error);
     return { success: false, message: "Database error: Failed to update template." };
