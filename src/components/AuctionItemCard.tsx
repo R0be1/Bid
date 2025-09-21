@@ -1,4 +1,6 @@
 
+"use client";
+
 import type { AuctionItem } from "@/lib/types";
 import Image from "next/image";
 import Link from "next/link";
@@ -7,16 +9,23 @@ import { Button } from "@/components/ui/button";
 import { Tag, Clock, Gavel } from "lucide-react";
 import CountdownTimer from "./CountdownTimer";
 import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
 
 interface AuctionItemCardProps {
   item: AuctionItem;
 }
 
 export default function AuctionItemCard({ item }: AuctionItemCardProps) {
+  const [isUpcoming, setIsUpcoming] = useState(new Date(item.startDate) > new Date());
+  
   const currentPrice = item.currentBid ?? item.startingPrice;
-  const isUpcoming = new Date(item.startDate) > new Date();
-
   const isLiveAndUpcoming = item.type === "LIVE" && isUpcoming;
+
+  const handleAuctionStart = () => {
+    // A small delay to ensure the state updates before reload might be better in some cases
+    // but a direct reload is simple and effective.
+    window.location.reload();
+  };
 
   return (
     <Card className="group relative flex flex-col overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
@@ -51,7 +60,7 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
           <div className="mt-2 flex items-center text-sm text-foreground/80">
             <Clock className="mr-2 h-4 w-4" />
             {isUpcoming ? (
-              <CountdownTimer date={item.startDate} prefix="Starts In:" endedText="Started" />
+              <CountdownTimer date={item.startDate} prefix="Starts In:" endedText="Started" onEnded={handleAuctionStart} />
             ) : (
               <CountdownTimer date={item.endDate} />
             )}
@@ -61,7 +70,7 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
       <CardFooter className="p-4 pt-0">
         <Button asChild={!isLiveAndUpcoming} disabled={isLiveAndUpcoming} className="w-full">
             <Link href={`/auctions/${item.id}`}>
-              {item.type === "LIVE" ? "Bid Now" : "View Details"}
+              {isLiveAndUpcoming ? 'Starting Soon' : (item.type === "LIVE" ? "Bid Now" : "View Details")}
             </Link>
         </Button>
       </CardFooter>

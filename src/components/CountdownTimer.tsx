@@ -8,18 +8,26 @@ interface CountdownTimerProps {
   date: string;
   prefix?: string;
   endedText?: string;
+  onEnded?: () => void;
 }
 
-export default function CountdownTimer({ date, prefix = "Ends In:", endedText = "Auction Ended" }: CountdownTimerProps) {
+export default function CountdownTimer({ date, prefix = "Ends In:", endedText = "Auction Ended", onEnded }: CountdownTimerProps) {
   const [timeLeft, setTimeLeft] = useState("");
   const [hasEnded, setHasEnded] = useState(false);
 
   useEffect(() => {
     const targetDate = new Date(date);
 
-    if (isPast(targetDate)) {
+    const handleAuctionEnd = () => {
       setHasEnded(true);
       setTimeLeft(endedText);
+      if (onEnded) {
+        onEnded();
+      }
+    };
+
+    if (isPast(targetDate)) {
+      handleAuctionEnd();
       return;
     }
 
@@ -27,8 +35,7 @@ export default function CountdownTimer({ date, prefix = "Ends In:", endedText = 
       const now = new Date();
       if (now > targetDate) {
         clearInterval(timer);
-        setHasEnded(true);
-        setTimeLeft(endedText);
+        handleAuctionEnd();
         return;
       }
 
@@ -46,7 +53,7 @@ export default function CountdownTimer({ date, prefix = "Ends In:", endedText = 
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [date, endedText]);
+  }, [date, endedText, onEnded]);
   
   if (hasEnded) {
       return (
