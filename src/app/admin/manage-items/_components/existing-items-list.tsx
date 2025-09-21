@@ -116,12 +116,14 @@ export function ExistingItemsList({ items: initialItems }: ExistingItemsListProp
           <TableBody>
             {paginatedItems.map((item) => {
               const now = new Date();
+              const startDate = new Date(item.startDate);
+              const endDate = new Date(item.endDate);
+              const isEditable = startDate > now;
+              
               let status: "Active" | "Upcoming" | "Ended";
-               const isEditable = new Date(item.startDate) > now;
-
-              if (new Date(item.endDate) < now) {
+              if (endDate < now) {
                   status = "Ended";
-              } else if (new Date(item.startDate) > now) {
+              } else if (startDate > now) {
                   status = "Upcoming";
               } else {
                   status = "Active";
@@ -138,7 +140,7 @@ export function ExistingItemsList({ items: initialItems }: ExistingItemsListProp
                         {status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{format(new Date(item.endDate), "PPP")}</TableCell>
+                  <TableCell>{format(endDate, "PPP")}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" asChild disabled={!isEditable} title={!isEditable ? "Cannot edit an active or ended auction" : "Edit Item"}>
                         <Link href={isEditable ? `/admin/manage-items/${item.id}/edit` : '#'}>
