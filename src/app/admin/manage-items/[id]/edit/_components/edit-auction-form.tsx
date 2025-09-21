@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
@@ -27,7 +26,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import type { Category, AuctionItem, Image } from "@prisma/client";
 import { useTransition } from "react";
@@ -35,48 +38,65 @@ import { useToast } from "@/hooks/use-toast";
 import { updateAuctionItem } from "../../../actions";
 import { useRouter } from "next/navigation";
 
-
 const imageSchema = z.object({
   url: z.string().url("Invalid URL").min(1, "URL is required."),
 });
 
-const formSchema = z.object({
-  name: z.string().min(1, "Item name is required."),
-  description: z.string().min(1, "Description is required."),
-  categoryId: z.string().min(1, "Category is required."),
-  startingPrice: z.coerce.number().positive("Starting price must be positive."),
-  type: z.enum(["LIVE", "SEALED"]),
-  startDate: z.date({ required_error: "Start date is required." }),
-  endDate: z.date({ required_error: "End date is required." }),
-  participationFee: z.coerce.number().min(0).optional(),
-  securityDeposit: z.coerce.number().min(0).optional(),
-  minIncrement: z.coerce.number().optional(),
-  maxAllowedValue: z.coerce.number().optional(),
-  images: z.array(imageSchema).min(1, "At least one image is required.").max(3, "You can add a maximum of 3 images."),
-}).refine((data) => {
-    if (data.type === 'LIVE') {
+const formSchema = z
+  .object({
+    name: z.string().min(1, "Item name is required."),
+    description: z.string().min(1, "Description is required."),
+    categoryId: z.string().min(1, "Category is required."),
+    startingPrice: z.coerce
+      .number()
+      .positive("Starting price must be positive."),
+    type: z.enum(["LIVE", "SEALED"]),
+    startDate: z.date({ required_error: "Start date is required." }),
+    endDate: z.date({ required_error: "End date is required." }),
+    participationFee: z.coerce.number().min(0).optional(),
+    securityDeposit: z.coerce.number().min(0).optional(),
+    minIncrement: z.coerce.number().optional(),
+    maxAllowedValue: z.coerce.number().optional(),
+    images: z
+      .array(imageSchema)
+      .min(1, "At least one image is required.")
+      .max(3, "You can add a maximum of 3 images."),
+  })
+  .refine(
+    (data) => {
+      if (data.type === "LIVE") {
         return data.minIncrement !== undefined && data.minIncrement > 0;
-    }
-    return true;
-}, {
-    message: "Minimum increment must be a positive number for live auctions.",
-    path: ["minIncrement"],
-}).refine((data) => {
-    if (data.type === 'SEALED') {
-        return data.maxAllowedValue !== undefined && data.maxAllowedValue > data.startingPrice;
-    }
-    return true;
-}, {
-    message: "Max value must be greater than starting price for sealed bids.",
-    path: ["maxAllowedValue"],
-}).refine((data) => data.endDate > data.startDate, {
+      }
+      return true;
+    },
+    {
+      message: "Minimum increment must be a positive number for live auctions.",
+      path: ["minIncrement"],
+    },
+  )
+  .refine(
+    (data) => {
+      if (data.type === "SEALED") {
+        return (
+          data.maxAllowedValue !== undefined &&
+          data.maxAllowedValue > data.startingPrice
+        );
+      }
+      return true;
+    },
+    {
+      message: "Max value must be greater than starting price for sealed bids.",
+      path: ["maxAllowedValue"],
+    },
+  )
+  .refine((data) => data.endDate > data.startDate, {
     message: "End date must be after start date.",
     path: ["endDate"],
-});
+  });
 
 interface EditAuctionFormProps {
-    item: AuctionItem & { images: Image[] };
-    categories: Category[];
+  item: AuctionItem & { images: Image[] };
+  categories: Category[];
 }
 
 export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
@@ -98,23 +118,23 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
       securityDeposit: item.securityDeposit || 0,
       minIncrement: item.minIncrement || 1,
       maxAllowedValue: item.maxAllowedValue || 0,
-      images: item.images.map(i => ({ url: i.url })),
+      images: item.images.map((i) => ({ url: i.url })),
     },
   });
-  
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "images",
   });
 
   const auctionType = useWatch({
-      control: form.control,
-      name: "type"
+    control: form.control,
+    name: "type",
   });
 
   const startDate = useWatch({
-      control: form.control,
-      name: "startDate"
+    control: form.control,
+    name: "startDate",
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -125,14 +145,14 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
           title: "Auction Item Updated!",
           description: `"${values.name}" has been successfully updated.`,
         });
-        router.push('/admin/manage-items');
+        router.push("/admin/manage-items");
         router.refresh();
       } else {
         toast({
           title: "Error",
           description: result.message,
-          variant: "destructive"
-        })
+          variant: "destructive",
+        });
       }
     });
   }
@@ -150,7 +170,9 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Item Name <span className="text-destructive">*</span></FormLabel>
+                  <FormLabel>
+                    Item Name <span className="text-destructive">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Input placeholder="Item Name" {...field} />
                   </FormControl>
@@ -164,7 +186,9 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description <span className="text-destructive">*</span></FormLabel>
+                  <FormLabel>
+                    Description <span className="text-destructive">*</span>
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Description"
@@ -176,15 +200,20 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                 </FormItem>
               )}
             />
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormField
                 control={form.control}
                 name="categoryId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category <span className="text-destructive">*</span></FormLabel>
-                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel>
+                      Category <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select a category" />
@@ -192,9 +221,9 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                       </FormControl>
                       <SelectContent>
                         {categories.map((category) => (
-                            <SelectItem key={category.id} value={category.id}>
-                                {category.name}
-                            </SelectItem>
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -207,24 +236,37 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                 name="startingPrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Starting Price (Birr) <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      Starting Price (Birr){" "}
+                      <span className="text-destructive">*</span>
+                    </FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" placeholder="Starting Price (Birr)" {...field} />
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="Starting Price (Birr)"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-               <FormField
+              <FormField
                 control={form.control}
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Auction Type <span className="text-destructive">*</span></FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel>
+                      Auction Type <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select an auction type" />
@@ -239,14 +281,19 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                   </FormItem>
                 )}
               />
-               <FormField
+              <FormField
                 control={form.control}
                 name="participationFee"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Participation Fee (Birr)</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" placeholder="Participation Fee (Birr)" {...field} />
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="Participation Fee (Birr)"
+                        {...field}
+                      />
                     </FormControl>
                     <FormDescription>
                       Optional fee to participate in the auction.
@@ -256,13 +303,15 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                 )}
               />
             </div>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <FormField
                 control={form.control}
                 name="startDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>Start Date <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      Start Date <span className="text-destructive">*</span>
+                    </FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -270,7 +319,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                             variant={"outline"}
                             className={cn(
                               "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
+                              !field.value && "text-muted-foreground",
                             )}
                           >
                             {field.value ? (
@@ -293,32 +342,54 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                           fromYear={new Date().getFullYear()}
                           toYear={new Date().getFullYear() + 10}
                         />
-                         <div className="p-3 border-t border-border flex items-center justify-center gap-2">
-                             <Select
-                                value={String(getHours(field.value || new Date()))}
-                                onValueChange={(value) => {
-                                    if (!field.value) return;
-                                    field.onChange(setHours(field.value, parseInt(value)));
-                                }}
-                            >
-                                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    {Array.from({length: 24}, (_, i) => String(i).padStart(2, '0')).map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            :
-                            <Select
-                                value={String(getMinutes(field.value || new Date())).padStart(2, '0')}
-                                onValueChange={(value) => {
-                                    if (!field.value) return;
-                                    field.onChange(setMinutes(field.value, parseInt(value)));
-                                }}
-                            >
-                                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    {Array.from({length: 60}, (_, i) => String(i).padStart(2, '0')).map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
+                        <div className="p-3 border-t border-border flex items-center justify-center gap-2">
+                          <Select
+                            value={String(getHours(field.value || new Date()))}
+                            onValueChange={(value) => {
+                              if (!field.value) return;
+                              field.onChange(
+                                setHours(field.value, parseInt(value)),
+                              );
+                            }}
+                          >
+                            <SelectTrigger className="w-20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 24 }, (_, i) =>
+                                String(i).padStart(2, "0"),
+                              ).map((h) => (
+                                <SelectItem key={h} value={h}>
+                                  {h}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          :
+                          <Select
+                            value={String(
+                              getMinutes(field.value || new Date()),
+                            ).padStart(2, "0")}
+                            onValueChange={(value) => {
+                              if (!field.value) return;
+                              field.onChange(
+                                setMinutes(field.value, parseInt(value)),
+                              );
+                            }}
+                          >
+                            <SelectTrigger className="w-20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 60 }, (_, i) =>
+                                String(i).padStart(2, "0"),
+                              ).map((m) => (
+                                <SelectItem key={m} value={m}>
+                                  {m}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       </PopoverContent>
                     </Popover>
@@ -331,7 +402,9 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                 name="endDate"
                 render={({ field }) => (
                   <FormItem className="flex flex-col">
-                    <FormLabel>End Date <span className="text-destructive">*</span></FormLabel>
+                    <FormLabel>
+                      End Date <span className="text-destructive">*</span>
+                    </FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
                         <FormControl>
@@ -339,7 +412,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                             variant={"outline"}
                             className={cn(
                               "w-full pl-3 text-left font-normal",
-                              !field.value && "text-muted-foreground"
+                              !field.value && "text-muted-foreground",
                             )}
                             disabled={!startDate}
                           >
@@ -357,38 +430,62 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) => date < startDate || date < new Date("1900-01-01")}
+                          disabled={(date) =>
+                            date < startDate || date < new Date("1900-01-01")
+                          }
                           initialFocus
                           captionLayout="dropdown-buttons"
                           fromYear={new Date().getFullYear()}
                           toYear={new Date().getFullYear() + 10}
                         />
-                         <div className="p-3 border-t border-border flex items-center justify-center gap-2">
-                             <Select
-                                value={String(getHours(field.value || new Date()))}
-                                onValueChange={(value) => {
-                                    if (!field.value) return;
-                                    field.onChange(setHours(field.value, parseInt(value)));
-                                }}
-                            >
-                                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    {Array.from({length: 24}, (_, i) => String(i).padStart(2, '0')).map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            :
-                            <Select
-                                value={String(getMinutes(field.value || new Date())).padStart(2, '0')}
-                                onValueChange={(value) => {
-                                    if (!field.value) return;
-                                    field.onChange(setMinutes(field.value, parseInt(value)));
-                                }}
-                            >
-                                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    {Array.from({length: 60}, (_, i) => String(i).padStart(2, '0')).map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
+                        <div className="p-3 border-t border-border flex items-center justify-center gap-2">
+                          <Select
+                            value={String(getHours(field.value || new Date()))}
+                            onValueChange={(value) => {
+                              if (!field.value) return;
+                              field.onChange(
+                                setHours(field.value, parseInt(value)),
+                              );
+                            }}
+                          >
+                            <SelectTrigger className="w-20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 24 }, (_, i) =>
+                                String(i).padStart(2, "0"),
+                              ).map((h) => (
+                                <SelectItem key={h} value={h}>
+                                  {h}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          :
+                          <Select
+                            value={String(
+                              getMinutes(field.value || new Date()),
+                            ).padStart(2, "0")}
+                            onValueChange={(value) => {
+                              if (!field.value) return;
+                              field.onChange(
+                                setMinutes(field.value, parseInt(value)),
+                              );
+                            }}
+                          >
+                            <SelectTrigger className="w-20">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Array.from({ length: 60 }, (_, i) =>
+                                String(i).padStart(2, "0"),
+                              ).map((m) => (
+                                <SelectItem key={m} value={m}>
+                                  {m}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </div>
                       </PopoverContent>
                     </Popover>
@@ -397,16 +494,21 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                 )}
               />
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-               <FormField
+              <FormField
                 control={form.control}
                 name="securityDeposit"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Security Deposit (Birr)</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" placeholder="Security Deposit (Birr)" {...field} />
+                      <Input
+                        type="number"
+                        step="0.01"
+                        placeholder="Security Deposit (Birr)"
+                        {...field}
+                      />
                     </FormControl>
                     <FormDescription>
                       Optional deposit forfeited if winner doesn't pay.
@@ -415,15 +517,23 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                   </FormItem>
                 )}
               />
-              {auctionType === 'LIVE' ? (
+              {auctionType === "LIVE" ? (
                 <FormField
                   control={form.control}
                   name="minIncrement"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Minimum Increment (Birr) <span className="text-destructive">*</span></FormLabel>
+                      <FormLabel>
+                        Minimum Increment (Birr){" "}
+                        <span className="text-destructive">*</span>
+                      </FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="Minimum Increment (Birr)" {...field} />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="Minimum Increment (Birr)"
+                          {...field}
+                        />
                       </FormControl>
                       <FormDescription>
                         The smallest amount by which a bid can be increased.
@@ -433,14 +543,22 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                   )}
                 />
               ) : (
-                 <FormField
+                <FormField
                   control={form.control}
                   name="maxAllowedValue"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Max Allowed Value (Birr) <span className="text-destructive">*</span></FormLabel>
+                      <FormLabel>
+                        Max Allowed Value (Birr){" "}
+                        <span className="text-destructive">*</span>
+                      </FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="Max Allowed Value (Birr)" {...field} />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="Max Allowed Value (Birr)"
+                          {...field}
+                        />
                       </FormControl>
                       <FormDescription>
                         (Sealed Bid) The max value for bid validation.
@@ -448,34 +566,47 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                       <FormMessage />
                     </FormItem>
                   )}
+                />
               )}
             </div>
 
             <div>
-              <FormLabel>Item Images <span className="text-destructive">*</span></FormLabel>
-              <FormDescription className="text-xs">Provide public image URLs.</FormDescription>
+              <FormLabel>
+                Item Images <span className="text-destructive">*</span>
+              </FormLabel>
+              <FormDescription className="text-xs">
+                Provide public image URLs.
+              </FormDescription>
               <div className="space-y-4 mt-2">
                 {fields.map((field, index) => (
-                  <div key={field.id} className="flex items-start gap-2 p-2 border rounded-md">
-                     <div className="grid gap-2 flex-grow">
-                        <FormField
-                            control={form.control}
-                            name={`images.${index}.url`}
-                            render={({ field }) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input placeholder="Image URL" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                     </div>
-                      {fields.length > 1 && (
-                        <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)}>
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      )}
+                  <div
+                    key={field.id}
+                    className="flex items-start gap-2 p-2 border rounded-md"
+                  >
+                    <div className="grid gap-2 flex-grow">
+                      <FormField
+                        control={form.control}
+                        name={`images.${index}.url`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <Input placeholder="Image URL" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    {fields.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => remove(index)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    )}
                   </div>
                 ))}
                 {fields.length < 3 && (
@@ -483,7 +614,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => append({url: ''})}
+                    onClick={() => append({ url: "" })}
                     className="mt-2"
                   >
                     <PlusCircle className="mr-2 h-4 w-4" />
@@ -494,9 +625,8 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
               <FormMessage>{form.formState.errors.images?.message}</FormMessage>
             </div>
 
-
             <Button type="submit" className="w-full" disabled={isPending}>
-              {isPending ? 'Saving...' : 'Save Changes'}
+              {isPending ? "Saving..." : "Save Changes"}
             </Button>
           </form>
         </Form>
@@ -504,5 +634,3 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
     </Card>
   );
 }
-
-    
