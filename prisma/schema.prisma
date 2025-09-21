@@ -45,12 +45,15 @@ model AuctioneerProfile {
   auctionItems      AuctionItem[]
   messageTemplates  MessageTemplate[]
   communicationLogs CommunicationLog[]
+  categories        Category[]
 }
 
 model Category {
   id           String        @id @default(uuid())
   name         String        @unique
   auctionItems AuctionItem[]
+  auctioneer        AuctioneerProfile @relation(fields: [auctioneerId], references: [id], onDelete: Cascade)
+  auctioneerId      String
 }
 
 model AuctionItem {
