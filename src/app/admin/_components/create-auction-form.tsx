@@ -355,7 +355,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                           mode="single"
                           selected={field.value}
                           onSelect={field.onChange}
-                          disabled={(date) => date < startDate || date < new Date("1900-01-01")}
+                          disabled={(date) => date < startDate}
                           initialFocus
                           captionLayout="dropdown-buttons"
                           fromYear={new Date().getFullYear()}
@@ -366,7 +366,10 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                                 value={String(getHours(field.value || new Date()))}
                                 onValueChange={(value) => {
                                     if (!field.value) return;
-                                    field.onChange(setHours(field.value, parseInt(value)));
+                                    const newDate = setHours(field.value, parseInt(value));
+                                    if (newDate > startDate) {
+                                      field.onChange(newDate);
+                                    }
                                 }}
                             >
                                 <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
@@ -379,7 +382,10 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                                 value={String(getMinutes(field.value || new Date())).padStart(2, '0')}
                                 onValueChange={(value) => {
                                     if (!field.value) return;
-                                    field.onChange(setMinutes(field.value, parseInt(value)));
+                                    const newDate = setMinutes(field.value, parseInt(value));
+                                     if (newDate > startDate) {
+                                      field.onChange(newDate);
+                                    }
                                 }}
                             >
                                 <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
