@@ -20,3 +20,4 @@ export interface AuthResult {
   forcePasswordChange?: boolean;
   userId?: string;
 }
+

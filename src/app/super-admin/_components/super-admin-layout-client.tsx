@@ -82,3 +82,4 @@ export function SuperAdminLayoutClient({ children }: { children: ReactNode }) {
       </SidebarProvider>
   );
 }
+
