@@ -118,7 +118,6 @@ export function ExistingItemsList({ items: initialItems }: ExistingItemsListProp
               const now = new Date();
               const startDate = new Date(item.startDate);
               const endDate = new Date(item.endDate);
-              const isEditable = startDate > now;
               
               let status: "Active" | "Upcoming" | "Ended";
               if (endDate < now) {
@@ -128,6 +127,8 @@ export function ExistingItemsList({ items: initialItems }: ExistingItemsListProp
               } else {
                   status = "Active";
               }
+
+              const isEditable = status === "Upcoming";
 
               return (
                 <TableRow key={item.id}>
@@ -147,7 +148,7 @@ export function ExistingItemsList({ items: initialItems }: ExistingItemsListProp
                           <Edit className="h-4 w-4" />
                         </Link>
                     </Button>
-                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteClick(item)} disabled={isPending || !isEditable} title={!isEditable ? "Cannot delete an active or ended auction" : "Delete Item"}>
+                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteClick(item)} disabled={!isEditable} title={!isEditable ? "Cannot delete an active or ended auction" : "Delete Item"}>
                         <Trash2 className="h-4 w-4" />
                     </Button>
                   </TableCell>

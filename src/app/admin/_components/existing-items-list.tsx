@@ -40,14 +40,17 @@ export function ExistingItemsList({ items }: ExistingItemsListProps) {
       <TableBody>
         {items.map((item) => {
            const now = new Date();
+           const startDate = new Date(item.startDate);
            let status: "Active" | "Upcoming" | "Ended";
            if (new Date(item.endDate) < now) {
                status = "Ended";
-           } else if (new Date(item.startDate) > now) {
+           } else if (startDate > now) {
                status = "Upcoming";
            } else {
                status = "Active";
            }
+
+           const isEditable = status === "Upcoming";
 
           return (
             <TableRow key={item.id}>
@@ -62,10 +65,12 @@ export function ExistingItemsList({ items }: ExistingItemsListProps) {
               </TableCell>
               <TableCell>{format(new Date(item.endDate), "PPP")}</TableCell>
               <TableCell className="text-right">
-                <Button variant="ghost" size="icon" disabled>
-                    <Edit className="h-4 w-4" />
+                <Button variant="ghost" size="icon" disabled={!isEditable} title={!isEditable ? "Cannot edit an active or ended auction" : "Edit Item"}>
+                    <Link href={isEditable ? `/admin/manage-items/${item.id}/edit` : '#'}>
+                      <Edit className="h-4 w-4" />
+                    </Link>
                 </Button>
-                 <Button variant="ghost" size="icon" className="text-destructive" disabled>
+                 <Button variant="ghost" size="icon" className="text-destructive" disabled={!isEditable} title={!isEditable ? "Cannot delete an active or ended auction" : "Delete Item"}>
                     <Trash2 className="h-4 w-4" />
                 </Button>
               </TableCell>
