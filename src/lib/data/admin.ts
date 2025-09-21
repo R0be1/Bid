@@ -1,4 +1,5 @@
 
+
 "use server";
 
 import prisma from "@/lib/prisma";
@@ -242,5 +243,34 @@ export async function getMessageTemplatesForAdmin(): Promise<MessageTemplate[]> 
     } catch (error) {
         console.error("Database error:", error);
         throw new Error("Failed to fetch message templates.");
+    }
+}
+
+export async function getMessageTemplateForEdit(id: string): Promise<MessageTemplate | null> {
+    noStore();
+    const user = await getCurrentUser();
+    if (!user) {
+        return null;
+    }
+
+    const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
+        where: { userId: user.id },
+    });
+
+    if (!auctioneerProfile) {
+        return null;
+    }
+    
+    try {
+        const template = await prisma.messageTemplate.findFirst({
+            where: {
+                id,
+                auctioneerId: auctioneerProfile.id,
+            },
+        });
+        return template;
+    } catch (error) {
+        console.error("Database Error:", error);
+        return null;
     }
 }
