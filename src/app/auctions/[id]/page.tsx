@@ -2,7 +2,7 @@
 "use client";
 
 import { getAuctionItemForListing } from "@/lib/data/public";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -21,6 +21,7 @@ import { cn } from "@/lib/utils";
 
 export default function AuctionDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [item, setItem] = useState<AuctionItem | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -35,6 +36,12 @@ export default function AuctionDetailPage() {
         });
     }
   }, [id]);
+
+  const handleAuctionEnd = () => {
+    if (id) {
+      router.push(`/auctions/${id}/results`);
+    }
+  };
 
 
   if (!item || !selectedImage) {
@@ -148,7 +155,7 @@ export default function AuctionDetailPage() {
               </div>
               <div className="flex items-center space-x-3">
                 <Clock className="h-5 w-5 text-accent" />
-                <CountdownTimer date={item.endDate} />
+                <CountdownTimer date={item.endDate} onEnded={handleAuctionEnd} />
               </div>
               <div className="flex items-center space-x-3">
                  <Hammer className="h-5 w-5 text-accent" />
