@@ -1,6 +1,6 @@
 
 import prisma from "@/lib/prisma";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/data/server-only";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Gavel, Users, Clock, Calendar, CheckCircle, Banknote } from "lucide-react";
 import { redirect } from "next/navigation";

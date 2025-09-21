@@ -3,7 +3,7 @@ import { getUsersForAdmin } from "@/lib/data/admin";
 import { UserList } from "./_components/user-list";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { UserCog } from "lucide-react";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/data/server-only";
 import { redirect } from "next/navigation";
 
 export default async function UsersPage() {

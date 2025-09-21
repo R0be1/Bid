@@ -2,7 +2,7 @@
 'use server';
 
 import prisma from '@/lib/prisma';
-import { getCurrentUser } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/data/server-only';
 
 export async function getSuperAdminProfile() {
     const user = await getCurrentUser();

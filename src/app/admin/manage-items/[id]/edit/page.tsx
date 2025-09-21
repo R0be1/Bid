@@ -1,7 +1,7 @@
 
 import { getAuctionItemForEdit } from "@/lib/data/admin";
 import { getCategoriesForAdmin } from "@/lib/data/admin";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/data/server-only";
 import { notFound, redirect } from "next/navigation";
 import { EditAuctionForm } from "./_components/edit-auction-form";
 

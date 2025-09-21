@@ -2,7 +2,7 @@
 'use server';
 
 import prisma from '@/lib/prisma';
-import { getCurrentUser } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/data/server-only';
 import { revalidatePath } from 'next/cache';
 import { cookies } from 'next/headers';
 import type { User, AuctionItemFee, PaymentType } from '@/lib/types';

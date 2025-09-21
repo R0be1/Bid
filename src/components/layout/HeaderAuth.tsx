@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import {
   getCurrentUserClient,
-  type AuthenticatedUser,
 } from "@/lib/auth-client";
+import type { AuthenticatedUser } from "@/lib/auth";
 import { logout } from "@/app/actions";
 import { Skeleton } from "../ui/skeleton";
 import { usePathname } from "next/navigation";

@@ -6,7 +6,7 @@ import type { AuthenticatedUser, UserRole } from './lib/auth';
 const SESSION_KEY = 'user_session';
 
 // Define which routes are protected and for which roles
-const protectedRoutesConfig = {
+const protectedRoutesConfig: Record<string, UserRole[]> = {
     '/dashboard': ['user'],
     '/profile': ['user', 'admin', 'super-admin'],
     '/admin': ['admin'],
@@ -27,7 +27,6 @@ function getRouteProtection(pathname: string): UserRole[] | null {
     if (pathname.startsWith('/super-admin/')) return ['super-admin'];
     
     for (const route in protectedRoutesConfig) {
-        // @ts-ignore
         if (pathname.startsWith(route)) return protectedRoutesConfig[route];
     }
     return null;
@@ -52,8 +51,9 @@ export function middleware(request: NextRequest) {
         path: '/',
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax' as const,
       };
-      response.cookies.set(newCookie);
+      response.cookies.set(newCookie.name, newCookie.value, newCookie);
 
     } catch (e) {
       // Invalid session cookie, treat as logged out

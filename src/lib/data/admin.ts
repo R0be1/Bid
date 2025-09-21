@@ -1,11 +1,10 @@
 
-
 "use server";
 
 import prisma from "@/lib/prisma";
 import { unstable_noStore as noStore } from "next/cache";
 import type { User, UserStatus, MessageTemplate } from "@prisma/client";
-import { getCurrentUser } from "../auth";
+import { getCurrentUser } from "../data/server-only";
 import type { CommunicationLog } from "../types";
 
 export async function getCategoriesForAdmin() {

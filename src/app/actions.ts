@@ -4,8 +4,7 @@
 import { validateSealedBid, type ValidateSealedBidInput } from "@/ai/flows/sealed-bid-validation";
 import { z } from "zod";
 import { getAuctionItemForListing } from "@/lib/data/public";
-import { logout as serverLogout } from "@/lib/auth";
-import { getCurrentUser } from "@/lib/auth";
+import { logout as serverLogout, getCurrentUser } from "@/lib/data/server-only";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 

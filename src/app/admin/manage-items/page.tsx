@@ -3,7 +3,7 @@ import { ExistingItemsList } from "./_components/existing-items-list";
 import { getAuctionItemsForAdmin } from "@/lib/data/admin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/data/server-only";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PlusCircle } from "lucide-react";

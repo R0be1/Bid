@@ -19,7 +19,7 @@ import { Eye } from "lucide-react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/data/server-only";
 import { redirect } from "next/navigation";
 import { getAuctionItemsForAdmin } from "@/lib/data/admin";
 import type { AuctionItem } from "@prisma/client";

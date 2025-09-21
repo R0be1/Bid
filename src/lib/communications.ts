@@ -1,6 +1,6 @@
 
 import type { CommunicationLog } from "./types";
-import { getCurrentUser } from "./auth";
+import { getCurrentUser } from "./data/server-only";
 import prisma from "./prisma";
 
 export async function getCommunications(): Promise<CommunicationLog[]> {

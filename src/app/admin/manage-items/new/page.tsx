@@ -1,7 +1,7 @@
 
 import { CreateAuctionForm } from "../../_components/create-auction-form";
 import { getCategoriesForAdmin } from "@/lib/data/admin";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/data/server-only";
 import { redirect } from "next/navigation";
 
 
