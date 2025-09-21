@@ -15,8 +15,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
 
   useEffect(() => {
-    const currentUser = getCurrentUserClient();
-    setUser(currentUser);
+    getCurrentUserClient().then(setUser);
   }, []);
   
   const navItems = [
@@ -86,4 +85,3 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       </SidebarProvider>
   );
 }
-
