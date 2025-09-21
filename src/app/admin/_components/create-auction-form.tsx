@@ -281,42 +281,44 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                         </FormControl>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) => date < new Date("1900-01-01")}
-                          initialFocus
-                          captionLayout="dropdown-buttons"
-                          fromYear={new Date().getFullYear()}
-                          toYear={new Date().getFullYear() + 10}
-                        />
-                         <div className="p-3 border-t border-border flex items-center justify-center gap-2">
-                            <Select
-                                value={String(getHours(field.value || new Date()))}
-                                onValueChange={(value) => {
-                                    const newDate = setHours(field.value || new Date(), parseInt(value));
-                                    field.onChange(newDate);
-                                }}
-                            >
-                                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    {Array.from({length: 24}, (_, i) => String(i).padStart(2, '0')).map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            :
-                            <Select
-                                value={String(getMinutes(field.value || new Date())).padStart(2, '0')}
-                                onValueChange={(value) => {
-                                    const newDate = setMinutes(field.value || new Date(), parseInt(value));
-                                    field.onChange(newDate);
-                                }}
-                            >
-                                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    {Array.from({length: 60}, (_, i) => String(i).padStart(2, '0')).map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
+                        <div className="flex">
+                            <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) => date < new Date("1900-01-01")}
+                            initialFocus
+                            captionLayout="dropdown-buttons"
+                            fromYear={new Date().getFullYear()}
+                            toYear={new Date().getFullYear() + 10}
+                            />
+                            <div className="p-3 border-l border-border flex flex-col items-center justify-center gap-2">
+                                <Select
+                                    value={String(getHours(field.value || new Date()))}
+                                    onValueChange={(value) => {
+                                        const newDate = setHours(field.value || new Date(), parseInt(value));
+                                        field.onChange(newDate);
+                                    }}
+                                >
+                                    <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        {Array.from({length: 24}, (_, i) => String(i).padStart(2, '0')).map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                                <span className="text-muted-foreground">:</span>
+                                <Select
+                                    value={String(getMinutes(field.value || new Date())).padStart(2, '0')}
+                                    onValueChange={(value) => {
+                                        const newDate = setMinutes(field.value || new Date(), parseInt(value));
+                                        field.onChange(newDate);
+                                    }}
+                                >
+                                    <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        {Array.from({length: 60}, (_, i) => String(i).padStart(2, '0')).map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                       </PopoverContent>
                     </Popover>
@@ -351,48 +353,50 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                         </FormControl>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          onSelect={field.onChange}
-                          disabled={(date) => date < startDate}
-                          initialFocus
-                          captionLayout="dropdown-buttons"
-                          fromYear={new Date().getFullYear()}
-                          toYear={new Date().getFullYear() + 10}
-                        />
-                        <div className="p-3 border-t border-border flex items-center justify-center gap-2">
-                             <Select
-                                value={String(getHours(field.value || new Date()))}
-                                onValueChange={(value) => {
-                                    if (!field.value) return;
-                                    const newDate = setHours(field.value, parseInt(value));
-                                    if (newDate > startDate) {
-                                      field.onChange(newDate);
-                                    }
-                                }}
-                            >
-                                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    {Array.from({length: 24}, (_, i) => String(i).padStart(2, '0')).map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
-                            :
-                            <Select
-                                value={String(getMinutes(field.value || new Date())).padStart(2, '0')}
-                                onValueChange={(value) => {
-                                    if (!field.value) return;
-                                    const newDate = setMinutes(field.value, parseInt(value));
-                                     if (newDate > startDate) {
-                                      field.onChange(newDate);
-                                    }
-                                }}
-                            >
-                                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
-                                <SelectContent>
-                                    {Array.from({length: 60}, (_, i) => String(i).padStart(2, '0')).map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-                                </SelectContent>
-                            </Select>
+                        <div className="flex">
+                            <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) => date < startDate}
+                            initialFocus
+                            captionLayout="dropdown-buttons"
+                            fromYear={new Date().getFullYear()}
+                            toYear={new Date().getFullYear() + 10}
+                            />
+                            <div className="p-3 border-l border-border flex flex-col items-center justify-center gap-2">
+                                <Select
+                                    value={String(getHours(field.value || new Date()))}
+                                    onValueChange={(value) => {
+                                        if (!field.value) return;
+                                        const newDate = setHours(field.value, parseInt(value));
+                                        if (newDate > startDate) {
+                                        field.onChange(newDate);
+                                        }
+                                    }}
+                                >
+                                    <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        {Array.from({length: 24}, (_, i) => String(i).padStart(2, '0')).map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                                <span className="text-muted-foreground">:</span>
+                                <Select
+                                    value={String(getMinutes(field.value || new Date())).padStart(2, '0')}
+                                    onValueChange={(value) => {
+                                        if (!field.value) return;
+                                        const newDate = setMinutes(field.value, parseInt(value));
+                                        if (newDate > startDate) {
+                                        field.onChange(newDate);
+                                        }
+                                    }}
+                                >
+                                    <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
+                                    <SelectContent>
+                                        {Array.from({length: 60}, (_, i) => String(i).padStart(2, '0')).map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                       </PopoverContent>
                     </Popover>
@@ -509,5 +513,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
     </Card>
   );
 }
+
+    
 
     
