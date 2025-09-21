@@ -2,7 +2,7 @@
 "use client";
 
 import { getAuctionItemForListing } from "@/lib/data/public";
-import { notFound } from "next/navigation";
+import { notFound, useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -19,18 +19,22 @@ import type { AuctionItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 
-export default function AuctionDetailPage({ params }: { params: { id: string } }) {
+export default function AuctionDetailPage() {
+  const params = useParams();
+  const id = Array.isArray(params.id) ? params.id[0] : params.id;
   const [item, setItem] = useState<AuctionItem | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   useEffect(() => {
-    getAuctionItemForListing(params.id).then(itemData => {
-        setItem(itemData);
-        if (itemData && itemData.imageUrls.length > 0) {
-            setSelectedImage(itemData.imageUrls[0]);
-        }
-    });
-  }, [params.id]);
+    if (id) {
+        getAuctionItemForListing(id).then(itemData => {
+            setItem(itemData);
+            if (itemData && itemData.imageUrls.length > 0) {
+                setSelectedImage(itemData.imageUrls[0]);
+            }
+        });
+    }
+  }, [id]);
 
 
   if (!item || !selectedImage) {
