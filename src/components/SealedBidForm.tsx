@@ -140,11 +140,16 @@ const formSchema = z.object({
   bidAmount: z.coerce.number().min(0.01, "Bid must be greater than zero."),
 });
 
-function SubmitButton({ currentUser }: { currentUser: AuthenticatedUser | null }) {
+function SubmitButton({ currentUser, children }: { currentUser: AuthenticatedUser | null, children: React.ReactNode }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="w-full font-bold" disabled={pending || currentUser?.status !== 'APPROVED'}>
-      {pending ? "Submitting..." : "Submit Sealed Bid"}
+    <Button 
+        type="submit" 
+        className="absolute right-1 h-10 rounded-full px-6 font-bold" 
+        disabled={pending || currentUser?.status !== 'APPROVED'}
+        variant="accent"
+    >
+        {pending ? "Submitting..." : children}
     </Button>
   );
 }
@@ -257,27 +262,28 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
               name="bidAmount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Your Bid Amount <span className="text-destructive">*</span></FormLabel>
+                  <FormLabel htmlFor={field.name} className="sr-only">Your Bid Amount</FormLabel>
                   <FormControl>
-                    <div className="relative">
-                      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                         <span className="text-muted-foreground">Birr</span>
+                    <div className="relative flex items-center">
+                       <div className="absolute left-0 pl-3 flex items-center pointer-events-none">
+                         <span className="text-muted-foreground font-semibold">Birr</span>
                       </div>
                       <Input
                         type="number"
-                        placeholder="Your Bid Amount"
+                        placeholder="Your Sealed Bid"
                         step="0.01"
                         {...field}
-                        className="pl-10"
+                        id={field.name}
+                        className="pl-12 pr-36 h-12 text-lg rounded-full"
                         disabled={currentUser.status !== 'APPROVED'}
                       />
+                      <SubmitButton currentUser={currentUser}>Submit Bid</SubmitButton>
                     </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <SubmitButton currentUser={currentUser} />
              {currentUser.status !== 'APPROVED' && <p className="text-xs text-center text-red-600">Your account is not approved to submit a bid. Please contact an administrator.</p>}
           </form>
         </Form>

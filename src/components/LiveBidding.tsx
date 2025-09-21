@@ -244,11 +244,10 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
             </div>
           </div>
           <form onSubmit={handleBidSubmit} className="space-y-4">
-            <div>
               <Label htmlFor="bidAmount" className="sr-only">Your Bid Amount</Label>
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <span className="text-muted-foreground">Birr</span>
+              <div className="relative flex items-center">
+                <div className="absolute left-0 pl-3 flex items-center pointer-events-none">
+                  <span className="text-muted-foreground font-semibold">Birr</span>
                 </div>
                 <Input
                   id="bidAmount"
@@ -256,16 +255,20 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
                   placeholder="Your Bid Amount"
                   value={newBid}
                   onChange={(e) => setNewBid(e.target.value)}
-                  className="pl-10"
+                  className="pl-12 pr-32 h-12 text-lg rounded-full"
                   required
                   step={minIncrement}
                   disabled={currentUser.status !== 'APPROVED'}
                 />
+                 <Button 
+                    type="submit" 
+                    className="absolute right-1 h-10 rounded-full px-6 font-bold" 
+                    disabled={currentUser.status !== 'APPROVED'}
+                    variant="accent"
+                >
+                  Place Bid
+                </Button>
               </div>
-            </div>
-            <Button type="submit" className="w-full font-bold" disabled={currentUser.status !== 'APPROVED'}>
-              Place Bid
-            </Button>
           </form>
            {currentUser.status !== 'APPROVED' ? (
              <p className="text-xs text-center text-red-600">
