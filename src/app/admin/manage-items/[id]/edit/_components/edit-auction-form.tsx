@@ -338,7 +338,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) => date < new Date()}
+                            disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                             initialFocus
                             captionLayout="dropdown-buttons"
                             fromYear={new Date().getFullYear()}
@@ -434,7 +434,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) => date < (startDate || new Date())}
+                            disabled={(date) => date < (startDate || new Date(new Date().setHours(0, 0, 0, 0)))}
                             initialFocus
                             captionLayout="dropdown-buttons"
                             fromYear={new Date().getFullYear()}
