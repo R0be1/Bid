@@ -16,6 +16,8 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
   const currentPrice = item.currentBid ?? item.startingPrice;
   const isUpcoming = new Date(item.startDate) > new Date();
 
+  const isLiveAndUpcoming = item.type === "LIVE" && isUpcoming;
+
   return (
     <Card className="group relative flex flex-col overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
       <Link href={`/auctions/${item.id}`} className="flex flex-col h-full flex-grow">
@@ -57,7 +59,7 @@ export default function AuctionItemCard({ item }: AuctionItemCardProps) {
         </CardContent>
       </Link>
       <CardFooter className="p-4 pt-0">
-        <Button asChild className="w-full">
+        <Button asChild={!isLiveAndUpcoming} disabled={isLiveAndUpcoming} className="w-full">
             <Link href={`/auctions/${item.id}`}>
               {item.type === "LIVE" ? "Bid Now" : "View Details"}
             </Link>
