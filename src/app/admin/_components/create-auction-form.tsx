@@ -4,7 +4,7 @@
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format, addDays, getHours, getMinutes, setHours, setMinutes } from "date-fns";
+import { format, addDays, getHours, getMinutes, setHours, setMinutes, isSameDay } from "date-fns";
 import { CalendarIcon, PlusCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -113,6 +113,11 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
   const startDate = useWatch({
     control: form.control,
     name: "startDate"
+  });
+
+  const endDate = useWatch({
+    control: form.control,
+    name: "endDate"
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -358,7 +363,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) => date < (startDate || new Date(new Date().setHours(0, 0, 0, 0)))}
+                            disabled={(date) => date < new Date(new Date(startDate || new Date()).setHours(0,0,0,0))}
                             initialFocus
                             captionLayout="dropdown-buttons"
                             fromYear={new Date().getFullYear()}
@@ -366,7 +371,7 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                             />
                             <div className="p-3 border-l border-border flex flex-col items-center justify-center gap-2">
                                 <Select
-                                    value={String(getHours(field.value || new Date())).padStart(2, '0')}
+                                    value={String(getHours(field.value || startDate || new Date())).padStart(2, '0')}
                                     onValueChange={(value) => {
                                         if (!field.value) return;
                                         const newDate = setHours(field.value, parseInt(value));
@@ -377,12 +382,20 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                                 >
                                     <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
                                     <SelectContent>
-                                        {Array.from({length: 24}, (_, i) => String(i).padStart(2, '0')).map(h => <SelectItem key={h} value={h}>{h}</SelectItem>)}
+                                        {Array.from({length: 24}, (_, i) => String(i).padStart(2, '0')).map(h => (
+                                          <SelectItem 
+                                            key={h} 
+                                            value={h} 
+                                            disabled={isSameDay(field.value || new Date(), startDate) && parseInt(h) < getHours(startDate)}
+                                          >
+                                            {h}
+                                          </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                                 <span className="text-muted-foreground">:</span>
                                 <Select
-                                    value={String(getMinutes(field.value || new Date())).padStart(2, '0')}
+                                    value={String(getMinutes(field.value || startDate || new Date())).padStart(2, '0')}
                                     onValueChange={(value) => {
                                         if (!field.value) return;
                                         const newDate = setMinutes(field.value, parseInt(value));
@@ -393,7 +406,19 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                                 >
                                     <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
                                     <SelectContent>
-                                        {Array.from({length: 60}, (_, i) => String(i).padStart(2, '0')).map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                                        {Array.from({length: 60}, (_, i) => String(i).padStart(2, '0')).map(m => (
+                                          <SelectItem 
+                                            key={m} 
+                                            value={m}
+                                            disabled={
+                                              isSameDay(field.value || new Date(), startDate) && 
+                                              getHours(field.value || new Date()) === getHours(startDate) &&
+                                              parseInt(m) <= getMinutes(startDate)
+                                            }
+                                          >
+                                            {m}
+                                          </SelectItem>
+                                        ))}
                                     </SelectContent>
                                 </Select>
                             </div>

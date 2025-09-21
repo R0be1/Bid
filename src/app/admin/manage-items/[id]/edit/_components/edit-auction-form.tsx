@@ -4,7 +4,7 @@
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { format, getHours, getMinutes, setHours, setMinutes } from "date-fns";
+import { format, getHours, getMinutes, setHours, setMinutes, isSameDay } from "date-fns";
 import { CalendarIcon, PlusCircle, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
@@ -434,7 +434,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                             mode="single"
                             selected={field.value}
                             onSelect={field.onChange}
-                            disabled={(date) => date < (startDate || new Date(new Date().setHours(0, 0, 0, 0)))}
+                            disabled={(date) => date < new Date(new Date(startDate || new Date()).setHours(0,0,0,0))}
                             initialFocus
                             captionLayout="dropdown-buttons"
                             fromYear={new Date().getFullYear()}
@@ -442,7 +442,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                             />
                             <div className="p-3 border-l border-border flex flex-col items-center justify-center gap-2">
                             <Select
-                                value={String(getHours(field.value || new Date())).padStart(2, '0')}
+                                value={String(getHours(field.value || startDate || new Date())).padStart(2, '0')}
                                 onValueChange={(value) => {
                                 if (!field.value) return;
                                 const newDate = setHours(field.value, parseInt(value));
@@ -458,7 +458,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                                 {Array.from({ length: 24 }, (_, i) =>
                                     String(i).padStart(2, "0"),
                                 ).map((h) => (
-                                    <SelectItem key={h} value={h}>
+                                    <SelectItem key={h} value={h} disabled={isSameDay(field.value || new Date(), startDate) && parseInt(h) < getHours(startDate)}>
                                     {h}
                                     </SelectItem>
                                 ))}
@@ -467,7 +467,7 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                             <span className="text-muted-foreground">:</span>
                             <Select
                                 value={String(
-                                getMinutes(field.value || new Date()),
+                                getMinutes(field.value || startDate || new Date()),
                                 ).padStart(2, "0")}
                                 onValueChange={(value) => {
                                 if (!field.value) return;
@@ -484,7 +484,15 @@ export function EditAuctionForm({ item, categories }: EditAuctionFormProps) {
                                 {Array.from({ length: 60 }, (_, i) =>
                                     String(i).padStart(2, "0"),
                                 ).map((m) => (
-                                    <SelectItem key={m} value={m}>
+                                    <SelectItem
+                                      key={m}
+                                      value={m}
+                                      disabled={
+                                        isSameDay(field.value || new Date(), startDate) &&
+                                        getHours(field.value || new Date()) === getHours(startDate) &&
+                                        parseInt(m) <= getMinutes(startDate)
+                                      }
+                                    >
                                     {m}
                                     </SelectItem>
                                 ))}
