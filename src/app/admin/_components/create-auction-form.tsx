@@ -373,10 +373,10 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                                 <Select
                                     value={String(getHours(field.value || startDate || new Date())).padStart(2, '0')}
                                     onValueChange={(value) => {
-                                        if (!field.value) return;
-                                        const newDate = setHours(field.value, parseInt(value));
-                                        if (newDate > startDate) {
-                                        field.onChange(newDate);
+                                        const dateToUpdate = field.value || startDate || new Date();
+                                        const newDate = setHours(dateToUpdate, parseInt(value));
+                                        if (newDate > (startDate || new Date())) {
+                                            field.onChange(newDate);
                                         }
                                     }}
                                 >
@@ -397,10 +397,10 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                                 <Select
                                     value={String(getMinutes(field.value || startDate || new Date())).padStart(2, '0')}
                                     onValueChange={(value) => {
-                                        if (!field.value) return;
-                                        const newDate = setMinutes(field.value, parseInt(value));
-                                        if (newDate > startDate) {
-                                        field.onChange(newDate);
+                                        const dateToUpdate = field.value || startDate || new Date();
+                                        const newDate = setMinutes(dateToUpdate, parseInt(value));
+                                        if (newDate > (startDate || new Date())) {
+                                            field.onChange(newDate);
                                         }
                                     }}
                                 >
