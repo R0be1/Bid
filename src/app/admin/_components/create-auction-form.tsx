@@ -91,8 +91,8 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
       categoryId: "",
       startingPrice: 0,
       type: "LIVE",
-      startDate: new Date(),
-      endDate: addDays(new Date(), 3),
+      startDate: undefined,
+      endDate: undefined,
       participationFee: 0,
       securityDeposit: 0,
       minIncrement: 1,
@@ -295,8 +295,8 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                             <Select
                                 value={String(getHours(field.value || new Date()))}
                                 onValueChange={(value) => {
-                                    if (!field.value) return;
-                                    field.onChange(setHours(field.value, parseInt(value)));
+                                    const newDate = setHours(field.value || new Date(), parseInt(value));
+                                    field.onChange(newDate);
                                 }}
                             >
                                 <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
@@ -308,8 +308,8 @@ export function CreateAuctionForm({ categories }: CreateAuctionFormProps) {
                             <Select
                                 value={String(getMinutes(field.value || new Date())).padStart(2, '0')}
                                 onValueChange={(value) => {
-                                    if (!field.value) return;
-                                    field.onChange(setMinutes(field.value, parseInt(value)));
+                                    const newDate = setMinutes(field.value || new Date(), parseInt(value));
+                                    field.onChange(newDate);
                                 }}
                             >
                                 <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
