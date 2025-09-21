@@ -153,7 +153,7 @@ export async function handleSealedBid(prevState: FormState, formData: FormData):
 
 
 export async function logout() {
-  cookies().delete(SESSION_KEY);
+  (await cookies()).delete(SESSION_KEY);
 }
 
 

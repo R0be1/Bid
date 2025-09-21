@@ -5,7 +5,7 @@ import type { AuthenticatedUser } from "@/lib/auth";
 const SESSION_KEY = "user_session";
 
 export async function GET() {
-  const session = cookies().get(SESSION_KEY)?.value;
+  const session = (await cookies()).get(SESSION_KEY)?.value;
 
   if (!session) {
     return new Response(JSON.stringify(null), { status: 200 });
