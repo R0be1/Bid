@@ -1,10 +1,9 @@
 
 "use client";
 
-import { notFound, useParams } from "next/navigation";
-import { useState, useEffect, useMemo, useTransition } from "react";
-import type { Bid, CommunicationLog, AuctionItem } from "@/lib/types";
-import { getAuctionItemForListing, getAuctionBidsForResults } from "@/lib/data/public";
+import { useState, useMemo, useTransition } from "react";
+import type { Bid, CommunicationLog } from "@/lib/types";
+import type { AuctionItem as PublicAuctionItem } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -21,41 +20,41 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { format } from "date-fns";
-import { Trophy, Users, BarChart2, Loader2 } from "lucide-react";
+import { Trophy, Users, BarChart2, Megaphone, Send } from "lucide-react";
+import { AnnounceResultsForm } from "@/app/auctions/[id]/results/_components/announce-results-form";
+import { AnnouncementHistory } from "@/app/auctions/[id]/results/_components/announcement-history";
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
-import { Skeleton } from "@/components/ui/skeleton";
+import type { MessageTemplate } from "@prisma/client";
 
+interface AuctionResultsClientPageProps {
+  item: PublicAuctionItem;
+  initialBids: Bid[];
+  initialAnnouncements: CommunicationLog[];
+  messageTemplates: MessageTemplate[];
+}
 
-export default function AuctionResultsPage() {
-  const params = useParams();
-  const id = Array.isArray(params.id) ? params.id[0] : params.id;
-
-  const [item, setItem] = useState<AuctionItem | null>(null);
-  const [bids, setBids] = useState<Bid[]>([]);
-  const [isLoading, startTransition] = useTransition();
-
-  const auctionEnded = item ? new Date() >= new Date(item.endDate) : false;
-  const participantCount = new Set(bids.map(b => b.bidderName)).size;
+export function AuctionResultsClientPage({
+  item,
+  initialBids,
+  initialAnnouncements,
+  messageTemplates,
+}: AuctionResultsClientPageProps) {
+  const [bids] = useState<Bid[]>(initialBids);
+  const [announcements, setAnnouncements] = useState<CommunicationLog[]>(initialAnnouncements);
   
+  const participantCount = new Set(bids.map(b => b.bidderName)).size;
+
   const [winnersPage, setWinnersPage] = useState(1);
   const [winnersRowsPerPage, setWinnersRowsPerPage] = useState(5);
-
-  useEffect(() => {
-    startTransition(async () => {
-      const [itemData, bidsData] = await Promise.all([
-        getAuctionItemForListing(id),
-        getAuctionBidsForResults(id),
-      ]);
-      setItem(itemData);
-      setBids(bidsData);
-    });
-  }, [id]);
 
   const paginatedWinners = useMemo(() => {
     const startIndex = (winnersPage - 1) * winnersRowsPerPage;
     return bids.slice(startIndex, startIndex + winnersRowsPerPage);
   }, [bids, winnersPage, winnersRowsPerPage]);
+
+  const handleAddAnnouncement = (announcement: CommunicationLog) => {
+    setAnnouncements(prev => [announcement, ...prev]);
+  };
 
   const bidCounts = useMemo(() => bids.reduce((acc, bid) => {
       const priceRange = Math.floor(bid.amount / 100) * 100;
@@ -64,42 +63,38 @@ export default function AuctionResultsPage() {
       return acc;
   }, {} as Record<string, number>), [bids]);
 
-  if (isLoading) {
-    return (
-        <div className="max-w-4xl mx-auto py-8 space-y-8">
-            <Skeleton className="h-10 w-3/4" />
-            <Skeleton className="h-6 w-1/2" />
-            <Card><CardHeader><Skeleton className="h-8 w-1/4" /></CardHeader><CardContent><Skeleton className="h-48 w-full" /></CardContent></Card>
-            <Card><CardHeader><Skeleton className="h-8 w-1/4" /></CardHeader><CardContent><Skeleton className="h-48 w-full" /></CardContent></Card>
-        </div>
-    );
-  }
-
-  if (!item) {
-    notFound();
-  }
-
-  if (!auctionEnded) {
-    return (
-        <div className="max-w-4xl mx-auto py-8 text-center">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Auction Still in Progress</CardTitle>
-                    <CardDescription>
-                        The results will be available once the auction ends on {format(new Date(item.endDate), "PPP p")}.
-                    </CardDescription>
-                </CardHeader>
-            </Card>
-        </div>
-    );
-  }
 
   return (
-    <div className="max-w-4xl mx-auto py-8 space-y-8">
-        <div>
-            <h1 className="text-3xl font-bold font-headline text-primary">{item.name}</h1>
-            <p className="text-lg text-muted-foreground">Auction Results</p>
-        </div>
+    <div className="space-y-8">
+        <h2 className="text-2xl font-bold text-foreground -mb-4">Results for: <span className="text-primary">{item.name}</span></h2>
+      
+       <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Megaphone className="text-accent" />
+            Announce Results
+          </CardTitle>
+          <CardDescription>
+            Notify the top bidders about the auction outcome using a message template.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AnnounceResultsForm templates={messageTemplates} bids={bids} item={item} onAnnouncementSent={handleAddAnnouncement} />
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Send className="text-accent" />
+            Announcement History
+          </CardTitle>
+          <CardDescription>A log of all announcements sent for this auction.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <AnnouncementHistory announcements={announcements} />
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
