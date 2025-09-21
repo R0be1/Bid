@@ -18,6 +18,12 @@ export default async function EditAuctionItemPage({ params }: { params: { id: st
     notFound();
   }
 
+  // Redirect if the auction has started
+  if (new Date(item.startDate) <= new Date()) {
+    redirect('/admin/manage-items');
+  }
+
+
   return (
     <div className="space-y-8 p-4 md:p-8">
        <div>

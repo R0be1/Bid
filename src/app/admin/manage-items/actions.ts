@@ -103,7 +103,6 @@ export async function updateAuctionItem(itemId: string, values: unknown) {
       return { success: false, message: "Auctioneer profile not found." };
     }
 
-    // Check if item belongs to this auctioneer
     const item = await prisma.auctionItem.findFirst({
       where: {
         id: itemId,
@@ -115,6 +114,13 @@ export async function updateAuctionItem(itemId: string, values: unknown) {
       return {
         success: false,
         message: "Item not found or you do not have permission to edit it.",
+      };
+    }
+
+    if (new Date(item.startDate) <= new Date()) {
+      return {
+        success: false,
+        message: "Cannot update an auction that has already started.",
       };
     }
 
@@ -133,7 +139,7 @@ export async function updateAuctionItem(itemId: string, values: unknown) {
         securityDeposit: data.securityDeposit,
         categoryId: data.categoryId,
         images: {
-          deleteMany: {}, // Delete old images
+          deleteMany: {},
           create: data.images.map((img) => ({
             url: img.url,
             hint: "",
@@ -169,7 +175,6 @@ export async function deleteAuctionItem(itemId: string) {
       return { success: false, message: "Auctioneer profile not found." };
     }
 
-    // Verify the item belongs to the auctioneer before deleting
     const itemToDelete = await prisma.auctionItem.findFirst({
       where: {
         id: itemId,
@@ -181,6 +186,13 @@ export async function deleteAuctionItem(itemId: string) {
       return {
         success: false,
         message: "Item not found or you do not have permission to delete it.",
+      };
+    }
+
+     if (new Date(itemToDelete.startDate) <= new Date()) {
+      return {
+        success: false,
+        message: "Cannot delete an auction that has already started.",
       };
     }
 
@@ -198,5 +210,3 @@ export async function deleteAuctionItem(itemId: string) {
     };
   }
 }
-
-    

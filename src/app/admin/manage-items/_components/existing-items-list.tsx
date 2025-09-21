@@ -117,6 +117,8 @@ export function ExistingItemsList({ items: initialItems }: ExistingItemsListProp
             {paginatedItems.map((item) => {
               const now = new Date();
               let status: "Active" | "Upcoming" | "Ended";
+               const isEditable = new Date(item.startDate) > now;
+
               if (new Date(item.endDate) < now) {
                   status = "Ended";
               } else if (new Date(item.startDate) > now) {
@@ -138,12 +140,12 @@ export function ExistingItemsList({ items: initialItems }: ExistingItemsListProp
                   </TableCell>
                   <TableCell>{format(new Date(item.endDate), "PPP")}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/admin/manage-items/${item.id}/edit`}>
+                    <Button variant="ghost" size="icon" asChild disabled={!isEditable} title={!isEditable ? "Cannot edit an active or ended auction" : "Edit Item"}>
+                        <Link href={isEditable ? `/admin/manage-items/${item.id}/edit` : '#'}>
                           <Edit className="h-4 w-4" />
                         </Link>
                     </Button>
-                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteClick(item)} disabled={isPending}>
+                    <Button variant="ghost" size="icon" className="text-destructive" onClick={() => handleDeleteClick(item)} disabled={isPending || !isEditable} title={!isEditable ? "Cannot delete an active or ended auction" : "Delete Item"}>
                         <Trash2 className="h-4 w-4" />
                     </Button>
                   </TableCell>
