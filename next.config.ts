@@ -22,7 +22,13 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    remotePatterns: remotePatterns,
+    remotePatterns: [
+        ...remotePatterns,
+        {
+            protocol: 'https',
+            hostname: '**',
+        }
+    ],
   },
   webpack: (config, { isServer }) => {
     // Suppress warnings from handlebars library
