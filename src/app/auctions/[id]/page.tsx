@@ -1,4 +1,6 @@
 
+"use client";
+
 import { getAuctionItemForListing } from "@/lib/data/public";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -12,12 +14,28 @@ import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { DescriptionWithReadMore } from "@/components/DescriptionWithReadMore";
+import { useEffect, useState } from "react";
+import type { AuctionItem } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
-export default async function AuctionDetailPage({ params }: { params: { id: string } }) {
-  const item = await getAuctionItemForListing(params.id);
 
-  if (!item) {
-    notFound();
+export default function AuctionDetailPage({ params }: { params: { id: string } }) {
+  const [item, setItem] = useState<AuctionItem | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  useEffect(() => {
+    getAuctionItemForListing(params.id).then(itemData => {
+        setItem(itemData);
+        if (itemData && itemData.imageUrls.length > 0) {
+            setSelectedImage(itemData.imageUrls[0]);
+        }
+    });
+  }, [params.id]);
+
+
+  if (!item || !selectedImage) {
+    // Optional: add a skeleton loader here
+    return <div>Loading...</div>;
   }
   
   const auctionActive = new Date() >= new Date(item.startDate) && new Date() < new Date(item.endDate);
@@ -41,7 +59,7 @@ export default async function AuctionDetailPage({ params }: { params: { id: stri
         <div className="space-y-4 group">
             <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-lg">
             <Image
-                src={item.imageUrls[0]}
+                src={selectedImage}
                 alt={item.name}
                 width={600}
                 height={400}
@@ -49,15 +67,18 @@ export default async function AuctionDetailPage({ params }: { params: { id: stri
             />
             </div>
             {item.imageUrls.length > 1 && (
-            <div className="grid grid-cols-3 gap-2">
-                {item.imageUrls.slice(1).map((url, index) => (
-                <div key={index} className="aspect-w-1 aspect-h-1">
+            <div className="grid grid-cols-5 gap-2">
+                {item.imageUrls.map((url, index) => (
+                <div key={index} className="aspect-w-1 aspect-h-1 cursor-pointer" onClick={() => setSelectedImage(url)}>
                     <Image
                     src={url}
-                    alt={`${item.name} image ${index + 2}`}
+                    alt={`${item.name} image ${index + 1}`}
                     width={200}
                     height={200}
-                    className="rounded-md object-cover w-full h-full shadow-md"
+                    className={cn(
+                        "rounded-md object-cover w-full h-full shadow-md transition-all",
+                        selectedImage === url ? "ring-2 ring-primary ring-offset-2" : "opacity-70 hover:opacity-100"
+                    )}
                     />
                 </div>
                 ))}
