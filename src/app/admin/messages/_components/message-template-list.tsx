@@ -10,6 +10,7 @@ import { deleteMessageTemplateAction } from "@/app/admin/messages/actions";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { Edit, Trash2 } from "lucide-react";
+import Link from "next/link";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -109,9 +110,11 @@ export function MessageTemplateList({ initialTemplates }: MessageTemplateListPro
                               </CardDescription>
                           </div>
                           <div className="flex items-center gap-1">
-                              <Button variant="ghost" size="icon" disabled>
-                                  <Edit className="h-4 w-4" />
-                                  <span className="sr-only">Edit Template</span>
+                              <Button variant="ghost" size="icon" asChild>
+                                  <Link href={`/admin/messages/${template.id}/edit`}>
+                                    <Edit className="h-4 w-4" />
+                                    <span className="sr-only">Edit Template</span>
+                                  </Link>
                               </Button>
                               <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(template)} disabled={isPending}>
                                   <Trash2 className="h-4 w-4 text-destructive" />

@@ -68,6 +68,70 @@ export async function addMessageTemplateAction(values: unknown) {
   }
 }
 
+export async function updateMessageTemplateAction(id: string, values: unknown) {
+  const user = await getCurrentUser();
+  if (!user) {
+    return { success: false, message: "Unauthorized" };
+  }
+
+  const validatedFields = formSchema.safeParse(values);
+  if (!validatedFields.success) {
+    return { success: false, message: "Invalid form data." };
+  }
+
+  const { name, channel, template } = validatedFields.data;
+
+  try {
+    const auctioneerProfile = await prisma.auctioneerProfile.findUnique({
+      where: { userId: user.id },
+    });
+
+    if (!auctioneerProfile) {
+      return { success: false, message: "Auctioneer profile not found." };
+    }
+
+    const templateToUpdate = await prisma.messageTemplate.findFirst({
+      where: {
+        id,
+        auctioneerId: auctioneerProfile.id,
+      },
+    });
+
+    if (!templateToUpdate) {
+      return { success: false, message: "Template not found or you do not have permission to edit it." };
+    }
+    
+    const existingTemplate = await prisma.messageTemplate.findFirst({
+        where: {
+            name: {equals: name, mode: 'insensitive'},
+            auctioneerId: auctioneerProfile.id,
+            id: { not: id }
+        }
+    });
+
+    if (existingTemplate) {
+        return { success: false, message: "Another template with this name already exists." };
+    }
+
+
+    await prisma.messageTemplate.update({
+      where: { id },
+      data: {
+        name,
+        channel,
+        template,
+      },
+    });
+
+    revalidatePath("/admin/messages");
+    revalidatePath(`/admin/messages/${id}/edit`);
+    return { success: true, message: "Template updated successfully." };
+  } catch (error) {
+    console.error("Database error: ", error);
+    return { success: false, message: "Database error: Failed to update template." };
+  }
+}
+
 
 export async function deleteMessageTemplateAction(templateId: string) {
     const user = await getCurrentUser();
