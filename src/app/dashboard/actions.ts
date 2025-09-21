@@ -1,10 +1,9 @@
 
-'use server';
+"use server";
 
 import prisma from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/data/server-only';
 import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
 import type { User, AuctionItemFee, PaymentType } from '@/lib/types';
 import { UserStatus, PaymentMethod } from '@prisma/client';
 
@@ -88,7 +87,7 @@ export async function recordPaymentAction(paymentType: PaymentType, method: 'dir
             paidDeposit?: boolean;
             paymentMethod?: PaymentMethod;
             status?: UserStatus;
-            receiptUrl?: string;
+            receiptUrl?: string | null;
         } = {
             paymentMethod: method === 'direct' ? PaymentMethod.DIRECT : PaymentMethod.RECEIPT,
         };
@@ -104,9 +103,9 @@ export async function recordPaymentAction(paymentType: PaymentType, method: 'dir
                 updateData.status = UserStatus.APPROVED;
             }
         } else {
-            updateData.receiptUrl = receiptUrl || '/receipt-placeholder.pdf';
-            if (currentUser.status === 'APPROVED') {
-                updateData.status = UserStatus.PENDING; // Back to pending for verification
+            updateData.receiptUrl = receiptUrl || null;
+            if (currentUser.status !== 'BLOCKED') {
+              updateData.status = UserStatus.PENDING; // Back to pending for verification
             }
         }
 
