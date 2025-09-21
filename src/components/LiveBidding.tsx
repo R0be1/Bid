@@ -2,7 +2,8 @@
 "use client";
 
 import type { AuctionItem, PaymentType } from "@/lib/types";
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useTransition, useRef } from "react";
+import { useFormState, useFormStatus } from "react-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,8 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { recordPaymentAction } from "@/app/dashboard/actions";
+import { handleLiveBid, type FormState } from "@/app/actions";
+import { getAuctionItemForListing } from "@/lib/data/public";
 
 
 function PaymentPrompt({ item, onPaymentSuccess }: { item: AuctionItem, onPaymentSuccess: (user: AuthenticatedUser) => void }) {
@@ -110,7 +113,7 @@ function PaymentPrompt({ item, onPaymentSuccess }: { item: AuctionItem, onPaymen
                                     <DialogHeader>
                                     <DialogTitle>Upload Payment Receipt</DialogTitle>
                                     <DialogDescription>Upload proof of payment for the security deposit.</DialogDescription>
-                                    </DialogHeader>
+                                    </Header>
                                     <div className="py-4"><Input id="receipt" type="file" /></div>
                                     <DialogFooter>
                                     <DialogClose asChild><Button type="button" variant="outline">Cancel</Button></DialogClose>
@@ -126,66 +129,71 @@ function PaymentPrompt({ item, onPaymentSuccess }: { item: AuctionItem, onPaymen
     );
 }
 
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button
+      type="submit"
+      className="absolute right-1 h-10 rounded-full px-6 font-bold"
+      disabled={pending}
+      variant="accent"
+    >
+      {pending ? "Placing..." : "Place Bid"}
+    </Button>
+  );
+}
+
 
 interface LiveBiddingProps {
   item: AuctionItem;
 }
 
-export default function LiveBidding({ item }: LiveBiddingProps) {
+export default function LiveBidding({ item: initialItem }: LiveBiddingProps) {
+  const [item, setItem] = useState(initialItem);
   const [currentUser, setCurrentUser] = useState<AuthenticatedUser | null | undefined>(undefined);
-  const [currentBid, setCurrentBid] = useState(item.currentBid ?? item.startingPrice);
-  const [highBidder, setHighBidder] = useState(item.highBidder ?? "None");
-  const [newBid, setNewBid] = useState("");
   const { toast } = useToast();
-  const minIncrement = item.minIncrement ?? 1;
-
+  const formRef = useRef<HTMLFormElement>(null);
+  
+  const initialState: FormState = { success: false, message: "" };
+  const [state, formAction] = useFormState(handleLiveBid, initialState);
+  
   useEffect(() => {
     getCurrentUserClient().then(setCurrentUser);
   }, []);
-  
+
+  useEffect(() => {
+    if (state.message) {
+      toast({
+        title: state.success ? "Success!" : "Bid Error",
+        description: state.message,
+        variant: state.success ? "default" : "destructive",
+      });
+      if (state.success) {
+        formRef.current?.reset();
+      }
+    }
+  }, [state, toast]);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (new Date() < new Date(item.endDate)) {
+        const updatedItem = await getAuctionItemForListing(item.id);
+        if (updatedItem) {
+          setItem(updatedItem);
+        }
+      } else {
+        clearInterval(interval);
+      }
+    }, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [item.id, item.endDate]);
+
   const requiresFees = (item.participationFee && item.participationFee > 0 && !currentUser?.paidParticipation) || 
                        (item.securityDeposit && item.securityDeposit > 0 && !currentUser?.paidDeposit);
-
-  const handleBidSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!currentUser) {
-        toast({ title: "Login Required", description: "You must be logged in to place a bid.", variant: "destructive"});
-        return;
-    }
-    if (requiresFees) {
-      toast({ title: "Payment Required", description: "Please complete the required payments to participate.", variant: "destructive"});
-      return;
-    }
-    if (currentUser.status !== 'APPROVED') {
-        toast({ title: "Account Not Approved", description: `Your account status is "${currentUser.status}". Admin approval is required to bid.`, variant: "destructive"});
-        return;
-    }
-
-    const bidAmount = parseFloat(newBid);
-    const requiredBid = currentBid + minIncrement;
-    
-    if (!bidAmount || bidAmount < requiredBid) {
-      toast({
-        title: "Invalid Bid",
-        description: `Your bid must be at least ${requiredBid.toLocaleString()} Birr. (Minimum increment: ${minIncrement.toLocaleString()} Birr)`,
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    // In a real app, this would be a server action
-    // For now, this just updates the client state.
-    setCurrentBid(bidAmount);
-    setHighBidder("You");
-
-    toast({
-      title: "Bid Placed!",
-      description: `You are now the highest bidder with ${bidAmount.toLocaleString()} Birr.`,
-    });
-    setNewBid("");
-  };
   
+  const highBidderName = item.highBidder === `${currentUser?.name}` ? "You" : item.highBidder;
+
   if (currentUser === undefined) {
     return (
         <Card className="shadow-lg">
@@ -212,7 +220,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
                 <AlertDescription>
                    You need to be logged in to participate in this auction. Please register or log in to continue.
                     <Button asChild className="w-full mt-4">
-                        <Link href="/register">Register or Log In</Link>
+                        <Link href="/login">Register or Log In</Link>
                     </Button>
                 </AlertDescription>
             </Alert>
@@ -236,14 +244,15 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
           <div className="p-4 border rounded-lg bg-secondary/50">
             <div className="flex justify-between items-center mb-2">
               <span className="text-sm font-medium text-muted-foreground">Current Bid</span>
-              <span className="text-2xl font-bold text-primary">{currentBid.toLocaleString()} Birr</span>
+              <span className="text-2xl font-bold text-primary">{item.currentBid?.toLocaleString()} Birr</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-muted-foreground">High Bidder</span>
-              <span className={`font-semibold ${highBidder === 'You' ? 'text-accent' : ''}`}>{highBidder}</span>
+              <span className={`font-semibold ${highBidderName === 'You' ? 'text-accent' : ''}`}>{highBidderName}</span>
             </div>
           </div>
-          <form onSubmit={handleBidSubmit} className="space-y-4">
+          <form ref={formRef} action={formAction} className="space-y-4">
+             <input type="hidden" name="itemId" value={item.id} />
               <Label htmlFor="bidAmount" className="sr-only">Your Bid Amount</Label>
               <div className="relative flex items-center">
                 <div className="absolute left-0 pl-3 flex items-center pointer-events-none">
@@ -251,23 +260,15 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
                 </div>
                 <Input
                   id="bidAmount"
+                  name="bidAmount"
                   type="number"
-                  placeholder="Your Bid Amount"
-                  value={newBid}
-                  onChange={(e) => setNewBid(e.target.value)}
+                  placeholder={`Min. ${(item.currentBid! + item.minIncrement!).toLocaleString()}`}
                   className="pl-12 pr-32 h-12 text-lg rounded-full"
                   required
-                  step={minIncrement}
+                  step={item.minIncrement}
                   disabled={currentUser.status !== 'APPROVED'}
                 />
-                 <Button 
-                    type="submit" 
-                    className="absolute right-1 h-10 rounded-full px-6 font-bold" 
-                    disabled={currentUser.status !== 'APPROVED'}
-                    variant="accent"
-                >
-                  Place Bid
-                </Button>
+                 <SubmitButton />
               </div>
           </form>
            {currentUser.status !== 'APPROVED' ? (
@@ -276,7 +277,7 @@ export default function LiveBidding({ item }: LiveBiddingProps) {
             </p>
             ) : (
             <p className="text-xs text-center text-muted-foreground">
-              Minimum bid increment: {minIncrement.toLocaleString()} Birr
+              Minimum bid increment: {item.minIncrement?.toLocaleString()} Birr
             </p>
            )}
         </div>

@@ -30,6 +30,9 @@ export async function getAuctionItemsForListing(): Promise<AuctionItem[]> {
             amount: 'desc',
           },
           take: 1,
+           include: {
+            bidder: true,
+          }
         },
       },
       orderBy: {
@@ -51,7 +54,7 @@ export async function getAuctionItemsForListing(): Promise<AuctionItem[]> {
       participationFee: item.participationFee ?? undefined,
       securityDeposit: item.securityDeposit ?? undefined,
       currentBid: item.bids.length > 0 ? item.bids[0].amount : item.startingPrice,
-      highBidder: item.bids.length > 0 ? 'A bidder' : undefined,
+      highBidder: item.bids.length > 0 ? `${item.bids[0].bidder.firstName} ${item.bids[0].bidder.lastName}` : undefined,
       maxAllowedValue: item.maxAllowedValue ?? undefined,
       minIncrement: item.minIncrement ?? undefined,
     }));
@@ -76,6 +79,9 @@ export async function getAuctionItemForListing(id: string): Promise<AuctionItem 
             amount: 'desc',
           },
           take: 1,
+          include: {
+            bidder: true,
+          }
         },
       },
     });
@@ -96,7 +102,7 @@ export async function getAuctionItemForListing(id: string): Promise<AuctionItem 
       participationFee: item.participationFee ?? undefined,
       securityDeposit: item.securityDeposit ?? undefined,
       currentBid: item.bids.length > 0 ? item.bids[0].amount : item.startingPrice,
-      highBidder: item.bids.length > 0 ? 'A Bidder' : undefined,
+      highBidder: item.bids.length > 0 ? `${item.bids[0].bidder.firstName} ${item.bids[0].bidder.lastName}` : "None",
       maxAllowedValue: item.maxAllowedValue ?? undefined,
       minIncrement: item.minIncrement ?? undefined,
     };
