@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useState, useEffect, useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -33,7 +33,7 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   const initialState: RegisterFormState = { success: false, message: "" };
-  const [state, formAction] = useFormState(registerUser, initialState);
+  const [state, formAction] = useActionState(registerUser, initialState);
 
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -144,5 +144,7 @@ export default function RegisterPage() {
     </div>
   );
 }
+
+    
 
     

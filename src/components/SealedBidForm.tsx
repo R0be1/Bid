@@ -2,8 +2,8 @@
 "use client";
 
 import type { AuctionItem, PaymentType } from "@/lib/types";
-import { useFormState, useFormStatus } from "react-dom";
-import { useEffect, useState, useTransition } from "react";
+import { useFormStatus } from "react-dom";
+import { useEffect, useState, useTransition, useActionState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -163,7 +163,7 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
   }, []);
 
   const initialState: FormState = { success: false, message: "" };
-  const [state, formAction] = useFormState(handleSealedBid, initialState);
+  const [state, formAction] = useActionState(handleSealedBid, initialState);
   
   const requiresFees = (item.participationFee && item.participationFee > 0 && !currentUser?.paidParticipation) || 
                        (item.securityDeposit && item.securityDeposit > 0 && !currentUser?.paidDeposit);
@@ -291,3 +291,5 @@ export default function SealedBidForm({ item }: SealedBidFormProps) {
     </Card>
   );
 }
+
+    

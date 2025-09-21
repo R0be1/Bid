@@ -1,8 +1,9 @@
+
 "use client";
 
 import type { AuctionItem, PaymentType } from "@/lib/types";
-import { useState, useEffect, useTransition, useRef } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useState, useEffect, useTransition, useRef, useActionState } from "react";
+import { useFormStatus } from "react-dom";
 import {
   Card,
   CardContent,
@@ -227,7 +228,7 @@ export default function LiveBidding({ item: initialItem }: LiveBiddingProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
   const initialState: FormState = { success: false, message: "" };
-  const [state, formAction] = useFormState(handleLiveBid, initialState);
+  const [state, formAction] = useActionState(handleLiveBid, initialState);
 
   useEffect(() => {
     getCurrentUserClient().then(setCurrentUser);
@@ -381,3 +382,5 @@ export default function LiveBidding({ item: initialItem }: LiveBiddingProps) {
     </Card>
   );
 }
+
+    
